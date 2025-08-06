@@ -59,7 +59,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     try:
         if CONF_DATE_TEMPLATE in config:
-            date_str = Template(config[CONF_DATE_TEMPLATE], hass).async_render()
+            date_str = await Template(config[CONF_DATE_TEMPLATE], hass).async_render()
             anniversary_date = _validate_date(date_str)
         else:
             anniversary_date = _validate_date(config[CONF_DATE])

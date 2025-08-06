@@ -50,11 +50,16 @@ class AnniversaryCalendar(CalendarEntity):
     def event(self) -> CalendarEvent | None:
         """Return the next upcoming event."""
         next_date = self.anniversary.next_anniversary_date
+        description = (
+            f"Happy {self.anniversary.next_years}th anniversary!"
+            if self.anniversary.next_years is not None
+            else self.anniversary.name
+        )
         return CalendarEvent(
             summary=self.anniversary.name,
             start=next_date,
             end=next_date + timedelta(days=1),
-            description=f"Happy {self.anniversary.next_years}th anniversary!",
+            description=description,
         )
 
     async def async_get_events(
@@ -64,12 +69,17 @@ class AnniversaryCalendar(CalendarEntity):
         events = []
         next_date = self.anniversary.next_anniversary_date
         if start_date.date() <= next_date <= end_date.date():
+            description = (
+                f"Happy {self.anniversary.next_years}th anniversary!"
+                if self.anniversary.next_years is not None
+                else self.anniversary.name
+            )
             events.append(
                 CalendarEvent(
                     summary=self.anniversary.name,
                     start=next_date,
                     end=next_date + timedelta(days=1),
-                    description=f"Happy {self.anniversary.next_years}th anniversary!",
+                    description=description,
                 )
             )
         return events

@@ -47,7 +47,8 @@ class AnniversariesFlowHandler(config_entries.ConfigFlow):
         if user_input is not None:
             try:
                 # Validate date
-                is_not_date(user_input[CONF_DATE], user_input.get(CONF_ONE_TIME, False))
+                if is_not_date(user_input[CONF_DATE], user_input.get(CONF_ONE_TIME, False)):
+                    raise ValueError("Invalid date")
 
                 # Set a unique ID for the entry
                 await self.async_set_unique_id(str(uuid.uuid4()))
