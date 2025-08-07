@@ -113,7 +113,7 @@ class AnniversaryData:
 
         last_date = anniversary_date.replace(year=today.year)
         if today < last_date:
-            last_date = last_date.replace(year=today.year -1)
+            last_date = last_date.replace(year=today.year - 1)
         return last_date
 
     @property
