@@ -42,6 +42,8 @@ class AnniversaryData:
     is_count_up: bool = False
     show_half_anniversary: bool = False
     unknown_year: bool = False
+    on_this_day_event: str | None = None
+    config: dict = None
 
     @property
     def zodiac_sign(self) -> str | None:

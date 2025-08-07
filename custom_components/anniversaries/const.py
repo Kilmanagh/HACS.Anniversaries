@@ -45,6 +45,10 @@ ATTR_HALF_DAYS = "days_until_half_anniversary"
 ATTR_ZODIAC_SIGN = "zodiac_sign"
 ATTR_NAMED_ANNIVERSARY = "named_anniversary"
 ATTR_IS_MILESTONE = "is_milestone"
+ATTR_ON_THIS_DAY = "on_this_day"
+
+# Configuration
+CONF_ON_THIS_DAY = "on_this_day"
 
 # Schema
 CONFIG_SCHEMA = vol.Schema(
