@@ -21,7 +21,10 @@ async def async_setup_entry(
     """Set up the calendar platform."""
     coordinator: AnniversaryDataUpdateCoordinator = hass.data[DOMAIN]["coordinator"]
     async_add_entities(
-        AnniversaryCalendar(coordinator, entry.entry_id, entry)
+        [
+            AnniversaryCalendar(coordinator, key, entry)
+            for key in coordinator.data.keys()
+        ]
     )
 
 
