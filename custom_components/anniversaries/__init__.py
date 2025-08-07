@@ -1,100 +1,103 @@
 """The Anniversaries Integration"""
 import logging
-from homeassistant import config_entries
-from homeassistant.helpers import discovery
+from datetime import datetime
+import voluptuous as vol
 
-from integrationhelper.const import CC_STARTUP_VERSION
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_NAME, CONF_SENSORS, Platform
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.template import Template
 
 from .const import (
-    CONF_SENSORS,
+    CONF_DATE,
     CONF_DATE_TEMPLATE,
+    CONF_ONE_TIME,
+    CONF_COUNT_UP,
+    CONF_HALF_ANNIVERSARY,
     DOMAIN,
-    ISSUE_URL,
-    PLATFORM,
-    VERSION,
-    CONFIG_SCHEMA,
 )
+from .coordinator import AnniversaryDataUpdateCoordinator
+from .data import AnniversaryData
 
 _LOGGER = logging.getLogger(__name__)
 
-async def async_setup(hass, config):
-    """Set up this component using YAML."""
-    if config.get(DOMAIN) is None:
-        # Config flow setup if no YAML config exists
+PLATFORMS = [Platform.SENSOR, Platform.CALENDAR]
+
+def _validate_date(value):
+    """Validate a date string."""
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    except ValueError:
+        pass
+    try:
+        return datetime.strptime(value, "%m-%d").date().replace(year=1900)
+    except ValueError:
+        raise vol.Invalid(f"Invalid date: {value}")
+
+async def async_setup(hass: HomeAssistant, config: dict) -> bool:
+    """Set up the Anniversaries component from YAML."""
+    if DOMAIN not in config:
         return True
 
-    # Log startup message
-    _LOGGER.info(
-        CC_STARTUP_VERSION.format(name=DOMAIN, version=VERSION, issue_link=ISSUE_URL)
-    )
-
-    platform_config = config[DOMAIN].get(CONF_SENSORS, {})
-
-    # If no platform is enabled, skip setup
-    if not platform_config:
-        return False
-
-    # Load platform configuration for each entry
-    for entry in platform_config:
+    for sensor_config in config[DOMAIN].get(CONF_SENSORS, []):
         hass.async_create_task(
-            discovery.async_load_platform(hass, PLATFORM, DOMAIN, entry, config)
+            hass.config_entries.flow.async_init(
+                DOMAIN,
+                context={"source": "import"},
+                data=sensor_config,
+            )
         )
-
-    # Initiate config flow to import YAML config
-    hass.async_create_task(
-        hass.config_entries.flow.async_init(
-            DOMAIN, context={"source": config_entries.SOURCE_IMPORT}, data={}
-        )
-    )
-
     return True
 
-async def async_setup_entry(hass, config_entry):
-    """Set up this integration using UI."""
-    if config_entry.source == config_entries.SOURCE_IMPORT:
-        # Remove UI config entry if set up via YAML
-        await hass.config_entries.async_remove(config_entry.entry_id)
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Set up Anniversaries from a config entry."""
+    hass.data.setdefault(DOMAIN, {})
+
+    config = entry.options or entry.data
+    name = config[CONF_NAME]
+
+    try:
+        if CONF_DATE_TEMPLATE in config:
+            date_str = await Template(config[CONF_DATE_TEMPLATE], hass).async_render()
+            anniversary_date = _validate_date(date_str)
+        else:
+            anniversary_date = _validate_date(config[CONF_DATE])
+    except Exception as ex:
+        _LOGGER.error("Error parsing date for %s: %s", name, ex)
         return False
 
-    # Log startup message
-    _LOGGER.info(
-        CC_STARTUP_VERSION.format(name=DOMAIN, version=VERSION, issue_link=ISSUE_URL)
+    unknown_year = anniversary_date.year == 1900
+
+    anniversary = AnniversaryData(
+        name=name,
+        date=anniversary_date,
+        is_one_time=config.get(CONF_ONE_TIME, False),
+        is_count_up=config.get(CONF_COUNT_UP, False),
+        show_half_anniversary=config.get(CONF_HALF_ANNIVERSARY, False),
+        unknown_year=unknown_year,
     )
 
-    # Safely update entry options if needed
-    hass.config_entries.async_update_entry(
-        config_entry, options=config_entry.data
-    )
+    coordinator = AnniversaryDataUpdateCoordinator(hass, {entry.entry_id: anniversary})
+    await coordinator.async_config_entry_first_refresh()
 
-    # Add update listener for configuration changes
-    config_entry.add_update_listener(update_listener)
+    hass.data[DOMAIN][entry.entry_id] = coordinator
 
-    # Set up the platforms using the new `async_forward_entry_setups`
-    await hass.config_entries.async_forward_entry_setups(config_entry, [PLATFORM])
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+    entry.async_on_unload(entry.add_update_listener(update_listener))
 
     return True
 
-async def async_unload_entry(hass, config_entry):
+
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    # Unload the platform using the new `async_forward_entry_unload`
-    if await hass.config_entries.async_forward_entry_unload(config_entry, [PLATFORM]):
-        _LOGGER.info(f"Successfully unloaded {PLATFORM} for {DOMAIN}")
-        return True
-    else:
-        _LOGGER.error(f"Error unloading {PLATFORM} for {DOMAIN}")
-        return False
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    if unload_ok:
+        hass.data[DOMAIN].pop(entry.entry_id)
+    return unload_ok
 
-async def async_remove_entry(hass, config_entry):
-    """Handle removal of a config entry."""
-    # Ensure the platform is unloaded before removing the entry
-    await async_unload_entry(hass, config_entry)
-    _LOGGER.info(f"Successfully removed entry for {DOMAIN}")
 
-async def update_listener(hass, entry):
-    """Handle updates to the config entry."""
-    # Update the entry's data based on options
-    hass.config_entries.async_update_entry(entry, data=entry.options)
-
-    # Unload and reload platform to apply new settings
-    await async_unload_entry(hass, entry)
-    await async_setup_entry(hass, entry)
+async def update_listener(hass: HomeAssistant, entry: ConfigEntry):
+    """Handle options update."""
+    await hass.config_entries.async_reload(entry.entry_id)
