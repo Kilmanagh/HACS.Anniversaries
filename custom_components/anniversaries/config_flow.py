@@ -26,6 +26,7 @@ from .const import (
     CONF_ONE_TIME,
     CONF_COUNT_UP,
     CONF_ON_THIS_DAY,
+    CONF_UPCOMING_ANNIVERSARIES_SENSOR,
 )
 
 from homeassistant.const import CONF_NAME
@@ -124,6 +125,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         data_schema = vol.Schema(
             {
+                vol.Optional(
+                    CONF_UPCOMING_ANNIVERSARIES_SENSOR,
+                    default=self.config_entry.options.get(CONF_UPCOMING_ANNIVERSARIES_SENSOR, False),
+                ): bool,
                 vol.Optional(
                     CONF_COUNT_UP,
                     default=self.config_entry.options.get(CONF_COUNT_UP, DEFAULT_COUNT_UP),

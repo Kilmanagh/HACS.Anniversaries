@@ -52,7 +52,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Anniversaries from a config entry."""
-    hass.data.setdefault(DOMAIN, {})
+    hass.data.setdefault(DOMAIN, {"anniversaries": {}})
 
     config = entry.options or entry.data
     name = config[CONF_NAME]
@@ -79,11 +79,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         config=config,
     )
 
-    websession = aiohttp_client.async_get_clientsession(hass)
-    coordinator = AnniversaryDataUpdateCoordinator(hass, {entry.entry_id: anniversary}, websession)
-    await coordinator.async_config_entry_first_refresh()
+    if "coordinator" not in hass.data[DOMAIN]:
+        websession = aiohttp_client.async_get_clientsession(hass)
+        coordinator = AnniversaryDataUpdateCoordinator(hass, {}, websession)
+        hass.data[DOMAIN]["coordinator"] = coordinator
 
-    hass.data[DOMAIN][entry.entry_id] = coordinator
+    coordinator = hass.data[DOMAIN]["coordinator"]
+    coordinator.anniversaries[entry.entry_id] = anniversary
+
+    await coordinator.async_config_entry_first_refresh()
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -96,7 +100,10 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
-        hass.data[DOMAIN].pop(entry.entry_id)
+        coordinator = hass.data[DOMAIN]["coordinator"]
+        coordinator.anniversaries.pop(entry.entry_id)
+        if not coordinator.anniversaries:
+            hass.data.pop(DOMAIN)
     return unload_ok
 
 
