@@ -6,7 +6,7 @@ import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_NAME, CONF_SENSORS, Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import config_validation as cv, aiohttp_client
 from homeassistant.helpers.template import Template
 
 from .const import (
@@ -76,9 +76,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         is_count_up=config.get(CONF_COUNT_UP, False),
         show_half_anniversary=config.get(CONF_HALF_ANNIVERSARY, False),
         unknown_year=unknown_year,
+        config=config,
     )
 
-    coordinator = AnniversaryDataUpdateCoordinator(hass, {entry.entry_id: anniversary})
+    websession = aiohttp_client.async_get_clientsession(hass)
+    coordinator = AnniversaryDataUpdateCoordinator(hass, {entry.entry_id: anniversary}, websession)
     await coordinator.async_config_entry_first_refresh()
 
     hass.data[DOMAIN][entry.entry_id] = coordinator
