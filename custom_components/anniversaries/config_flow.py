@@ -26,6 +26,9 @@ from .const import (
     CONF_ONE_TIME,
     CONF_COUNT_UP,
     CONF_UPCOMING_ANNIVERSARIES_SENSOR,
+    CONF_ENABLE_GENERATION_SENSOR,
+    CONF_ENABLE_BIRTHSTONE_SENSOR,
+    CONF_ENABLE_BIRTH_FLOWER_SENSOR,
 )
 
 from homeassistant.const import CONF_NAME
@@ -126,6 +129,18 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 vol.Optional(
                     CONF_UPCOMING_ANNIVERSARIES_SENSOR,
                     default=self.config_entry.options.get(CONF_UPCOMING_ANNIVERSARIES_SENSOR, False),
+                ): bool,
+                vol.Optional(
+                    CONF_ENABLE_GENERATION_SENSOR,
+                    default=self.config_entry.options.get(CONF_ENABLE_GENERATION_SENSOR, False),
+                ): bool,
+                vol.Optional(
+                    CONF_ENABLE_BIRTHSTONE_SENSOR,
+                    default=self.config_entry.options.get(CONF_ENABLE_BIRTHSTONE_SENSOR, False),
+                ): bool,
+                vol.Optional(
+                    CONF_ENABLE_BIRTH_FLOWER_SENSOR,
+                    default=self.config_entry.options.get(CONF_ENABLE_BIRTH_FLOWER_SENSOR, False),
                 ): bool,
                 vol.Optional(
                     CONF_COUNT_UP,

@@ -19,7 +19,7 @@ class AnniversaryDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Anniversa
             hass,
             _LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(hours=1),
+            update_interval=timedelta(minutes=1),
         )
         self.anniversaries = anniversaries
         self.upcoming = []

@@ -45,9 +45,15 @@ ATTR_HALF_DAYS = "days_until_half_anniversary"
 ATTR_ZODIAC_SIGN = "zodiac_sign"
 ATTR_NAMED_ANNIVERSARY = "named_anniversary"
 ATTR_IS_MILESTONE = "is_milestone"
+ATTR_GENERATION = "generation"
+ATTR_BIRTHSTONE = "birthstone"
+ATTR_BIRTH_FLOWER = "birth_flower"
 
 # Configuration
 CONF_UPCOMING_ANNIVERSARIES_SENSOR = "upcoming_anniversaries_sensor"
+CONF_ENABLE_GENERATION_SENSOR = "enable_generation_sensor"
+CONF_ENABLE_BIRTHSTONE_SENSOR = "enable_birthstone_sensor"
+CONF_ENABLE_BIRTH_FLOWER_SENSOR = "enable_birth_flower_sensor"
 
 # Schema
 CONFIG_SCHEMA = vol.Schema(

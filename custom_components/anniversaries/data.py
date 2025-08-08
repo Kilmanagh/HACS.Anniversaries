@@ -45,6 +45,44 @@ class AnniversaryData:
     config: dict = field(default_factory=dict)
 
     @property
+    def birthstone(self) -> str | None:
+        """Return the birthstone for the anniversary month."""
+        birthstones = {
+            1: "Garnet",
+            2: "Amethyst",
+            3: "Aquamarine",
+            4: "Diamond",
+            5: "Emerald",
+            6: "Pearl",
+            7: "Ruby",
+            8: "Peridot",
+            9: "Sapphire",
+            10: "Opal",
+            11: "Topaz",
+            12: "Turquoise",
+        }
+        return birthstones.get(self.date.month)
+
+    @property
+    def birth_flower(self) -> str | None:
+        """Return the birth flower for the anniversary month."""
+        birth_flowers = {
+            1: "Carnation",
+            2: "Violet",
+            3: "Daffodil",
+            4: "Daisy",
+            5: "Lily of the Valley",
+            6: "Rose",
+            7: "Larkspur",
+            8: "Gladiolus",
+            9: "Aster",
+            10: "Marigold",
+            11: "Chrysanthemum",
+            12: "Narcissus",
+        }
+        return birth_flowers.get(self.date.month)
+
+    @property
     def zodiac_sign(self) -> str | None:
         """Return the zodiac sign of the anniversary."""
         return get_zodiac_sign(self.date.day, self.date.month)
@@ -65,6 +103,26 @@ class AnniversaryData:
             60: "Diamond",
         }
         return named_anniversaries.get(self.next_years)
+
+    @property
+    def generation(self) -> str | None:
+        """Return the generation of the person."""
+        if self.unknown_year:
+            return None
+        year = self.date.year
+        if 1928 <= year <= 1945:
+            return "Silent Generation"
+        if 1946 <= year <= 1964:
+            return "Baby Boomers"
+        if 1965 <= year <= 1980:
+            return "Gen X"
+        if 1981 <= year <= 1996:
+            return "Millennials"
+        if 1997 <= year <= 2012:
+            return "Gen Z"
+        if year > 2012:
+            return "Gen Alpha"
+        return None
 
     @property
     def is_milestone(self) -> bool:

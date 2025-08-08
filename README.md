@@ -72,37 +72,74 @@ anniversaries:
 
 ### CONFIGURATION PARAMETERS
 
+Anniversaries are configured through the UI. The YAML configuration has been deprecated.
+
+#### Main Configuration
+
+When adding an anniversary, you will be presented with the following options:
+
 |Parameter |Optional|Description
 |:----------|----------|------------
-| `name` | No | Friendly name
-|`date` | Either `date` or `date_template` MUST be included | date in format `'YYYY-MM-DD'` (or `'MM-DD'` if year is unknown)
-|`date_template` | Either `date` or `date_template` MUST be included | Template to evaluate date from _(Note this is ONLY available in YAML configuration)_ The template must return a string in either `'YYYY-MM-DD'` or `'MM-DD'` format, ie: `date_template: '{{ states("input_datetime.your_input_datetime") \| string }}'`
-| `count_up` | Yes | `true` or `false` changes the state to count up from a date (can be useful for non-recurring events) **Default**: `false`
-| `one_time` | Yes | `true` or `false`. For a one-time event (Non-recurring) **Default**: `false`
-| `show_half_anniversary` | Yes | `true` or `false`. Enables the `half_anniversary_date` and `days_until_half_anniversary` attributes. **Default**: `false`
-| `unit_of_measurement` | Yes | Your choice of label N.B. The sensor always returns Days, but this option allows you to express this in the language of your choice without needing a customization
-| `id_prefix` | Yes | Your choice of prefix for the entity_id **Default**: `anniversary_` NB. the entity_id cannot be changed from within the integration once it has been created.  You muse either delete your entity and re-create it or manually rename the entity_id on the configuration -> entities page
-| `icon_normal` | Yes | Default icon **Default**:  `mdi:calendar-blank`
-| `icon_today` | Yes | Icon if the anniversary is today **Default**: `mdi:calendar-star`
-| `days_as_soon` | Yes | Days in advance to display the icon defined in `icon_soon` **Default**: 1
-| `icon_soon` | Yes | Icon if the anniversary is 'soon' **Default**: `mdi:calendar`
+| `name` | No | Friendly name for the anniversary.
+|`date` | No | The date of the anniversary in `YYYY-MM-DD` or `MM-DD` format.
+| `count_up` | Yes | `true` or `false`. Changes the sensor to count up from the anniversary date. **Default**: `false`
+| `one_time` | Yes | `true` or `false`. For a one-time event (non-recurring). **Default**: `false`
+| `show_half_anniversary` | Yes | `true` or `false`. Enables the half-anniversary attributes. **Default**: `false`
+| `unit_of_measurement` | Yes | Your choice of label for the sensor's unit. The sensor always returns days, but this allows for localization. **Default**: `Days`
+| `icon_normal` | Yes | The icon to display for the sensor in its normal state. **Default**:  `mdi:calendar-blank`
+| `icon_today` | Yes | The icon to display when the anniversary is today. **Default**: `mdi:calendar-star`
+| `days_as_soon` | Yes | The number of days in advance to display the "soon" icon. **Default**: 1
+| `icon_soon` | Yes | The icon to display when the anniversary is "soon". **Default**: `mdi:calendar`
+
+#### Options
+
+After creating an anniversary, you can click "Configure" to access additional options:
+
+|Parameter |Optional|Description
+|:----------|----------|------------
+| `Enable Upcoming Anniversaries Sensor` | Yes | `true` or `false`. Enables a summary sensor showing the next 5 upcoming anniversaries. **Default**: `false`
+| `Enable Generation Sensor` | Yes | `true` or `false`. Enables the `generation` attribute. **Default**: `false`
+| `Enable Birthstone Sensor` | Yes | `true` or `false`. Enables the `birthstone` attribute. **Default**: `false`
+| `Enable Birth Flower Sensor` | Yes | `true` or `false`. Enables the `birth_flower` attribute. **Default**: `false`
 
 ## State and Attributes
 
-### State
+### Individual Anniversary Sensor (`sensor.anniversary_...`)
 
-* The number of days remaining to the next occurance. (or days since last occurence if you have chosen the count up option)
+#### State
 
-### Attributes
+* The number of days remaining until the next occurrence (or days since the last occurrence if `count_up` is enabled).
 
-* years at anniversary: number of years that will have passed at the occurrence counted down to _(NOT displayed if year is unknown)_
-* current years: number of years have passed since the first occurance (ie, current age)  _(NOT displayed if year is unknown)_
-* date:  The date of the first occurence _(or the date of the next occurence if year is unknown)_
-* next_date: The date of the next occurance
-* weeks_remaining: The number of weeks until the anniversary
-* unit_of_measurement: 'Days' By default, this is displayed after the state. _this is NOT translate-able.  See below for work-around_
-* half_anniversary_date: The date of the next half anniversary (if enabled by `show_half_anniversary`)
-* days_until_half_anniversary: The number of days until the next half anniversary
+#### Attributes
+
+* `years_at_anniversary`: Number of years that will have passed at the next anniversary (not displayed if year is unknown).
+* `current_years`: Current age in years (not displayed if year is unknown).
+* `date`: The date of the first occurrence (or the date of the next occurrence if year is unknown).
+* `next_date`: The date of the next occurrence.
+* `weeks_remaining`: The number of weeks until the anniversary.
+* `zodiac_sign`: The Western zodiac sign for the anniversary date.
+* `named_anniversary`: The traditional name for the anniversary (e.g., "Silver", "Golden"), if applicable.
+* `is_milestone`: `true` if the anniversary is a significant milestone (e.g., 10, 25, 50 years).
+* `generation`: The generational name (e.g., "Millennial", "Gen X") if enabled and the birth year is known.
+* `birthstone`: The birthstone for the anniversary month, if enabled.
+* `birth_flower`: The birth flower for the anniversary month, if enabled.
+* `half_anniversary_date`: The date of the next half anniversary, if enabled.
+* `days_until_half_anniversary`: The number of days until the next half anniversary, if enabled.
+
+### Upcoming Anniversaries Sensor (`sensor.upcoming_anniversaries`)
+
+This sensor is created if you enable it in the options.
+
+#### State
+
+* The name of the next upcoming anniversary.
+
+#### Attributes
+
+* `upcoming`: A list of the next 5 upcoming anniversaries, with each item containing:
+    * `name`: The name of the anniversary.
+    * `date`: The date of the next occurrence.
+    * `days_remaining`: The number of days until the anniversary.
 
 ### Notes about unit of measurement
 
