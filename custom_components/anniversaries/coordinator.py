@@ -29,14 +29,12 @@ class AnniversaryDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Anniversa
         self.anniversaries = anniversaries
         self.websession = websession
         self._on_this_day_cache = OrderedDict()
+        self.upcoming = []
 
     @property
     def upcoming_anniversaries(self) -> list[AnniversaryData]:
         """Return a sorted list of the next 5 upcoming anniversaries."""
-        return sorted(
-            self.anniversaries.values(),
-            key=lambda x: x.next_anniversary_date,
-        )[:5]
+        return self.upcoming
 
     async def _async_update_data(self) -> dict[str, AnniversaryData]:
         """Fetch the latest data from Wikipedia."""
@@ -70,5 +68,10 @@ class AnniversaryDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Anniversa
                     anniversary.on_this_day_event = None
             else:
                 anniversary.on_this_day_event = None
+
+        self.upcoming = sorted(
+            self.anniversaries.values(),
+            key=lambda x: x.next_anniversary_date,
+        )[:5]
 
         return self.anniversaries

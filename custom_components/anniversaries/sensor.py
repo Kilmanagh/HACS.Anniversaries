@@ -45,13 +45,8 @@ async def async_setup_entry(
     """Set up the sensor platform."""
     coordinator: AnniversaryDataUpdateCoordinator = hass.data[DOMAIN]["coordinator"]
 
-    # Add the individual anniversary sensors
-    async_add_entities(
-        [
-            AnniversarySensor(coordinator, key, entry)
-            for key in coordinator.data.keys()
-        ]
-    )
+    # Add the individual anniversary sensor
+    async_add_entities([AnniversarySensor(coordinator, entry.entry_id, entry)])
 
     # Add the summary sensor if it is enabled and doesn't exist yet
     if entry.options.get(CONF_UPCOMING_ANNIVERSARIES_SENSOR, False) and "summary_sensor_added" not in hass.data[DOMAIN]:
@@ -162,6 +157,6 @@ class UpcomingAnniversariesSensor(CoordinatorEntity[AnniversaryDataUpdateCoordin
         attrs = {}
         for i, anniversary in enumerate(upcoming):
             attrs[f"anniversary_{i+1}_name"] = anniversary.name
-            attrs[f"anniversary_{i+1}_date"] = anniversary.next_anniversary_date
+            attrs[f"anniversary_{i+1}_date"] = anniversary.next_anniversary_date.isoformat()
             attrs[f"anniversary_{i+1}_days_remaining"] = anniversary.days_remaining
         return attrs

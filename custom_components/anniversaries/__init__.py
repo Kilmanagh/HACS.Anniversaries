@@ -1,4 +1,5 @@
 """The Anniversaries Integration"""
+import asyncio
 import logging
 from datetime import datetime
 import voluptuous as vol
@@ -52,7 +53,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Anniversaries from a config entry."""
-    hass.data.setdefault(DOMAIN, {"anniversaries": {}})
+    hass.data.setdefault(DOMAIN, {})
 
     config = entry.options or entry.data
     name = config[CONF_NAME]
@@ -80,9 +81,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
 
     if "coordinator" not in hass.data[DOMAIN]:
-        websession = aiohttp_client.async_get_clientsession(hass)
-        coordinator = AnniversaryDataUpdateCoordinator(hass, {}, websession)
-        hass.data[DOMAIN]["coordinator"] = coordinator
+        lock = hass.data[DOMAIN].setdefault("coordinator_lock", asyncio.Lock())
+        async with lock:
+            if "coordinator" not in hass.data[DOMAIN]:
+                websession = aiohttp_client.async_get_clientsession(hass)
+                coordinator = AnniversaryDataUpdateCoordinator(hass, {}, websession)
+                hass.data[DOMAIN]["coordinator"] = coordinator
 
     coordinator = hass.data[DOMAIN]["coordinator"]
     coordinator.anniversaries[entry.entry_id] = anniversary
@@ -103,8 +107,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         coordinator = hass.data[DOMAIN]["coordinator"]
         coordinator.anniversaries.pop(entry.entry_id)
         if not coordinator.anniversaries:
-            hass.data[DOMAIN].pop("anniversaries", None)
-            hass.data[DOMAIN].pop("coordinator", None)
+            hass.data.pop(DOMAIN)
     return unload_ok
 
 
