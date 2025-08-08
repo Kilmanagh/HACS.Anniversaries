@@ -2,6 +2,8 @@ from datetime import timedelta, date
 import logging
 import random
 import aiohttp
+from collections import OrderedDict
+import heapq
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
@@ -23,15 +25,25 @@ class AnniversaryDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Anniversa
             hass,
             _LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(hours=2),  # Update every 2 hours
+            update_interval=timedelta(days=1),  # Update once per day
         )
         self.anniversaries = anniversaries
         self.websession = websession
-        self._on_this_day_cache = {}
+        self._on_this_day_cache = OrderedDict()
+        self.upcoming = []
+
+    @property
+    def upcoming_anniversaries(self) -> list[AnniversaryData]:
+        """Return a sorted list of the next 5 upcoming anniversaries."""
+        return self.upcoming
 
     async def _async_update_data(self) -> dict[str, AnniversaryData]:
         """Fetch the latest data from Wikipedia."""
         today = date.today()
+
+        # Clean up old cache entries
+        while len(self._on_this_day_cache) > 7:
+            self._on_this_day_cache.popitem(last=False)
 
         # Check if we need to fetch new "On This Day" data
         if today not in self._on_this_day_cache:
@@ -46,7 +58,7 @@ class AnniversaryDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Anniversa
                         self._on_this_day_cache[today] = [event["text"] for event in data["events"]]
             except aiohttp.ClientError as err:
                 _LOGGER.warning("Error fetching 'On This Day' data: %s", err)
-                self._on_this_day_cache[today] = None # Avoid retrying for a while
+                self._on_this_day_cache[today] = [] # Avoid retrying for a while
 
         # Assign a random event to each anniversary that has the feature enabled
         for anniversary in self.anniversaries.values():
@@ -57,5 +69,11 @@ class AnniversaryDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Anniversa
                     anniversary.on_this_day_event = None
             else:
                 anniversary.on_this_day_event = None
+
+        self.upcoming = heapq.nsmallest(
+            5,
+            self.anniversaries.values(),
+            key=lambda x: x.next_anniversary_date,
+        )
 
         return self.anniversaries

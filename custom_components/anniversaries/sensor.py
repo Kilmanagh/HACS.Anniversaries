@@ -31,6 +31,7 @@ from .const import (
     CONF_ICON_SOON,
     CONF_SOON,
     CONF_UNIT_OF_MEASUREMENT,
+    CONF_UPCOMING_ANNIVERSARIES_SENSOR,
 )
 from .coordinator import AnniversaryDataUpdateCoordinator
 from .data import AnniversaryData
@@ -42,11 +43,18 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Set up the sensor platform."""
-    coordinator: AnniversaryDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities(
-        AnniversarySensor(coordinator, entity_id, entry)
-        for entity_id in coordinator.data
-    )
+    coordinator: AnniversaryDataUpdateCoordinator = hass.data[DOMAIN]["coordinator"]
+
+    # Add the individual anniversary sensor
+    async_add_entities([AnniversarySensor(coordinator, entry.entry_id, entry)])
+
+    # Add the summary sensor if it is enabled and doesn't exist yet
+    if entry.options.get(CONF_UPCOMING_ANNIVERSARIES_SENSOR, False):
+        lock = hass.data[DOMAIN]["coordinator_lock"]
+        async with lock:
+            if "summary_sensor_added" not in hass.data[DOMAIN]:
+                async_add_entities([UpcomingAnniversariesSensor(coordinator)])
+                hass.data[DOMAIN]["summary_sensor_added"] = True
 
 
 class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], SensorEntity):
@@ -116,4 +124,47 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
             attrs[ATTR_DATE] = self.anniversary.date
         if self.anniversary.on_this_day_event:
             attrs[ATTR_ON_THIS_DAY] = self.anniversary.on_this_day_event
+        return attrs
+
+
+class UpcomingAnniversariesSensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], SensorEntity):
+    """Upcoming Anniversaries Sensor class."""
+
+    _attr_attribution = ATTRIBUTION
+    _attr_name = "Upcoming Anniversaries"
+    _attr_icon = "mdi:calendar-multiple"
+
+    def __init__(
+        self,
+        coordinator: AnniversaryDataUpdateCoordinator,
+    ) -> None:
+        """Initialize the sensor."""
+        super().__init__(coordinator)
+        self._attr_unique_id = f"{DOMAIN}_summary_sensor"
+
+    @property
+    def native_value(self) -> str | None:
+        """Return the state of the sensor."""
+        upcoming = self.coordinator.upcoming_anniversaries
+        if not upcoming:
+            return "Nothing"
+        return upcoming[0].name
+
+    @property
+    def extra_state_attributes(self) -> dict[str, any] | None:
+        """Return the state attributes."""
+        upcoming = self.coordinator.upcoming_anniversaries
+        if not upcoming:
+            return None
+
+        attrs = {
+            "upcoming": [
+                {
+                    "name": anniversary.name,
+                    "date": anniversary.next_anniversary_date.isoformat(),
+                    "days_remaining": anniversary.days_remaining,
+                }
+                for anniversary in upcoming
+            ]
+        }
         return attrs

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime
 
 from dateutil.relativedelta import relativedelta
@@ -43,7 +43,7 @@ class AnniversaryData:
     show_half_anniversary: bool = False
     unknown_year: bool = False
     on_this_day_event: str | None = None
-    config: dict = None
+    config: dict = field(default_factory=dict)
 
     @property
     def zodiac_sign(self) -> str | None:

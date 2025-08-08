@@ -49,6 +49,7 @@ ATTR_ON_THIS_DAY = "on_this_day"
 
 # Configuration
 CONF_ON_THIS_DAY = "on_this_day"
+CONF_UPCOMING_ANNIVERSARIES_SENSOR = "upcoming_anniversaries_sensor"
 
 # Schema
 CONFIG_SCHEMA = vol.Schema(

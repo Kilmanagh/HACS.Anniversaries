@@ -1,4 +1,5 @@
 """The Anniversaries Integration"""
+import asyncio
 import logging
 from datetime import datetime
 import voluptuous as vol
@@ -79,11 +80,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         config=config,
     )
 
-    websession = aiohttp_client.async_get_clientsession(hass)
-    coordinator = AnniversaryDataUpdateCoordinator(hass, {entry.entry_id: anniversary}, websession)
-    await coordinator.async_config_entry_first_refresh()
+    lock = hass.data[DOMAIN].setdefault("coordinator_lock", asyncio.Lock())
+    async with lock:
+        if "coordinator" not in hass.data[DOMAIN]:
+            websession = aiohttp_client.async_get_clientsession(hass)
+            hass.data[DOMAIN]["coordinator"] = AnniversaryDataUpdateCoordinator(
+                hass, {}, websession
+            )
 
-    hass.data[DOMAIN][entry.entry_id] = coordinator
+        coordinator = hass.data[DOMAIN]["coordinator"]
+        coordinator.anniversaries[entry.entry_id] = anniversary
+
+    await coordinator.async_config_entry_first_refresh()
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -95,8 +103,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-    if unload_ok:
-        hass.data[DOMAIN].pop(entry.entry_id)
+    if unload_ok and DOMAIN in hass.data:
+        lock = hass.data[DOMAIN].get("coordinator_lock")
+        if lock:
+            async with lock:
+                if DOMAIN in hass.data:  # Check again after acquiring lock
+                    if coordinator := hass.data[DOMAIN].get("coordinator"):
+                        coordinator.anniversaries.pop(entry.entry_id, None)
+                        if not coordinator.anniversaries:
+                            hass.data[DOMAIN].pop("coordinator", None)
+                            hass.data[DOMAIN].pop("summary_sensor_added", None)
     return unload_ok
 
 
