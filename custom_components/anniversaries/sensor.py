@@ -49,9 +49,12 @@ async def async_setup_entry(
     async_add_entities([AnniversarySensor(coordinator, entry.entry_id, entry)])
 
     # Add the summary sensor if it is enabled and doesn't exist yet
-    if entry.options.get(CONF_UPCOMING_ANNIVERSARIES_SENSOR, False) and "summary_sensor_added" not in hass.data[DOMAIN]:
-        async_add_entities([UpcomingAnniversariesSensor(coordinator)])
-        hass.data[DOMAIN]["summary_sensor_added"] = True
+    if entry.options.get(CONF_UPCOMING_ANNIVERSARIES_SENSOR, False):
+        lock = hass.data[DOMAIN]["coordinator_lock"]
+        async with lock:
+            if "summary_sensor_added" not in hass.data[DOMAIN]:
+                async_add_entities([UpcomingAnniversariesSensor(coordinator)])
+                hass.data[DOMAIN]["summary_sensor_added"] = True
 
 
 class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], SensorEntity):
@@ -154,9 +157,14 @@ class UpcomingAnniversariesSensor(CoordinatorEntity[AnniversaryDataUpdateCoordin
         if not upcoming:
             return None
 
-        attrs = {}
-        for i, anniversary in enumerate(upcoming):
-            attrs[f"anniversary_{i+1}_name"] = anniversary.name
-            attrs[f"anniversary_{i+1}_date"] = anniversary.next_anniversary_date.isoformat()
-            attrs[f"anniversary_{i+1}_days_remaining"] = anniversary.days_remaining
+        attrs = {
+            "upcoming": [
+                {
+                    "name": anniversary.name,
+                    "date": anniversary.next_anniversary_date.isoformat(),
+                    "days_remaining": anniversary.days_remaining,
+                }
+                for anniversary in upcoming
+            ]
+        }
         return attrs

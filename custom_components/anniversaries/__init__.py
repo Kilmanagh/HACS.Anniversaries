@@ -80,16 +80,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         config=config,
     )
 
-    if "coordinator" not in hass.data[DOMAIN]:
-        lock = hass.data[DOMAIN].setdefault("coordinator_lock", asyncio.Lock())
-        async with lock:
-            if "coordinator" not in hass.data[DOMAIN]:
-                websession = aiohttp_client.async_get_clientsession(hass)
-                coordinator = AnniversaryDataUpdateCoordinator(hass, {}, websession)
-                hass.data[DOMAIN]["coordinator"] = coordinator
+    lock = hass.data[DOMAIN].setdefault("coordinator_lock", asyncio.Lock())
+    async with lock:
+        if "coordinator" not in hass.data[DOMAIN]:
+            websession = aiohttp_client.async_get_clientsession(hass)
+            hass.data[DOMAIN]["coordinator"] = AnniversaryDataUpdateCoordinator(
+                hass, {}, websession
+            )
 
-    coordinator = hass.data[DOMAIN]["coordinator"]
-    coordinator.anniversaries[entry.entry_id] = anniversary
+        coordinator = hass.data[DOMAIN]["coordinator"]
+        coordinator.anniversaries[entry.entry_id] = anniversary
 
     await coordinator.async_config_entry_first_refresh()
 
@@ -103,11 +103,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-    if unload_ok:
-        coordinator = hass.data[DOMAIN]["coordinator"]
-        coordinator.anniversaries.pop(entry.entry_id)
-        if not coordinator.anniversaries:
-            hass.data.pop(DOMAIN)
+    if unload_ok and DOMAIN in hass.data:
+        lock = hass.data[DOMAIN].get("coordinator_lock")
+        if lock:
+            async with lock:
+                if DOMAIN in hass.data:  # Check again after acquiring lock
+                    coordinator = hass.data[DOMAIN]["coordinator"]
+                    coordinator.anniversaries.pop(entry.entry_id, None)
+                    if not coordinator.anniversaries:
+                        hass.data.pop(DOMAIN)
     return unload_ok
 
 
