@@ -108,11 +108,11 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         if lock:
             async with lock:
                 if DOMAIN in hass.data:  # Check again after acquiring lock
-                    coordinator = hass.data[DOMAIN]["coordinator"]
-                    coordinator.anniversaries.pop(entry.entry_id, None)
-                    if not coordinator.anniversaries:
-                        hass.data[DOMAIN].pop("coordinator", None)
-                        hass.data[DOMAIN].pop("summary_sensor_added", None)
+                    if coordinator := hass.data[DOMAIN].get("coordinator"):
+                        coordinator.anniversaries.pop(entry.entry_id, None)
+                        if not coordinator.anniversaries:
+                            hass.data[DOMAIN].pop("coordinator", None)
+                            hass.data[DOMAIN].pop("summary_sensor_added", None)
     return unload_ok
 
 
