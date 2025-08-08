@@ -4,6 +4,36 @@ from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 
 
+_BIRTHSTONES = {
+    1: "Garnet",
+    2: "Amethyst",
+    3: "Aquamarine",
+    4: "Diamond",
+    5: "Emerald",
+    6: "Pearl",
+    7: "Ruby",
+    8: "Peridot",
+    9: "Sapphire",
+    10: "Opal",
+    11: "Topaz",
+    12: "Turquoise",
+}
+
+_BIRTH_FLOWERS = {
+    1: "Carnation",
+    2: "Violet",
+    3: "Daffodil",
+    4: "Daisy",
+    5: "Lily of the Valley",
+    6: "Rose",
+    7: "Larkspur",
+    8: "Gladiolus",
+    9: "Aster",
+    10: "Marigold",
+    11: "Chrysanthemum",
+    12: "Narcissus",
+}
+
 def get_zodiac_sign(day, month):
     """Return the zodiac sign for a given date."""
     if (month == 1 and day >= 20) or (month == 2 and day <= 18):
@@ -47,40 +77,12 @@ class AnniversaryData:
     @property
     def birthstone(self) -> str | None:
         """Return the birthstone for the anniversary month."""
-        birthstones = {
-            1: "Garnet",
-            2: "Amethyst",
-            3: "Aquamarine",
-            4: "Diamond",
-            5: "Emerald",
-            6: "Pearl",
-            7: "Ruby",
-            8: "Peridot",
-            9: "Sapphire",
-            10: "Opal",
-            11: "Topaz",
-            12: "Turquoise",
-        }
-        return birthstones.get(self.date.month)
+        return _BIRTHSTONES.get(self.date.month)
 
     @property
     def birth_flower(self) -> str | None:
         """Return the birth flower for the anniversary month."""
-        birth_flowers = {
-            1: "Carnation",
-            2: "Violet",
-            3: "Daffodil",
-            4: "Daisy",
-            5: "Lily of the Valley",
-            6: "Rose",
-            7: "Larkspur",
-            8: "Gladiolus",
-            9: "Aster",
-            10: "Marigold",
-            11: "Chrysanthemum",
-            12: "Narcissus",
-        }
-        return birth_flowers.get(self.date.month)
+        return _BIRTH_FLOWERS.get(self.date.month)
 
     @property
     def zodiac_sign(self) -> str | None:
@@ -110,18 +112,36 @@ class AnniversaryData:
         if self.unknown_year:
             return None
         year = self.date.year
-        if 1928 <= year <= 1945:
-            return "Silent Generation"
-        if 1946 <= year <= 1964:
-            return "Baby Boomers"
-        if 1965 <= year <= 1980:
-            return "Gen X"
-        if 1981 <= year <= 1996:
-            return "Millennials"
-        if 1997 <= year <= 2012:
-            return "Gen Z"
-        if year > 2012:
-            return "Gen Alpha"
+        # Generation year boundaries based on commonly accepted definitions:
++        # Silent Generation: 1928-1945
++        # Baby Boomers: 1946-1964
++        # Gen X: 1965-1980
++        # Millennials: 1981-1996
++        # Gen Z: 1997-2012
++        # Gen Alpha: 2013+
++        SILENT_GEN_START = 1928
++        SILENT_GEN_END = 1945
++        BOOMERS_START = 1946
++        BOOMERS_END = 1964
++        GEN_X_START = 1965
++        GEN_X_END = 1980
++        MILLENNIALS_START = 1981
++        MILLENNIALS_END = 1996
++        GEN_Z_START = 1997
++        GEN_Z_END = 2012
++        GEN_ALPHA_START = 2013
++        if SILENT_GEN_START <= year <= SILENT_GEN_END:
++            return "Silent Generation"
++        if BOOMERS_START <= year <= BOOMERS_END:
++            return "Baby Boomers"
++        if GEN_X_START <= year <= GEN_X_END:
++            return "Gen X"
++        if MILLENNIALS_START <= year <= MILLENNIALS_END:
++            return "Millennials"
++        if GEN_Z_START <= year <= GEN_Z_END:
++            return "Gen Z"
++        if year >= GEN_ALPHA_START:
++            return "Gen Alpha"
         return None
 
     @property
