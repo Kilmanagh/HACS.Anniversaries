@@ -7,7 +7,7 @@ import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_NAME, CONF_SENSORS, Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import config_validation as cv, aiohttp_client
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.template import Template
 
 from .const import (
@@ -83,9 +83,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     lock = hass.data[DOMAIN].setdefault("coordinator_lock", asyncio.Lock())
     async with lock:
         if "coordinator" not in hass.data[DOMAIN]:
-            websession = aiohttp_client.async_get_clientsession(hass)
             hass.data[DOMAIN]["coordinator"] = AnniversaryDataUpdateCoordinator(
-                hass, {}, websession
+                hass, {}
             )
 
         coordinator = hass.data[DOMAIN]["coordinator"]

@@ -19,7 +19,6 @@ from .const import (
     ATTR_ZODIAC_SIGN,
     ATTR_NAMED_ANNIVERSARY,
     ATTR_IS_MILESTONE,
-    ATTR_ON_THIS_DAY,
     DOMAIN,
     DEFAULT_ICON_NORMAL,
     DEFAULT_ICON_TODAY,
@@ -122,8 +121,6 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
             attrs[ATTR_HALF_DAYS] = self.anniversary.days_until_half_anniversary
         if not self.anniversary.unknown_year:
             attrs[ATTR_DATE] = self.anniversary.date
-        if self.anniversary.on_this_day_event:
-            attrs[ATTR_ON_THIS_DAY] = self.anniversary.on_this_day_event
         return attrs
 
 
