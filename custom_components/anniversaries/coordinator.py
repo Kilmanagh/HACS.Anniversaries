@@ -3,6 +3,7 @@ import logging
 import random
 import aiohttp
 from collections import OrderedDict
+import heapq
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
@@ -41,7 +42,7 @@ class AnniversaryDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Anniversa
         today = date.today()
 
         # Clean up old cache entries
-        if len(self._on_this_day_cache) > 7:
+        while len(self._on_this_day_cache) > 7:
             self._on_this_day_cache.popitem(last=False)
 
         # Check if we need to fetch new "On This Day" data
@@ -69,9 +70,10 @@ class AnniversaryDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Anniversa
             else:
                 anniversary.on_this_day_event = None
 
-        self.upcoming = sorted(
+        self.upcoming = heapq.nsmallest(
+            5,
             self.anniversaries.values(),
             key=lambda x: x.next_anniversary_date,
-        )[:5]
+        )
 
         return self.anniversaries
