@@ -72,7 +72,15 @@ anniversaries:
 
 ### CONFIGURATION PARAMETERS
 
-Anniversaries are configured through the UI. The YAML configuration has been deprecated.
+Anniversaries are configured through the UI. The YAML configuration is deprecated, but still supported.
+
+#### YAML Only Configuration
+
+The following options are only available when configuring anniversaries in `configuration.yaml`:
+
+|Parameter |Optional|Description
+|:----------|----------|------------
+|`date_template` | Yes | Template to evaluate date from. The template must return a string in either `'YYYY-MM-DD'` or `'MM-DD'` format, ie: `date_template: '{{ states("input_datetime.your_input_datetime") \| string }}'`
 
 #### Main Configuration
 
@@ -97,10 +105,10 @@ After creating an anniversary, you can click "Configure" to access additional op
 
 |Parameter |Optional|Description
 |:----------|----------|------------
-| `Enable Upcoming Anniversaries Sensor` | Yes | `true` or `false`. Enables a summary sensor showing the next 5 upcoming anniversaries. **Default**: `false`
-| `Enable Generation Sensor` | Yes | `true` or `false`. Enables the `generation` attribute. **Default**: `false`
-| `Enable Birthstone Sensor` | Yes | `true` or `false`. Enables the `birthstone` attribute. **Default**: `false`
-| `Enable Birth Flower Sensor` | Yes | `true` or `false`. Enables the `birth_flower` attribute. **Default**: `false`
+| `upcoming_anniversaries_sensor` | Yes | `true` or `false`. Enables a summary sensor showing the next 5 upcoming anniversaries. **Default**: `false`
+| `enable_generation_sensor` | Yes | `true` or `false`. Enables the `generation` attribute. **Default**: `false`
+| `enable_birthstone_sensor` | Yes | `true` or `false`. Enables the `birthstone` attribute. **Default**: `false`
+| `enable_birth_flower_sensor` | Yes | `true` or `false`. Enables the `birth_flower` attribute. **Default**: `false`
 
 ## State and Attributes
 
