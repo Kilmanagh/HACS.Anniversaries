@@ -114,7 +114,7 @@ After creating an anniversary, you can click "Configure" to access additional op
 
 * `years_at_anniversary`: Number of years that will have passed at the next anniversary (not displayed if year is unknown).
 * `current_years`: Current age in years (not displayed if year is unknown).
-* `date`: The date of the first occurrence (or the date of the next occurrence if year is unknown).
+* `date`: The date of the first occurrence (not displayed if year is unknown).
 * `next_date`: The date of the next occurrence.
 * `weeks_remaining`: The number of weeks until the anniversary.
 * `zodiac_sign`: The Western zodiac sign for the anniversary date.

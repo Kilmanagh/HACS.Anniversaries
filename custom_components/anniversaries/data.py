@@ -112,36 +112,21 @@ class AnniversaryData:
         if self.unknown_year:
             return None
         year = self.date.year
-        # Generation year boundaries based on commonly accepted definitions:
-+        # Silent Generation: 1928-1945
-+        # Baby Boomers: 1946-1964
-+        # Gen X: 1965-1980
-+        # Millennials: 1981-1996
-+        # Gen Z: 1997-2012
-+        # Gen Alpha: 2013+
-+        SILENT_GEN_START = 1928
-+        SILENT_GEN_END = 1945
-+        BOOMERS_START = 1946
-+        BOOMERS_END = 1964
-+        GEN_X_START = 1965
-+        GEN_X_END = 1980
-+        MILLENNIALS_START = 1981
-+        MILLENNIALS_END = 1996
-+        GEN_Z_START = 1997
-+        GEN_Z_END = 2012
-+        GEN_ALPHA_START = 2013
-+        if SILENT_GEN_START <= year <= SILENT_GEN_END:
-+            return "Silent Generation"
-+        if BOOMERS_START <= year <= BOOMERS_END:
-+            return "Baby Boomers"
-+        if GEN_X_START <= year <= GEN_X_END:
-+            return "Gen X"
-+        if MILLENNIALS_START <= year <= MILLENNIALS_END:
-+            return "Millennials"
-+        if GEN_Z_START <= year <= GEN_Z_END:
-+            return "Gen Z"
-+        if year >= GEN_ALPHA_START:
-+            return "Gen Alpha"
+
+        # Generation year boundaries based on commonly accepted definitions.
+        generations = (
+            ("Silent Generation", 1928, 1945),
+            ("Baby Boomers", 1946, 1964),
+            ("Gen X", 1965, 1980),
+            ("Millennials", 1981, 1996),
+            ("Gen Z", 1997, 2012),
+            ("Gen Alpha", 2013, 9999),
+        )
+
+        for name, start, end in generations:
+            if start <= year <= end:
+                return name
+
         return None
 
     @property
