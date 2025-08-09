@@ -40,7 +40,7 @@ _GENERATIONS = (
     ("Gen X", 1965, 1980),
     ("Millennials", 1981, 1996),
     ("Gen Z", 1997, 2012),
-    ("Gen Alpha", 2013, 9999),
+    ("Gen Alpha", 2013, GEN_ALPHA_END_YEAR)),
 )
 
 def get_zodiac_sign(day, month):
