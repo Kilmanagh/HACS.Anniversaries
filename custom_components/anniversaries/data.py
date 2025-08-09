@@ -34,6 +34,15 @@ _BIRTH_FLOWERS = {
     12: "Narcissus",
 }
 
+_GENERATIONS = (
+    ("Silent Generation", 1928, 1945),
+    ("Baby Boomers", 1946, 1964),
+    ("Gen X", 1965, 1980),
+    ("Millennials", 1981, 1996),
+    ("Gen Z", 1997, 2012),
+    ("Gen Alpha", 2013, 9999),
+)
+
 def get_zodiac_sign(day, month):
     """Return the zodiac sign for a given date."""
     if (month == 1 and day >= 20) or (month == 2 and day <= 18):
@@ -113,17 +122,7 @@ class AnniversaryData:
             return None
         year = self.date.year
 
-        # Generation year boundaries based on commonly accepted definitions.
-        generations = (
-            ("Silent Generation", 1928, 1945),
-            ("Baby Boomers", 1946, 1964),
-            ("Gen X", 1965, 1980),
-            ("Millennials", 1981, 1996),
-            ("Gen Z", 1997, 2012),
-            ("Gen Alpha", 2013, 9999),
-        )
-
-        for name, start, end in generations:
+        for name, start, end in _GENERATIONS:
             if start <= year <= end:
                 return name
 
