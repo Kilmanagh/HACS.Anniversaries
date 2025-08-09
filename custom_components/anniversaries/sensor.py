@@ -19,6 +19,9 @@ from .const import (
     ATTR_ZODIAC_SIGN,
     ATTR_NAMED_ANNIVERSARY,
     ATTR_IS_MILESTONE,
+    ATTR_GENERATION,
+    ATTR_BIRTHSTONE,
+    ATTR_BIRTH_FLOWER,
     DOMAIN,
     DEFAULT_ICON_NORMAL,
     DEFAULT_ICON_TODAY,
@@ -31,6 +34,9 @@ from .const import (
     CONF_SOON,
     CONF_UNIT_OF_MEASUREMENT,
     CONF_UPCOMING_ANNIVERSARIES_SENSOR,
+    CONF_ENABLE_GENERATION_SENSOR,
+    CONF_ENABLE_BIRTHSTONE_SENSOR,
+    CONF_ENABLE_BIRTH_FLOWER_SENSOR,
 )
 from .coordinator import AnniversaryDataUpdateCoordinator
 from .data import AnniversaryData
@@ -110,6 +116,12 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
             ATTR_ZODIAC_SIGN: self.anniversary.zodiac_sign,
             ATTR_IS_MILESTONE: self.anniversary.is_milestone,
         }
+        if self.config.get(CONF_ENABLE_GENERATION_SENSOR, False):
+            attrs[ATTR_GENERATION] = self.anniversary.generation
+        if self.config.get(CONF_ENABLE_BIRTHSTONE_SENSOR, False):
+            attrs[ATTR_BIRTHSTONE] = self.anniversary.birthstone
+        if self.config.get(CONF_ENABLE_BIRTH_FLOWER_SENSOR, False):
+            attrs[ATTR_BIRTH_FLOWER] = self.anniversary.birth_flower
         if self.anniversary.named_anniversary:
             attrs[ATTR_NAMED_ANNIVERSARY] = self.anniversary.named_anniversary
         if self.anniversary.current_years is not None:

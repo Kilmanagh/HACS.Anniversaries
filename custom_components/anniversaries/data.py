@@ -4,6 +4,45 @@ from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 
 
+_BIRTHSTONES = {
+    1: "Garnet",
+    2: "Amethyst",
+    3: "Aquamarine",
+    4: "Diamond",
+    5: "Emerald",
+    6: "Pearl",
+    7: "Ruby",
+    8: "Peridot",
+    9: "Sapphire",
+    10: "Opal",
+    11: "Topaz",
+    12: "Turquoise",
+}
+
+_BIRTH_FLOWERS = {
+    1: "Carnation",
+    2: "Violet",
+    3: "Daffodil",
+    4: "Daisy",
+    5: "Lily of the Valley",
+    6: "Rose",
+    7: "Larkspur",
+    8: "Gladiolus",
+    9: "Aster",
+    10: "Marigold",
+    11: "Chrysanthemum",
+    12: "Narcissus",
+}
+
+_GENERATIONS = (
+    ("Silent Generation", 1928, 1945),
+    ("Baby Boomers", 1946, 1964),
+    ("Gen X", 1965, 1980),
+    ("Millennials", 1981, 1996),
+    ("Gen Z", 1997, 2012),
+    ("Gen Alpha", 2013, 9999),
+)
+
 def get_zodiac_sign(day, month):
     """Return the zodiac sign for a given date."""
     if (month == 1 and day >= 20) or (month == 2 and day <= 18):
@@ -45,6 +84,16 @@ class AnniversaryData:
     config: dict = field(default_factory=dict)
 
     @property
+    def birthstone(self) -> str | None:
+        """Return the birthstone for the anniversary month."""
+        return _BIRTHSTONES.get(self.date.month)
+
+    @property
+    def birth_flower(self) -> str | None:
+        """Return the birth flower for the anniversary month."""
+        return _BIRTH_FLOWERS.get(self.date.month)
+
+    @property
     def zodiac_sign(self) -> str | None:
         """Return the zodiac sign of the anniversary."""
         return get_zodiac_sign(self.date.day, self.date.month)
@@ -65,6 +114,19 @@ class AnniversaryData:
             60: "Diamond",
         }
         return named_anniversaries.get(self.next_years)
+
+    @property
+    def generation(self) -> str | None:
+        """Return the generation of the person."""
+        if self.unknown_year:
+            return None
+        year = self.date.year
+
+        for name, start, end in _GENERATIONS:
+            if start <= year <= end:
+                return name
+
+        return None
 
     @property
     def is_milestone(self) -> bool:
