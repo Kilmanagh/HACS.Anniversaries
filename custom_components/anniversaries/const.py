@@ -51,9 +51,7 @@ ATTR_BIRTH_FLOWER = "birth_flower"
 
 # Configuration
 CONF_UPCOMING_ANNIVERSARIES_SENSOR = "upcoming_anniversaries_sensor"
-CONF_ENABLE_GENERATION_SENSOR = "enable_generation_sensor"
-CONF_ENABLE_BIRTHSTONE_SENSOR = "enable_birthstone_sensor"
-CONF_ENABLE_BIRTH_FLOWER_SENSOR = "enable_birth_flower_sensor"
+CONF_ENABLE_SUMMARY_SENSOR = "enable_summary_sensor"
 
 # Schema
 CONFIG_SCHEMA = vol.Schema(

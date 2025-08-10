@@ -26,9 +26,6 @@ from .const import (
     CONF_ONE_TIME,
     CONF_COUNT_UP,
     CONF_UPCOMING_ANNIVERSARIES_SENSOR,
-    CONF_ENABLE_GENERATION_SENSOR,
-    CONF_ENABLE_BIRTHSTONE_SENSOR,
-    CONF_ENABLE_BIRTH_FLOWER_SENSOR,
 )
 
 from homeassistant.const import CONF_NAME
@@ -66,9 +63,6 @@ class AnniversariesFlowHandler(config_entries.ConfigFlow):
                 vol.Optional(CONF_ONE_TIME, default=DEFAULT_ONE_TIME): bool,
                 vol.Optional(CONF_COUNT_UP, default=DEFAULT_COUNT_UP): bool,
                 vol.Optional(CONF_HALF_ANNIVERSARY, default=DEFAULT_HALF_ANNIVERSARY): bool,
-                vol.Optional(CONF_ENABLE_GENERATION_SENSOR, default=False): bool,
-                vol.Optional(CONF_ENABLE_BIRTHSTONE_SENSOR, default=False): bool,
-                vol.Optional(CONF_ENABLE_BIRTH_FLOWER_SENSOR, default=False): bool,
                 vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=DEFAULT_UNIT_OF_MEASUREMENT): str,
                 vol.Optional(CONF_ICON_NORMAL, default=DEFAULT_ICON_NORMAL): selector.IconSelector(),
                 vol.Optional(CONF_ICON_TODAY, default=DEFAULT_ICON_TODAY): selector.IconSelector(),
@@ -129,18 +123,6 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 vol.Optional(
                     CONF_UPCOMING_ANNIVERSARIES_SENSOR,
                     default=self.config_entry.options.get(CONF_UPCOMING_ANNIVERSARIES_SENSOR, False),
-                ): bool,
-                vol.Optional(
-                    CONF_ENABLE_GENERATION_SENSOR,
-                    default=self.config_entry.options.get(CONF_ENABLE_GENERATION_SENSOR, False),
-                ): bool,
-                vol.Optional(
-                    CONF_ENABLE_BIRTHSTONE_SENSOR,
-                    default=self.config_entry.options.get(CONF_ENABLE_BIRTHSTONE_SENSOR, False),
-                ): bool,
-                vol.Optional(
-                    CONF_ENABLE_BIRTH_FLOWER_SENSOR,
-                    default=self.config_entry.options.get(CONF_ENABLE_BIRTH_FLOWER_SENSOR, False),
                 ): bool,
                 vol.Optional(
                     CONF_COUNT_UP,
