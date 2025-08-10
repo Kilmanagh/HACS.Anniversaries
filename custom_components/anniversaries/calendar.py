@@ -7,6 +7,7 @@ from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import DOMAIN
 from .coordinator import AnniversaryDataUpdateCoordinator
@@ -23,7 +24,7 @@ async def async_setup_entry(
     async_add_entities([AnniversaryCalendar(coordinator, entry.entry_id, entry)])
 
 
-class AnniversaryCalendar(CalendarEntity):
+class AnniversaryCalendar(CoordinatorEntity[AnniversaryDataUpdateCoordinator], CalendarEntity):
     """Anniversary Calendar class."""
 
     def __init__(
@@ -33,7 +34,7 @@ class AnniversaryCalendar(CalendarEntity):
         entry: ConfigEntry,
     ) -> None:
         """Initialize the calendar."""
-        self.coordinator = coordinator
+        super().__init__(coordinator)
         self._entity_id = entity_id
         self._attr_unique_id = f"{entry.entry_id}_calendar"
 
@@ -56,19 +57,6 @@ class AnniversaryCalendar(CalendarEntity):
         if anniversary is None:
             return "Unknown Anniversary"
         return anniversary.name
-
-    @property
-    def entity_id(self) -> str:
-        """Return the entity ID with anniversary prefix."""
-        anniversary = self.anniversary
-        if anniversary is None:
-            return f"calendar.anniversary_unknown_{self._entity_id}"
-        
-        name = anniversary.name.lower().replace(' ', '_').replace('-', '_')
-        # Remove any non-alphanumeric characters except underscores
-        import re
-        clean_name = re.sub(r'[^a-z0-9_]', '', name)
-        return f"calendar.anniversary_{clean_name}"
 
     @property
     def event(self) -> CalendarEvent | None:

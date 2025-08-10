@@ -107,19 +107,6 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
         return anniversary.name
 
     @property
-    def entity_id(self) -> str:
-        """Return the entity ID with anniversary prefix."""
-        anniversary = self.anniversary
-        if anniversary is None:
-            return f"sensor.anniversary_unknown_{self._entity_id}"
-        
-        name = anniversary.name.lower().replace(' ', '_').replace('-', '_')
-        # Remove any non-alphanumeric characters except underscores
-        import re
-        clean_name = re.sub(r'[^a-z0-9_]', '', name)
-        return f"sensor.anniversary_{clean_name}"
-
-    @property
     def native_value(self) -> int | None:
         """Return the state of the sensor."""
         anniversary = self.anniversary
