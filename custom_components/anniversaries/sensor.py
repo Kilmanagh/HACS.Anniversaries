@@ -76,7 +76,6 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
         """Initialize the sensor."""
         super().__init__(coordinator)
         self._entity_id = entity_id
-        self._attr_name = self.anniversary.name
         self._attr_unique_id = f"{entry.entry_id}_sensor"
 
         self.config = entry.options or entry.data
@@ -87,13 +86,24 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
         self._attr_native_unit_of_measurement = self.config.get(CONF_UNIT_OF_MEASUREMENT, DEFAULT_UNIT_OF_MEASUREMENT)
 
     @property
+    def name(self) -> str:
+        """Return the name of the sensor."""
+        try:
+            return self.anniversary.name
+        except (KeyError, AttributeError):
+            return "Unknown Anniversary"
+
+    @property
     def entity_id(self) -> str:
         """Return the entity ID with anniversary prefix."""
-        name = self.anniversary.name.lower().replace(' ', '_').replace('-', '_')
-        # Remove any non-alphanumeric characters except underscores
-        import re
-        clean_name = re.sub(r'[^a-z0-9_]', '', name)
-        return f"sensor.anniversary_{clean_name}"
+        try:
+            name = self.anniversary.name.lower().replace(' ', '_').replace('-', '_')
+            # Remove any non-alphanumeric characters except underscores
+            import re
+            clean_name = re.sub(r'[^a-z0-9_]', '', name)
+            return f"sensor.anniversary_{clean_name}"
+        except (KeyError, AttributeError):
+            return f"sensor.anniversary_unknown_{self._entity_id}"
 
 
     @property
@@ -102,19 +112,38 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
         return self.coordinator.data[self._entity_id]
 
     @property
-    def native_value(self) -> int:
+    def available(self) -> bool:
+        """Return True if entity is available."""
+        return (
+            self.coordinator.last_update_success
+            and self.coordinator.data is not None
+            and self._entity_id in self.coordinator.data
+        )
+
+    @property
+    def native_value(self) -> int | None:
         """Return the state of the sensor."""
-        return self.anniversary.days_remaining
+        if not self.available:
+            return None
+        try:
+            return self.anniversary.days_remaining
+        except (KeyError, AttributeError):
+            return None
 
     @property
     def icon(self) -> str:
         """Return the icon of the sensor."""
-        days_remaining = self.anniversary.days_remaining
-        if days_remaining == 0:
-            return self.config.get(CONF_ICON_TODAY, DEFAULT_ICON_TODAY)
-        if days_remaining <= self.config.get(CONF_SOON, DEFAULT_SOON):
-            return self.config.get(CONF_ICON_SOON, DEFAULT_ICON_SOON)
-        return self.config.get(CONF_ICON_NORMAL, DEFAULT_ICON_NORMAL)
+        if not self.available:
+            return self.config.get(CONF_ICON_NORMAL, DEFAULT_ICON_NORMAL)
+        try:
+            days_remaining = self.anniversary.days_remaining
+            if days_remaining == 0:
+                return self.config.get(CONF_ICON_TODAY, DEFAULT_ICON_TODAY)
+            if days_remaining <= self.config.get(CONF_SOON, DEFAULT_SOON):
+                return self.config.get(CONF_ICON_SOON, DEFAULT_ICON_SOON)
+            return self.config.get(CONF_ICON_NORMAL, DEFAULT_ICON_NORMAL)
+        except (KeyError, AttributeError):
+            return self.config.get(CONF_ICON_NORMAL, DEFAULT_ICON_NORMAL)
 
     @property
     def extra_state_attributes(self) -> dict[str, any]:
