@@ -88,66 +88,63 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
     @property
     def name(self) -> str:
         """Return the name of the sensor."""
-        try:
-            return self.anniversary.name
-        except (KeyError, AttributeError):
+        if not self.available or self.anniversary is None:
             return "Unknown Anniversary"
+        return self.anniversary.name
 
     @property
     def entity_id(self) -> str:
         """Return the entity ID with anniversary prefix."""
-        try:
-            name = self.anniversary.name.lower().replace(' ', '_').replace('-', '_')
-            # Remove any non-alphanumeric characters except underscores
-            import re
-            clean_name = re.sub(r'[^a-z0-9_]', '', name)
-            return f"sensor.anniversary_{clean_name}"
-        except (KeyError, AttributeError):
+        if not self.available or self.anniversary is None:
             return f"sensor.anniversary_unknown_{self._entity_id}"
+        
+        name = self.anniversary.name.lower().replace(' ', '_').replace('-', '_')
+        # Remove any non-alphanumeric characters except underscores
+        import re
+        clean_name = re.sub(r'[^a-z0-9_]', '', name)
+        return f"sensor.anniversary_{clean_name}"
 
 
     @property
-    def anniversary(self) -> AnniversaryData:
+    def anniversary(self) -> AnniversaryData | None:
         """Return the anniversary data."""
-        return self.coordinator.data[self._entity_id]
+        return self.coordinator.anniversaries.get(self._entity_id)
 
     @property
     def available(self) -> bool:
         """Return True if entity is available."""
         return (
-            self.coordinator.last_update_success
-            and self.coordinator.data is not None
-            and self._entity_id in self.coordinator.data
+            self.coordinator.anniversaries is not None
+            and self._entity_id in self.coordinator.anniversaries
+            and self.coordinator.anniversaries[self._entity_id] is not None
         )
 
     @property
     def native_value(self) -> int | None:
         """Return the state of the sensor."""
-        if not self.available:
+        if not self.available or self.anniversary is None:
             return None
-        try:
-            return self.anniversary.days_remaining
-        except (KeyError, AttributeError):
-            return None
+        return self.anniversary.days_remaining
 
     @property
     def icon(self) -> str:
         """Return the icon of the sensor."""
-        if not self.available:
+        if not self.available or self.anniversary is None:
             return self.config.get(CONF_ICON_NORMAL, DEFAULT_ICON_NORMAL)
-        try:
-            days_remaining = self.anniversary.days_remaining
-            if days_remaining == 0:
-                return self.config.get(CONF_ICON_TODAY, DEFAULT_ICON_TODAY)
-            if days_remaining <= self.config.get(CONF_SOON, DEFAULT_SOON):
-                return self.config.get(CONF_ICON_SOON, DEFAULT_ICON_SOON)
-            return self.config.get(CONF_ICON_NORMAL, DEFAULT_ICON_NORMAL)
-        except (KeyError, AttributeError):
-            return self.config.get(CONF_ICON_NORMAL, DEFAULT_ICON_NORMAL)
+        
+        days_remaining = self.anniversary.days_remaining
+        if days_remaining == 0:
+            return self.config.get(CONF_ICON_TODAY, DEFAULT_ICON_TODAY)
+        if days_remaining <= self.config.get(CONF_SOON, DEFAULT_SOON):
+            return self.config.get(CONF_ICON_SOON, DEFAULT_ICON_SOON)
+        return self.config.get(CONF_ICON_NORMAL, DEFAULT_ICON_NORMAL)
 
     @property
     def extra_state_attributes(self) -> dict[str, any]:
         """Return the state attributes."""
+        if not self.available or self.anniversary is None:
+            return {}
+            
         attrs = {
             ATTR_NEXT_DATE: self.anniversary.next_anniversary_date,
             ATTR_WEEKS: self.anniversary.weeks_remaining,

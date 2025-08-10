@@ -31,9 +31,11 @@ class AnniversaryDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Anniversa
 
     async def _async_update_data(self) -> dict[str, AnniversaryData]:
         """Fetch the latest data."""
+        # Update upcoming anniversaries
         self.upcoming = heapq.nsmallest(
             5,
             self.anniversaries.values(),
             key=lambda x: x.next_anniversary_date,
         )
+        # Return the anniversaries dict as the coordinator data
         return self.anniversaries
