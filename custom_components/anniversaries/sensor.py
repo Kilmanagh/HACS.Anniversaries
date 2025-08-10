@@ -77,6 +77,7 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
         super().__init__(coordinator)
         self._entity_id = entity_id
         self._attr_unique_id = f"{entry.entry_id}_sensor"
+        self._entry = entry
 
         self.config = entry.options or entry.data
         self._icon_normal = self.config.get(CONF_ICON_NORMAL, DEFAULT_ICON_NORMAL)
@@ -86,53 +87,54 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
         self._attr_native_unit_of_measurement = self.config.get(CONF_UNIT_OF_MEASUREMENT, DEFAULT_UNIT_OF_MEASUREMENT)
 
     @property
-    def name(self) -> str:
-        """Return the name of the sensor."""
-        if not self.available or self.anniversary is None:
-            return "Unknown Anniversary"
-        return self.anniversary.name
-
-    @property
-    def entity_id(self) -> str:
-        """Return the entity ID with anniversary prefix."""
-        if not self.available or self.anniversary is None:
-            return f"sensor.anniversary_unknown_{self._entity_id}"
-        
-        name = self.anniversary.name.lower().replace(' ', '_').replace('-', '_')
-        # Remove any non-alphanumeric characters except underscores
-        import re
-        clean_name = re.sub(r'[^a-z0-9_]', '', name)
-        return f"sensor.anniversary_{clean_name}"
-
-
-    @property
     def anniversary(self) -> AnniversaryData | None:
         """Return the anniversary data."""
+        if not hasattr(self.coordinator, 'anniversaries') or self.coordinator.anniversaries is None:
+            return None
         return self.coordinator.anniversaries.get(self._entity_id)
 
     @property
     def available(self) -> bool:
         """Return True if entity is available."""
-        return (
-            self.coordinator.anniversaries is not None
-            and self._entity_id in self.coordinator.anniversaries
-            and self.coordinator.anniversaries[self._entity_id] is not None
-        )
+        return self.anniversary is not None
+
+    @property
+    def name(self) -> str:
+        """Return the name of the sensor."""
+        anniversary = self.anniversary
+        if anniversary is None:
+            return "Unknown Anniversary"
+        return anniversary.name
+
+    @property
+    def entity_id(self) -> str:
+        """Return the entity ID with anniversary prefix."""
+        anniversary = self.anniversary
+        if anniversary is None:
+            return f"sensor.anniversary_unknown_{self._entity_id}"
+        
+        name = anniversary.name.lower().replace(' ', '_').replace('-', '_')
+        # Remove any non-alphanumeric characters except underscores
+        import re
+        clean_name = re.sub(r'[^a-z0-9_]', '', name)
+        return f"sensor.anniversary_{clean_name}"
 
     @property
     def native_value(self) -> int | None:
         """Return the state of the sensor."""
-        if not self.available or self.anniversary is None:
+        anniversary = self.anniversary
+        if anniversary is None:
             return None
-        return self.anniversary.days_remaining
+        return anniversary.days_remaining
 
     @property
     def icon(self) -> str:
         """Return the icon of the sensor."""
-        if not self.available or self.anniversary is None:
+        anniversary = self.anniversary
+        if anniversary is None:
             return self.config.get(CONF_ICON_NORMAL, DEFAULT_ICON_NORMAL)
         
-        days_remaining = self.anniversary.days_remaining
+        days_remaining = anniversary.days_remaining
         if days_remaining == 0:
             return self.config.get(CONF_ICON_TODAY, DEFAULT_ICON_TODAY)
         if days_remaining <= self.config.get(CONF_SOON, DEFAULT_SOON):
@@ -142,32 +144,33 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
     @property
     def extra_state_attributes(self) -> dict[str, any]:
         """Return the state attributes."""
-        if not self.available or self.anniversary is None:
+        anniversary = self.anniversary
+        if anniversary is None:
             return {}
             
         attrs = {
-            ATTR_NEXT_DATE: self.anniversary.next_anniversary_date,
-            ATTR_WEEKS: self.anniversary.weeks_remaining,
-            ATTR_ZODIAC_SIGN: self.anniversary.zodiac_sign,
-            ATTR_IS_MILESTONE: self.anniversary.is_milestone,
+            ATTR_NEXT_DATE: anniversary.next_anniversary_date,
+            ATTR_WEEKS: anniversary.weeks_remaining,
+            ATTR_ZODIAC_SIGN: anniversary.zodiac_sign,
+            ATTR_IS_MILESTONE: anniversary.is_milestone,
         }
         if self.config.get(CONF_ENABLE_GENERATION_SENSOR, False):
-            attrs[ATTR_GENERATION] = self.anniversary.generation
+            attrs[ATTR_GENERATION] = anniversary.generation
         if self.config.get(CONF_ENABLE_BIRTHSTONE_SENSOR, False):
-            attrs[ATTR_BIRTHSTONE] = self.anniversary.birthstone
+            attrs[ATTR_BIRTHSTONE] = anniversary.birthstone
         if self.config.get(CONF_ENABLE_BIRTH_FLOWER_SENSOR, False):
-            attrs[ATTR_BIRTH_FLOWER] = self.anniversary.birth_flower
-        if self.anniversary.named_anniversary:
-            attrs[ATTR_NAMED_ANNIVERSARY] = self.anniversary.named_anniversary
-        if self.anniversary.current_years is not None:
-            attrs[ATTR_YEARS_CURRENT] = self.anniversary.current_years
-        if self.anniversary.next_years is not None:
-            attrs[ATTR_YEARS_NEXT] = self.anniversary.next_years
-        if self.anniversary.half_anniversary_date is not None:
-            attrs[ATTR_HALF_DATE] = self.anniversary.half_anniversary_date
-            attrs[ATTR_HALF_DAYS] = self.anniversary.days_until_half_anniversary
-        if not self.anniversary.unknown_year:
-            attrs[ATTR_DATE] = self.anniversary.date
+            attrs[ATTR_BIRTH_FLOWER] = anniversary.birth_flower
+        if anniversary.named_anniversary:
+            attrs[ATTR_NAMED_ANNIVERSARY] = anniversary.named_anniversary
+        if anniversary.current_years is not None:
+            attrs[ATTR_YEARS_CURRENT] = anniversary.current_years
+        if anniversary.next_years is not None:
+            attrs[ATTR_YEARS_NEXT] = anniversary.next_years
+        if anniversary.half_anniversary_date is not None:
+            attrs[ATTR_HALF_DATE] = anniversary.half_anniversary_date
+            attrs[ATTR_HALF_DAYS] = anniversary.days_until_half_anniversary
+        if not anniversary.unknown_year:
+            attrs[ATTR_DATE] = anniversary.date
         return attrs
 
 

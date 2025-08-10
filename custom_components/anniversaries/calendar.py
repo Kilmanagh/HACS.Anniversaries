@@ -38,52 +38,53 @@ class AnniversaryCalendar(CalendarEntity):
         self._attr_unique_id = f"{entry.entry_id}_calendar"
 
     @property
+    def anniversary(self) -> AnniversaryData | None:
+        """Return the anniversary data."""
+        if not hasattr(self.coordinator, 'anniversaries') or self.coordinator.anniversaries is None:
+            return None
+        return self.coordinator.anniversaries.get(self._entity_id)
+
+    @property
+    def available(self) -> bool:
+        """Return True if entity is available."""
+        return self.anniversary is not None
+
+    @property
     def name(self) -> str:
         """Return the name of the calendar."""
-        if not self.available or self.anniversary is None:
+        anniversary = self.anniversary
+        if anniversary is None:
             return "Unknown Anniversary"
-        return self.anniversary.name
+        return anniversary.name
 
     @property
     def entity_id(self) -> str:
         """Return the entity ID with anniversary prefix."""
-        if not self.available or self.anniversary is None:
+        anniversary = self.anniversary
+        if anniversary is None:
             return f"calendar.anniversary_unknown_{self._entity_id}"
         
-        name = self.anniversary.name.lower().replace(' ', '_').replace('-', '_')
+        name = anniversary.name.lower().replace(' ', '_').replace('-', '_')
         # Remove any non-alphanumeric characters except underscores
         import re
         clean_name = re.sub(r'[^a-z0-9_]', '', name)
         return f"calendar.anniversary_{clean_name}"
 
     @property
-    def anniversary(self) -> AnniversaryData | None:
-        """Return the anniversary data."""
-        return self.coordinator.anniversaries.get(self._entity_id)
-
-    @property
-    def available(self) -> bool:
-        """Return True if entity is available."""
-        return (
-            self.coordinator.anniversaries is not None
-            and self._entity_id in self.coordinator.anniversaries
-            and self.coordinator.anniversaries[self._entity_id] is not None
-        )
-
-    @property
     def event(self) -> CalendarEvent | None:
         """Return the next upcoming event."""
-        if not self.available or self.anniversary is None:
+        anniversary = self.anniversary
+        if anniversary is None:
             return None
         
-        next_date = self.anniversary.next_anniversary_date
+        next_date = anniversary.next_anniversary_date
         description = (
-            f"Happy {self.anniversary.next_years}th anniversary!"
-            if self.anniversary.next_years is not None
-            else self.anniversary.name
+            f"Happy {anniversary.next_years}th anniversary!"
+            if anniversary.next_years is not None
+            else anniversary.name
         )
         return CalendarEvent(
-            summary=self.anniversary.name,
+            summary=anniversary.name,
             start=next_date,
             end=next_date + timedelta(days=1),
             description=description,
@@ -93,20 +94,21 @@ class AnniversaryCalendar(CalendarEntity):
         self, hass: HomeAssistant, start_date: datetime, end_date: datetime
     ) -> list[CalendarEvent]:
         """Get all events in a specific time frame."""
-        if not self.available or self.anniversary is None:
+        anniversary = self.anniversary
+        if anniversary is None:
             return []
         
         events = []
-        next_date = self.anniversary.next_anniversary_date
+        next_date = anniversary.next_anniversary_date
         if start_date.date() <= next_date <= end_date.date():
             description = (
-                f"Happy {self.anniversary.next_years}th anniversary!"
-                if self.anniversary.next_years is not None
-                else self.anniversary.name
+                f"Happy {anniversary.next_years}th anniversary!"
+                if anniversary.next_years is not None
+                else anniversary.name
             )
             events.append(
                 CalendarEvent(
-                    summary=self.anniversary.name,
+                    summary=anniversary.name,
                     start=next_date,
                     end=next_date + timedelta(days=1),
                     description=description,
