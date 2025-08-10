@@ -35,8 +35,17 @@ class AnniversaryCalendar(CalendarEntity):
         """Initialize the calendar."""
         self.coordinator = coordinator
         self._entity_id = entity_id
-        self._attr_name = self.anniversary.name
+        self._attr_name = f"Anniversary {self.anniversary.name}"
         self._attr_unique_id = f"{entry.entry_id}_calendar"
+
+    @property
+    def entity_id(self) -> str:
+        """Return the entity ID with anniversary prefix."""
+        name = self.anniversary.name.lower().replace(' ', '_').replace('-', '_')
+        # Remove any non-alphanumeric characters except underscores
+        import re
+        clean_name = re.sub(r'[^a-z0-9_]', '', name)
+        return f"calendar.anniversary_{clean_name}"
 
     @property
     def anniversary(self) -> AnniversaryData:

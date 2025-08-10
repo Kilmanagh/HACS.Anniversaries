@@ -76,7 +76,7 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
         """Initialize the sensor."""
         super().__init__(coordinator)
         self._entity_id = entity_id
-        self._attr_name = self.anniversary.name
+        self._attr_name = f"Anniversary {self.anniversary.name}"
         self._attr_unique_id = f"{entry.entry_id}_sensor"
 
         self.config = entry.options or entry.data
@@ -85,6 +85,15 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
         self._icon_soon = self.config.get(CONF_ICON_SOON, DEFAULT_ICON_SOON)
         self._soon_days = self.config.get(CONF_SOON, DEFAULT_SOON)
         self._attr_native_unit_of_measurement = self.config.get(CONF_UNIT_OF_MEASUREMENT, DEFAULT_UNIT_OF_MEASUREMENT)
+
+    @property
+    def entity_id(self) -> str:
+        """Return the entity ID with anniversary prefix."""
+        name = self.anniversary.name.lower().replace(' ', '_').replace('-', '_')
+        # Remove any non-alphanumeric characters except underscores
+        import re
+        clean_name = re.sub(r'[^a-z0-9_]', '', name)
+        return f"sensor.anniversary_{clean_name}"
 
 
     @property
@@ -140,7 +149,7 @@ class UpcomingAnniversariesSensor(CoordinatorEntity[AnniversaryDataUpdateCoordin
     """Upcoming Anniversaries Sensor class."""
 
     _attr_attribution = ATTRIBUTION
-    _attr_name = "Upcoming Anniversaries"
+    _attr_name = "Anniversary Upcoming Anniversaries"
     _attr_icon = "mdi:calendar-multiple"
 
     def __init__(
@@ -150,6 +159,11 @@ class UpcomingAnniversariesSensor(CoordinatorEntity[AnniversaryDataUpdateCoordin
         """Initialize the sensor."""
         super().__init__(coordinator)
         self._attr_unique_id = f"{DOMAIN}_summary_sensor"
+
+    @property
+    def entity_id(self) -> str:
+        """Return the entity ID."""
+        return f"sensor.anniversary_upcoming_anniversaries"
 
     @property
     def native_value(self) -> str | None:
