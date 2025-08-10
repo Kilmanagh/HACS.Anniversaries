@@ -76,7 +76,7 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
         """Initialize the sensor."""
         super().__init__(coordinator)
         self._entity_id = entity_id
-        self._attr_name = f"Anniversary {self.anniversary.name}"
+        self._attr_name = self.anniversary.name
         self._attr_unique_id = f"{entry.entry_id}_sensor"
 
         self.config = entry.options or entry.data
@@ -149,7 +149,7 @@ class UpcomingAnniversariesSensor(CoordinatorEntity[AnniversaryDataUpdateCoordin
     """Upcoming Anniversaries Sensor class."""
 
     _attr_attribution = ATTRIBUTION
-    _attr_name = "Anniversary Upcoming Anniversaries"
+    _attr_name = "Upcoming Anniversaries"
     _attr_icon = "mdi:calendar-multiple"
 
     def __init__(
