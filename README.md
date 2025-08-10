@@ -106,9 +106,6 @@ After creating an anniversary, you can click "Configure" to access additional op
 |Parameter |Optional|Description
 |:----------|----------|------------
 | `upcoming_anniversaries_sensor` | Yes | `true` or `false`. Enables a summary sensor showing the next 5 upcoming anniversaries. **Default**: `false`
-| `enable_generation_sensor` | Yes | `true` or `false`. Enables the `generation` attribute. **Default**: `false`
-| `enable_birthstone_sensor` | Yes | `true` or `false`. Enables the `birthstone` attribute. **Default**: `false`
-| `enable_birth_flower_sensor` | Yes | `true` or `false`. Enables the `birth_flower` attribute. **Default**: `false`
 
 ## State and Attributes
 
@@ -128,9 +125,9 @@ After creating an anniversary, you can click "Configure" to access additional op
 * `zodiac_sign`: The Western zodiac sign for the anniversary date.
 * `named_anniversary`: The traditional name for the anniversary (e.g., "Silver", "Golden"), if applicable.
 * `is_milestone`: `true` if the anniversary is a significant milestone (e.g., 10, 25, 50 years).
-* `generation`: The generational name (e.g., "Millennial", "Gen X") if enabled and the birth year is known.
-* `birthstone`: The birthstone for the anniversary month, if enabled.
-* `birth_flower`: The birth flower for the anniversary month, if enabled.
+* `generation`: The generational name (e.g., "Millennial", "Gen X") if the birth year is known.
+* `birthstone`: The birthstone for the anniversary month.
+* `birth_flower`: The birth flower for the anniversary month.
 * `half_anniversary_date`: The date of the next half anniversary, if enabled.
 * `days_until_half_anniversary`: The number of days until the next half anniversary, if enabled.
 
