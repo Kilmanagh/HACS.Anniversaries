@@ -94,10 +94,7 @@ class AnniversariesFlowHandler(config_entries.ConfigFlow):
     @staticmethod
     @callback
     def async_get_options_flow(config_entry):
-        if config_entry.options.get("unique_id", None) is not None:
-            return OptionsFlowHandler(config_entry)
-        else:
-            return EmptyOptions(config_entry)
+        return OptionsFlowHandler(config_entry)
 
 def is_not_date(date, one_time):
     try:
@@ -180,8 +177,3 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             }
         )
         return self.async_show_form(step_id="init", data_schema=data_schema)
-
-
-class EmptyOptions(config_entries.OptionsFlow):
-    def __init__(self, config_entry):
-        self.config_entry = config_entry
