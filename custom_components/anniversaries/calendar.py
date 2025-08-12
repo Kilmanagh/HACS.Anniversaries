@@ -8,6 +8,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.helpers import entity_registry as er
 from homeassistant.util import slugify
 
 from .const import DOMAIN
@@ -45,11 +46,23 @@ class AnniversaryCalendar(CoordinatorEntity[AnniversaryDataUpdateCoordinator], C
         name = (entry.options or entry.data).get("name", "anniversary")
         slug = slugify(name)
         short_id = entry.entry_id.split("-")[0]
-        self._fixed_entity_id = f"calendar.anniversary_{slug}_{short_id}"
+        self._suggested_object_id = f"anniversary_{slug}_{short_id}"
 
-    @property
-    def entity_id(self) -> str:  # type: ignore[override]
-        return self._fixed_entity_id
+    async def async_added_to_hass(self) -> None:  # type: ignore[override]
+        await super().async_added_to_hass()
+        current_eid = self.entity_id
+        try:
+            domain, object_id = current_eid.split(".")
+        except ValueError:
+            return
+        if not object_id.startswith("anniversary_"):
+            # Normalize partial prefix forms
+            clean_object = object_id
+            if clean_object.startswith("anniversary") and not clean_object.startswith("anniversary_"):
+                clean_object = clean_object[len("anniversary"):].lstrip("_")
+            new_object_id = f"anniversary_{clean_object}" if clean_object else "anniversary"
+            registry = er.async_get(self.hass)
+            registry.async_update_entity(current_eid, new_entity_id=f"{domain}.{new_object_id}")
 
     @property
     def anniversary(self) -> AnniversaryData | None:

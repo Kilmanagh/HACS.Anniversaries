@@ -6,6 +6,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.helpers import entity_registry as er
 from homeassistant.util import slugify
 
 from .const import (
@@ -84,7 +85,8 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
         slug = slugify(name)
         short_id = entry.entry_id.split("-")[0]
         self._internal_key = entry_id  # key used in coordinator dict
-        self._fixed_entity_id = f"sensor.anniversary_{slug}_{short_id}"
+    # Suggested object id produced from name with required prefix
+    self._suggested_object_id = f"anniversary_{slug}_{short_id}"
         self._attr_unique_id = f"{entry.entry_id}_sensor"
 
         # Icons / display config
@@ -94,10 +96,23 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
         self._soon_days = self.config.get(CONF_SOON, DEFAULT_SOON)
         self._attr_native_unit_of_measurement = self.config.get(CONF_UNIT_OF_MEASUREMENT, DEFAULT_UNIT_OF_MEASUREMENT)
 
-    @property
-    def entity_id(self) -> str:  # type: ignore[override]
-        """Return the enforced, stable entity_id with required prefix."""
-        return self._fixed_entity_id
+    async def async_added_to_hass(self) -> None:  # lifecycle hook
+        await super().async_added_to_hass()
+        # Enforce required prefix while allowing custom suffix edits.
+        current_eid = self.entity_id  # domain.object_id
+        try:
+            domain, object_id = current_eid.split(".")
+        except ValueError:
+            return
+        if not object_id.startswith("anniversary_"):
+            # Avoid double prefixing if user already partly added it
+            clean_object = object_id
+            if clean_object.startswith("anniversary") and not clean_object.startswith("anniversary_"):
+                # Normalize missing underscore after prefix
+                clean_object = clean_object[len("anniversary"):].lstrip("_")
+            new_object_id = f"anniversary_{clean_object}" if clean_object else "anniversary"
+            registry = er.async_get(self.hass)
+            registry.async_update_entity(current_eid, new_entity_id=f"{domain}.{new_object_id}")
 
     @property
     def anniversary(self) -> AnniversaryData | None:
@@ -187,9 +202,15 @@ class UpcomingAnniversariesSensor(CoordinatorEntity[AnniversaryDataUpdateCoordin
         self._attr_unique_id = f"{DOMAIN}_summary_sensor"
 
     @property
-    def entity_id(self) -> str:  # type: ignore[override]
-        """Return the fixed entity ID with anniversary prefix."""
-        return "sensor.anniversary_upcoming_anniversaries"
+    async def async_added_to_hass(self) -> None:  # type: ignore[override]
+        await super().async_added_to_hass()
+        # Ensure prefix for summary sensor as well
+        current_eid = self.entity_id
+        domain, object_id = current_eid.split(".")
+        if not object_id.startswith("anniversary_"):
+            registry = er.async_get(self.hass)
+            new_object_id = f"anniversary_{object_id}"
+            registry.async_update_entity(current_eid, new_entity_id=f"{domain}.{new_object_id}")
 
     @property
     def native_value(self) -> str | None:
