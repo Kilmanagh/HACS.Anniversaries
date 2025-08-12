@@ -6,6 +6,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.util import slugify
 
 from .const import (
     ATTRIBUTION,
@@ -67,16 +68,26 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
     def __init__(
         self,
         coordinator: AnniversaryDataUpdateCoordinator,
-        entity_id: str,
+        entry_id: str,
         entry: ConfigEntry,
     ) -> None:
-        """Initialize the sensor."""
-        super().__init__(coordinator)
-        self._entity_id = entity_id
-        self._attr_unique_id = f"{entry.entry_id}_sensor"
-        self._entry = entry
+        """Initialize the sensor.
 
+        We create a stable, prefixed entity_id of the form:
+          sensor.anniversary_<slugified_name>_<short-entry-id>
+        This remains stable for the lifetime of the config entry regardless of name edits.
+        """
+        super().__init__(coordinator)
+        self._entry = entry
         self.config = entry.options or entry.data
+        name = self.config.get("name", "anniversary")
+        slug = slugify(name)
+        short_id = entry.entry_id.split("-")[0]
+        self._internal_key = entry_id  # key used in coordinator dict
+        self._fixed_entity_id = f"sensor.anniversary_{slug}_{short_id}"
+        self._attr_unique_id = f"{entry.entry_id}_sensor"
+
+        # Icons / display config
         self._icon_normal = self.config.get(CONF_ICON_NORMAL, DEFAULT_ICON_NORMAL)
         self._icon_today = self.config.get(CONF_ICON_TODAY, DEFAULT_ICON_TODAY)
         self._icon_soon = self.config.get(CONF_ICON_SOON, DEFAULT_ICON_SOON)
@@ -84,11 +95,16 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
         self._attr_native_unit_of_measurement = self.config.get(CONF_UNIT_OF_MEASUREMENT, DEFAULT_UNIT_OF_MEASUREMENT)
 
     @property
+    def entity_id(self) -> str:  # type: ignore[override]
+        """Return the enforced, stable entity_id with required prefix."""
+        return self._fixed_entity_id
+
+    @property
     def anniversary(self) -> AnniversaryData | None:
         """Return the anniversary data."""
-        if not hasattr(self.coordinator, 'anniversaries') or self.coordinator.anniversaries is None:
+    if not hasattr(self.coordinator, 'anniversaries') or self.coordinator.anniversaries is None:
             return None
-        return self.coordinator.anniversaries.get(self._entity_id)
+    return self.coordinator.anniversaries.get(self._internal_key)
 
     @property
     def available(self) -> bool:
@@ -171,16 +187,16 @@ class UpcomingAnniversariesSensor(CoordinatorEntity[AnniversaryDataUpdateCoordin
         self._attr_unique_id = f"{DOMAIN}_summary_sensor"
 
     @property
-    def entity_id(self) -> str:
-        """Return the entity ID."""
-        return f"sensor.anniversary_upcoming_anniversaries"
+    def entity_id(self) -> str:  # type: ignore[override]
+        """Return the fixed entity ID with anniversary prefix."""
+        return "sensor.anniversary_upcoming_anniversaries"
 
     @property
     def native_value(self) -> str | None:
         """Return the state of the sensor."""
         upcoming = self.coordinator.upcoming_anniversaries
         if not upcoming:
-            return "Nothing"
+            return None
         return upcoming[0].name
 
     @property

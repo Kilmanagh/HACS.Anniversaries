@@ -8,6 +8,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.util import slugify
 
 from .const import DOMAIN
 from .coordinator import AnniversaryDataUpdateCoordinator
@@ -30,20 +31,32 @@ class AnniversaryCalendar(CoordinatorEntity[AnniversaryDataUpdateCoordinator], C
     def __init__(
         self,
         coordinator: AnniversaryDataUpdateCoordinator,
-        entity_id: str,
+        entry_id: str,
         entry: ConfigEntry,
     ) -> None:
-        """Initialize the calendar."""
+        """Initialize the calendar with a stable prefixed entity id.
+
+        Format: calendar.anniversary_<slugified_name>_<short-entry-id>
+        """
         super().__init__(coordinator)
-        self._entity_id = entity_id
+        self._entry = entry
+        self._internal_key = entry_id
         self._attr_unique_id = f"{entry.entry_id}_calendar"
+        name = (entry.options or entry.data).get("name", "anniversary")
+        slug = slugify(name)
+        short_id = entry.entry_id.split("-")[0]
+        self._fixed_entity_id = f"calendar.anniversary_{slug}_{short_id}"
+
+    @property
+    def entity_id(self) -> str:  # type: ignore[override]
+        return self._fixed_entity_id
 
     @property
     def anniversary(self) -> AnniversaryData | None:
         """Return the anniversary data."""
-        if not hasattr(self.coordinator, 'anniversaries') or self.coordinator.anniversaries is None:
+    if not hasattr(self.coordinator, 'anniversaries') or self.coordinator.anniversaries is None:
             return None
-        return self.coordinator.anniversaries.get(self._entity_id)
+    return self.coordinator.anniversaries.get(self._internal_key)
 
     @property
     def available(self) -> bool:
