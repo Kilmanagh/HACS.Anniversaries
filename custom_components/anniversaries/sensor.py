@@ -1,7 +1,7 @@
 """Sensor platform for Anniversaries."""
 from __future__ import annotations
 
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -63,6 +63,7 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
     """Sensor for a single anniversary."""
 
     _attr_attribution = ATTRIBUTION
+    _attr_device_class = SensorDeviceClass.DURATION
 
     def __init__(
         self,
