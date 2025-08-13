@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, date
 import logging
 import heapq
 
@@ -31,11 +31,16 @@ class AnniversaryDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Anniversa
 
     async def _async_update_data(self) -> dict[str, AnniversaryData]:
         """Fetch the latest data."""
-        # Update upcoming anniversaries
+        today = date.today()
+        candidates = [
+            a for a in self.anniversaries.values()
+            if not (a.is_one_time and a.date < today)
+        ]
+        # Use days_remaining to ensure correct ordering for same-year rollover
         self.upcoming = heapq.nsmallest(
             5,
-            self.anniversaries.values(),
-            key=lambda x: x.next_anniversary_date,
+            candidates,
+            key=lambda x: x.days_remaining,
         )
         # Return the anniversaries dict as the coordinator data
         return self.anniversaries
