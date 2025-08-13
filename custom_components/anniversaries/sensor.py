@@ -46,13 +46,11 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Set up the sensor platform."""
+    """Set up the sensor entities for a config entry."""
     coordinator: AnniversaryDataUpdateCoordinator = hass.data[DOMAIN]["coordinator"]
 
-    # Add the individual anniversary sensor
     async_add_entities([AnniversarySensor(coordinator, entry.entry_id, entry)])
 
-    # Add the summary sensor if it is enabled and doesn't exist yet
     if entry.options.get(CONF_UPCOMING_ANNIVERSARIES_SENSOR, False):
         lock = hass.data[DOMAIN]["coordinator_lock"]
         async with lock:
@@ -62,7 +60,7 @@ async def async_setup_entry(
 
 
 class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], SensorEntity):
-    """anniversaries Sensor class."""
+    """Sensor for a single anniversary."""
 
     _attr_attribution = ATTRIBUTION
 
@@ -72,43 +70,34 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
         entry_id: str,
         entry: ConfigEntry,
     ) -> None:
-        """Initialize the sensor.
-
-        We create a stable, prefixed entity_id of the form:
-          sensor.anniversary_<slugified_name>_<short-entry-id>
-        This remains stable for the lifetime of the config entry regardless of name edits.
-        """
         super().__init__(coordinator)
         self._entry = entry
         self.config = entry.options or entry.data
         name = self.config.get("name", "anniversary")
         slug = slugify(name)
         short_id = entry.entry_id.split("-")[0]
-        self._internal_key = entry_id  # key used in coordinator dict
-    # Suggested object id produced from name with required prefix
-    self._suggested_object_id = f"anniversary_{slug}_{short_id}"
+        self._internal_key = entry_id
+        self._suggested_object_id = f"anniversary_{slug}_{short_id}"
         self._attr_unique_id = f"{entry.entry_id}_sensor"
-
-        # Icons / display config
         self._icon_normal = self.config.get(CONF_ICON_NORMAL, DEFAULT_ICON_NORMAL)
         self._icon_today = self.config.get(CONF_ICON_TODAY, DEFAULT_ICON_TODAY)
         self._icon_soon = self.config.get(CONF_ICON_SOON, DEFAULT_ICON_SOON)
         self._soon_days = self.config.get(CONF_SOON, DEFAULT_SOON)
-        self._attr_native_unit_of_measurement = self.config.get(CONF_UNIT_OF_MEASUREMENT, DEFAULT_UNIT_OF_MEASUREMENT)
+        self._attr_native_unit_of_measurement = self.config.get(
+            CONF_UNIT_OF_MEASUREMENT, DEFAULT_UNIT_OF_MEASUREMENT
+        )
 
-    async def async_added_to_hass(self) -> None:  # lifecycle hook
+    async def async_added_to_hass(self) -> None:
+        """Handle entity being added to hass."""
         await super().async_added_to_hass()
-        # Enforce required prefix while allowing custom suffix edits.
-        current_eid = self.entity_id  # domain.object_id
+        current_eid = self.entity_id
         try:
             domain, object_id = current_eid.split(".")
         except ValueError:
             return
         if not object_id.startswith("anniversary_"):
-            # Avoid double prefixing if user already partly added it
             clean_object = object_id
             if clean_object.startswith("anniversary") and not clean_object.startswith("anniversary_"):
-                # Normalize missing underscore after prefix
                 clean_object = clean_object[len("anniversary"):].lstrip("_")
             new_object_id = f"anniversary_{clean_object}" if clean_object else "anniversary"
             registry = er.async_get(self.hass)
@@ -116,97 +105,89 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
 
     @property
     def anniversary(self) -> AnniversaryData | None:
-        """Return the anniversary data."""
-    if not hasattr(self.coordinator, 'anniversaries') or self.coordinator.anniversaries is None:
+        """Get anniversary data."""
+        if not hasattr(self.coordinator, "anniversaries") or self.coordinator.anniversaries is None:
             return None
-    return self.coordinator.anniversaries.get(self._internal_key)
+        return self.coordinator.anniversaries.get(self._internal_key)
 
     @property
     def available(self) -> bool:
-        """Return True if entity is available."""
+        """Return if entity is available."""
         return self.anniversary is not None
 
     @property
     def name(self) -> str:
         """Return the name of the sensor."""
-        anniversary = self.anniversary
-        if anniversary is None:
-            return "Unknown Anniversary"
-        return anniversary.name
+        ann = self.anniversary
+        return ann.name if ann else "Unknown Anniversary"
 
     @property
     def native_value(self) -> int | None:
         """Return the state of the sensor."""
-        anniversary = self.anniversary
-        if anniversary is None:
-            return None
-        return anniversary.days_remaining
+        ann = self.anniversary
+        return ann.days_remaining if ann else None
 
     @property
     def icon(self) -> str:
-        """Return the icon of the sensor."""
-        anniversary = self.anniversary
-        if anniversary is None:
-            return self.config.get(CONF_ICON_NORMAL, DEFAULT_ICON_NORMAL)
-        
-        days_remaining = anniversary.days_remaining
-        if days_remaining == 0:
-            return self.config.get(CONF_ICON_TODAY, DEFAULT_ICON_TODAY)
-        if days_remaining <= self.config.get(CONF_SOON, DEFAULT_SOON):
-            return self.config.get(CONF_ICON_SOON, DEFAULT_ICON_SOON)
-        return self.config.get(CONF_ICON_NORMAL, DEFAULT_ICON_NORMAL)
+        """Return the icon to use in the frontend."""
+        ann = self.anniversary
+        if not ann:
+            return self._icon_normal
+        days = ann.days_remaining
+        if days == 0:
+            return self._icon_today
+        if days <= self._soon_days:
+            return self._icon_soon
+        return self._icon_normal
 
     @property
     def extra_state_attributes(self) -> dict[str, any]:
-        """Return the state attributes."""
-        anniversary = self.anniversary
-        if anniversary is None:
+        """Return entity specific state attributes."""
+        ann = self.anniversary
+        if not ann:
             return {}
-            
-        attrs = {
-            ATTR_NEXT_DATE: anniversary.next_anniversary_date,
-            ATTR_WEEKS: anniversary.weeks_remaining,
-            ATTR_ZODIAC_SIGN: anniversary.zodiac_sign,
-            ATTR_IS_MILESTONE: anniversary.is_milestone,
-            ATTR_GENERATION: anniversary.generation,
-            ATTR_BIRTHSTONE: anniversary.birthstone,
-            ATTR_BIRTH_FLOWER: anniversary.birth_flower,
+        attrs: dict[str, any] = {
+            ATTR_NEXT_DATE: ann.next_anniversary_date,
+            ATTR_WEEKS: ann.weeks_remaining,
+            ATTR_ZODIAC_SIGN: ann.zodiac_sign,
+            ATTR_IS_MILESTONE: ann.is_milestone,
+            ATTR_GENERATION: ann.generation,
+            ATTR_BIRTHSTONE: ann.birthstone,
+            ATTR_BIRTH_FLOWER: ann.birth_flower,
         }
-        if anniversary.named_anniversary:
-            attrs[ATTR_NAMED_ANNIVERSARY] = anniversary.named_anniversary
-        if anniversary.current_years is not None:
-            attrs[ATTR_YEARS_CURRENT] = anniversary.current_years
-        if anniversary.next_years is not None:
-            attrs[ATTR_YEARS_NEXT] = anniversary.next_years
-        if anniversary.half_anniversary_date is not None:
-            attrs[ATTR_HALF_DATE] = anniversary.half_anniversary_date
-            attrs[ATTR_HALF_DAYS] = anniversary.days_until_half_anniversary
-        if not anniversary.unknown_year:
-            attrs[ATTR_DATE] = anniversary.date
+        if ann.named_anniversary:
+            attrs[ATTR_NAMED_ANNIVERSARY] = ann.named_anniversary
+        if ann.current_years is not None:
+            attrs[ATTR_YEARS_CURRENT] = ann.current_years
+        if ann.next_years is not None:
+            attrs[ATTR_YEARS_NEXT] = ann.next_years
+        if ann.half_anniversary_date is not None:
+            attrs[ATTR_HALF_DATE] = ann.half_anniversary_date
+            attrs[ATTR_HALF_DAYS] = ann.days_until_half_anniversary
+        if not ann.unknown_year:
+            attrs[ATTR_DATE] = ann.date
         return attrs
 
 
 class UpcomingAnniversariesSensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], SensorEntity):
-    """Upcoming Anniversaries Sensor class."""
+    """Aggregated sensor listing next anniversaries."""
 
     _attr_attribution = ATTRIBUTION
     _attr_name = "Upcoming Anniversaries"
     _attr_icon = "mdi:calendar-multiple"
 
-    def __init__(
-        self,
-        coordinator: AnniversaryDataUpdateCoordinator,
-    ) -> None:
-        """Initialize the sensor."""
+    def __init__(self, coordinator: AnniversaryDataUpdateCoordinator) -> None:
         super().__init__(coordinator)
         self._attr_unique_id = f"{DOMAIN}_summary_sensor"
 
-    @property
-    async def async_added_to_hass(self) -> None:  # type: ignore[override]
+    async def async_added_to_hass(self) -> None:
+        """Handle entity being added to hass."""
         await super().async_added_to_hass()
-        # Ensure prefix for summary sensor as well
         current_eid = self.entity_id
-        domain, object_id = current_eid.split(".")
+        try:
+            domain, object_id = current_eid.split(".")
+        except ValueError:
+            return
         if not object_id.startswith("anniversary_"):
             registry = er.async_get(self.hass)
             new_object_id = f"anniversary_{object_id}"
@@ -222,19 +203,17 @@ class UpcomingAnniversariesSensor(CoordinatorEntity[AnniversaryDataUpdateCoordin
 
     @property
     def extra_state_attributes(self) -> dict[str, any] | None:
-        """Return the state attributes."""
+        """Return entity specific state attributes."""
         upcoming = self.coordinator.upcoming_anniversaries
         if not upcoming:
             return None
-
-        attrs = {
+        return {
             "upcoming": [
                 {
-                    "name": anniversary.name,
-                    "date": anniversary.next_anniversary_date.isoformat(),
-                    "days_remaining": anniversary.days_remaining,
+                    "name": a.name,
+                    "date": a.next_anniversary_date.isoformat(),
+                    "days_remaining": a.days_remaining,
                 }
-                for anniversary in upcoming
+                for a in upcoming
             ]
         }
-        return attrs
