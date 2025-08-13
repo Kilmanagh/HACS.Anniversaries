@@ -9,6 +9,7 @@ from homeassistant.const import CONF_NAME, CONF_SENSORS, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.template import Template
+from homeassistant.helpers import entity_registry as er
 
 from .const import (
     CONF_DATE,
@@ -96,6 +97,47 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     entry.async_on_unload(entry.add_update_listener(update_listener))
 
+    return True
+
+
+async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Migrate old config entries.
+
+    Version 1 -> 2: Ensure entity_ids have required anniversary_ prefix.
+    """
+    version = getattr(entry, "version", 1)
+    if version >= 2:
+        return True
+
+    _LOGGER.info("Migrating Anniversaries entry '%s' from version %s to 2", entry.entry_id, version)
+    registry = er.async_get(hass)
+    updated = 0
+    for entity_entry in list(registry.entities.values()):  # copy of values
+        if entity_entry.platform != DOMAIN:
+            continue
+        # sensor/calendar bound to this config entry by unique_id pattern
+        if not (entity_entry.unique_id.startswith(entry.entry_id) or entity_entry.unique_id == f"{DOMAIN}_summary_sensor"):
+            continue
+        object_id = entity_entry.object_id
+        domain = entity_entry.domain
+        if not object_id.startswith("anniversary_"):
+            # Normalize partial prefix forms
+            clean_object = object_id
+            if clean_object.startswith("anniversary") and not clean_object.startswith("anniversary_"):
+                clean_object = clean_object[len("anniversary"):].lstrip("_-")
+            new_object_id = f"anniversary_{clean_object}" if clean_object else "anniversary"
+            new_entity_id = f"{domain}.{new_object_id}"
+            try:
+                registry.async_update_entity(entity_entry.entity_id, new_entity_id=new_entity_id)
+                updated += 1
+            except Exception as exc:  # pragma: no cover - defensive
+                _LOGGER.warning("Failed to update entity_id %s: %s", entity_entry.entity_id, exc)
+
+    if updated:
+        _LOGGER.info("Updated %s entity_id(s) to include anniversary_ prefix", updated)
+
+    # Update entry version
+    hass.config_entries.async_update_entry(entry, version=2)
     return True
 
 

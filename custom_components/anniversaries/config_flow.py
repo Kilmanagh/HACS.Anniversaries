@@ -44,8 +44,15 @@ class AnniversariesFlowHandler(config_entries.ConfigFlow):
         errors = {}
         if user_input is not None:
             try:
+                # Prevent leading anniversary_ prefix in name to avoid double prefix
+                raw_name = user_input[CONF_NAME].strip()
+                if raw_name.lower().startswith("anniversary_"):
+                    errors[CONF_NAME] = "no_prefix"
+                    raise ValueError("name has forbidden prefix")
+
                 # Validate date
                 if is_not_date(user_input[CONF_DATE], user_input.get(CONF_ONE_TIME, False)):
+                    errors[CONF_DATE] = "invalid"
                     raise ValueError("Invalid date")
 
                 # Set a unique ID for the entry
@@ -53,8 +60,11 @@ class AnniversariesFlowHandler(config_entries.ConfigFlow):
                 self._abort_if_unique_id_configured()
 
                 return self.async_create_entry(title=user_input[CONF_NAME], data=user_input)
+            except ValueError:
+                if "base" not in errors and not errors:
+                    errors["base"] = "invalid"
             except Exception:
-                errors["base"] = "invalid_date"
+                errors["base"] = "invalid"
 
         data_schema = vol.Schema(
             {
