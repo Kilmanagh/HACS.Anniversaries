@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Test script to verify the Anniversaries integration works."""
+"""Manual test script (excluded from automated pytest collection).
+
+Pytest will skip this file because of the explicit skip marker below. It is
+kept only for ad-hoc local runs (python test_integration.py) without pulling
+in full Home Assistant server dependencies.
+"""
+import pytest  # type: ignore
+pytest.skip("manual script - skip in automated test run", allow_module_level=True)
 
 import sys
 import os
