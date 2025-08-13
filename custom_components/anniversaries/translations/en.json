@@ -9,9 +9,6 @@
                     "count_up": "Count Up (Count down is default)",
                     "one_time": "One Time Event (Non-recurring)",
                     "show_half_anniversary": "Show Half Anniversary Attributes",
-                    "enable_generation_sensor": "Show Generation Attribute",
-                    "enable_birthstone_sensor": "Show Birthstone Attribute",
-                    "enable_birth_flower_sensor": "Show Birth Flower Attribute",
                     "unit_of_measurement": "Text for unit_of_measurement",
                     "id_prefix": "Entity_id Prefix"
                 }
@@ -27,7 +24,8 @@
             }
         },
         "error": {
-            "invalid_date": "The date is not valid.  Please enter a valid 'YYYY-MM-DD'  or 'MM-DD' date"
+            "invalid_date": "The date is not valid.  Please enter a valid 'YYYY-MM-DD'  or 'MM-DD' date",
+            "no_prefix": "Do not start the name with 'anniversary_'"
         }
     },
     "options": {
@@ -40,9 +38,6 @@
                     "count_up": "Count Up (Count down is default)",
                     "one_time": "One Time Event (Non-recurring)",
                     "show_half_anniversary": "Show Half Anniversary Attributes",
-                    "enable_generation_sensor": "Show Generation Attribute",
-                    "enable_birthstone_sensor": "Show Birthstone Attribute", 
-                    "enable_birth_flower_sensor": "Show Birth Flower Attribute",
                     "upcoming_anniversaries_sensor": "Enable Upcoming Anniversaries Summary Sensor",
                     "unit_of_measurement": "Text for unit_of_measurement"
                 }
@@ -58,7 +53,8 @@
             }
         },
         "error": {
-            "invalid_date": "The date is not valid.  Please enter a valid 'YYYY-MM-DD' or 'MM-DD' date."
+            "invalid_date": "The date is not valid.  Please enter a valid 'YYYY-MM-DD' or 'MM-DD' date.",
+            "no_prefix": "Do not start the name with 'anniversary_'"
         }
     }
 }
