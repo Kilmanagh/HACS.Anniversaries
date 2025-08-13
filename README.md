@@ -14,19 +14,45 @@
 
 The 'anniversaries' component is a Home Assistant custom sensor which counts down to a recurring date such as birthdays, but can be used for any anniversary which occurs annually on the same date.
 
-Any anniversaries entries configured will be added to the home assistant calendar.  This also generates the `calendar.anniversaries` entity, which shows information about the next configured anniversary. _N.B. At the moment, only the next occurence of the anniversaries are added to the calendar_
+Any anniversaries entries configured will be added to the home assistant calendar. This also generates the `calendar.anniversaries` entity, which shows information about the next configured anniversary. _N.B. At the moment, only the next occurrence of the anniversaries are added to the calendar_
+
+## ✨ NEW: Custom Lovelace Cards
+
+This integration now includes **4 beautiful custom Lovelace cards** with emoji/icon support:
+
+- 🗓️ **Timeline Card**: Chronological list with color coding and attribute badges
+- 🌟 **Details Card**: Rich single-anniversary view with animations and backgrounds  
+- 📅 **Calendar Card**: Interactive mini calendar with clickable dates
+- 📊 **Stats Card**: Summary statistics and distribution charts
+
+See [CARDS.md](CARDS.md) for detailed card documentation and configuration examples.
+
+## 🎯 Features
+
+- ✅ **Automatic entity ID prefixing** with `anniversary_` for better organization
+- ✅ **Rich attributes**: zodiac signs ♈, birthstones 💎, generations 👥, milestones 🌟
+- ✅ **Calendar integration** with anniversary events
+- ✅ **Custom Lovelace cards** with animations and emoji support
+- ✅ **Upcoming anniversaries sensor** for dashboard summaries
+- ✅ **Half-anniversary support** for special dates
+- ✅ **Count-up mode** to track years since events
+- ✅ **One-time events** for non-recurring dates
+- ✅ **Multi-language support** with translations
 
 ## Table of Contents
 
 * [Installation](#installation)
   * [Manual Installation](#manual-installation)
   * [Installation via HACS](#installation-via-hacs)
+* [Custom Lovelace Cards](#custom-lovelace-cards)
 * [Configuration](#configuration)
   * [Configuration Parameters](#configuration-parameters)
 * [State and Attributes](#state-and-attributes)
   * [State](#state)
   * [Attributes](#attributes)
   * [Notes about unit of measurement](#notes-about-unit-of-measurement)
+* [Entity ID Management](#entity-id-management)
+* [Troubleshooting](#troubleshooting)
 
 ## Installation
 
@@ -46,6 +72,40 @@ Any anniversaries entries configured will be added to the home assistant calenda
 2. Search for and install the "anniversaries" integration.
 3. Configure the `anniversaries` sensor.
 4. Restart Home Assistant.
+5. **Custom cards are automatically available** - look for "Anniversary" cards in the Lovelace card picker!
+
+## Custom Lovelace Cards
+
+This integration includes 4 beautiful custom cards that automatically install with the integration:
+
+### 🗓️ Timeline Card (`anniversary-timeline-card`)
+Shows upcoming anniversaries in chronological order with:
+- Color coding by urgency (red=today, orange=week, yellow=month, green=future)
+- Optional attribute badges (zodiac ♈, birthstone 💎, generation 👥)
+- Smart emoji icons (🎂 birthdays, 💍 weddings, 📅 general)
+
+### 🌟 Details Card (`anniversary-details-card`)  
+Rich single-anniversary view featuring:
+- Dynamic background gradients based on days remaining
+- Pulse animation for today's anniversaries, sparkle for milestones
+- All anniversary attributes displayed beautifully
+- Compact mode option
+
+### 📅 Calendar Card (`anniversary-calendar-card`)
+Interactive mini calendar with:
+- Anniversary dates highlighted with visual indicators
+- Click dates for popup details
+- Month navigation controls
+- Support for multiple anniversaries per day
+
+### 📊 Stats Card (`anniversary-stats-card`)
+Comprehensive overview including:
+- Summary statistics (total, today, this week, month, milestones)  
+- Next 3 upcoming anniversaries
+- Distribution charts (zodiac signs, generations)
+- Quick insights and trends
+
+**For detailed card configuration and examples, see [CARDS.md](CARDS.md)**
 
 ## Configuration
 
@@ -150,6 +210,40 @@ This sensor is created if you enable it in the options.
 
 Unit_of_measurement is *not* translate-able.
 You can, however, change the text for unit of measurement in the configuration.  NB the sensor will always report in days, this just allows you to represent this in your own language.
+
+## Entity ID Management
+
+All anniversary entities automatically use the `anniversary_` prefix for better organization:
+
+- **Sensors**: `sensor.anniversary_mom_birthday_abc123`
+- **Calendars**: `calendar.anniversary_mom_birthday_abc123`  
+- **Summary Sensor**: `sensor.anniversary_upcoming_anniversaries` (when enabled)
+
+### Automatic Migration
+The integration automatically migrates existing entities to use the proper prefix. Entity IDs are updated during the migration process to ensure consistency.
+
+## Troubleshooting
+
+### Common Issues
+
+**IndentationError or SyntaxError during setup:**
+- Clear the integration's Python cache: `rm -rf /config/custom_components/anniversaries/__pycache__`
+- Restart Home Assistant
+- Ensure you have the latest version from HACS
+
+**Custom cards not appearing:**
+- Clear your browser cache (Ctrl+F5 or Cmd+Shift+R)
+- Verify the integration has `"frontend": true` in manifest.json
+- Look for "Anniversary" in the custom cards section of the card picker
+
+**Display Precision option showing for anniversary sensors:**
+- This has been fixed in recent versions - anniversary sensors now use `SensorDeviceClass.DURATION`
+- Update to the latest version to remove the irrelevant precision option
+
+**Entity IDs not using anniversary_ prefix:**
+- The integration automatically migrates entities on startup
+- Check Configuration → Entities to verify the new entity IDs
+- Old automations/scripts may need entity ID updates
 
 [patreon-shield]: https://c5.patreon.com/external/logo/become_a_patron_button.png
 [patreon]: https://www.patreon.com/pinkywafer
