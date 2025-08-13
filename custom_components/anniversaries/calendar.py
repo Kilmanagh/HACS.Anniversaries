@@ -35,10 +35,7 @@ class AnniversaryCalendar(CoordinatorEntity[AnniversaryDataUpdateCoordinator], C
         entry_id: str,
         entry: ConfigEntry,
     ) -> None:
-        """Initialize the calendar with a stable prefixed entity id.
-
-        Format: calendar.anniversary_<slugified_name>_<short-entry-id>
-        """
+        """Initialize the calendar with a stable prefixed entity id."""
         super().__init__(coordinator)
         self._entry = entry
         self._internal_key = entry_id
@@ -48,7 +45,8 @@ class AnniversaryCalendar(CoordinatorEntity[AnniversaryDataUpdateCoordinator], C
         short_id = entry.entry_id.split("-")[0]
         self._suggested_object_id = f"anniversary_{slug}_{short_id}"
 
-    async def async_added_to_hass(self) -> None:  # type: ignore[override]
+    async def async_added_to_hass(self) -> None:
+        """Handle entity being added to hass."""
         await super().async_added_to_hass()
         current_eid = self.entity_id
         try:
@@ -56,7 +54,6 @@ class AnniversaryCalendar(CoordinatorEntity[AnniversaryDataUpdateCoordinator], C
         except ValueError:
             return
         if not object_id.startswith("anniversary_"):
-            # Normalize partial prefix forms
             clean_object = object_id
             if clean_object.startswith("anniversary") and not clean_object.startswith("anniversary_"):
                 clean_object = clean_object[len("anniversary"):].lstrip("_")
@@ -67,9 +64,9 @@ class AnniversaryCalendar(CoordinatorEntity[AnniversaryDataUpdateCoordinator], C
     @property
     def anniversary(self) -> AnniversaryData | None:
         """Return the anniversary data."""
-    if not hasattr(self.coordinator, 'anniversaries') or self.coordinator.anniversaries is None:
+        if not hasattr(self.coordinator, "anniversaries") or self.coordinator.anniversaries is None:
             return None
-    return self.coordinator.anniversaries.get(self._internal_key)
+        return self.coordinator.anniversaries.get(self._internal_key)
 
     @property
     def available(self) -> bool:
