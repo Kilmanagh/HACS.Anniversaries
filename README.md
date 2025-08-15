@@ -1,6 +1,6 @@
 # Anniversaries
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
+[![HACS](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/pinkywafer/Anniversaries)](https://github.com/pinkywafer/Anniversaries/releases)
 ![GitHub Release Date](https://img.shields.io/github/release-date/pinkywafer/Anniversaries)
 [![GitHub](https://img.shields.io/github/license/pinkywafer/Anniversaries)](LICENSE)
@@ -16,16 +16,22 @@ The 'anniversaries' component is a Home Assistant custom sensor which counts dow
 
 Any anniversaries entries configured will be added to the home assistant calendar. This also generates the `calendar.anniversaries` entity, which shows information about the next configured anniversary. _N.B. At the moment, only the next occurrence of the anniversaries are added to the calendar_
 
-## ✨ NEW: Custom Lovelace Cards
+[![Support Pinkywafer on Patreon][patreon-shield]][patreon]
 
-This integration now includes **4 beautiful custom Lovelace cards** with emoji/icon support:
+The 'anniversaries' component is a Home Assistant custom sensor which counts down to a recurring date such as birthdays, but can be used for any anniversary which occurs annually on the same date.
+
+Any anniversaries entries configured will be added to the home assistant calendar. This also generates the `calendar.anniversaries` entity, which shows information about the next configured anniversary. _N.B. At the moment, only the next occurrence of the anniversaries are added to the calendar_
+
+## ✨ Custom Lovelace Cards
+
+This integration includes **4 custom Lovelace cards** that are **automatically loaded** when you install the integration:
 
 - 🗓️ **Timeline Card**: Chronological list with color coding and attribute badges
 - 🌟 **Details Card**: Rich single-anniversary view with animations and backgrounds  
 - 📅 **Calendar Card**: Interactive mini calendar with clickable dates
 - 📊 **Stats Card**: Summary statistics and distribution charts
 
-See [CARDS.md](CARDS.md) for detailed card documentation and configuration examples.
+The cards will automatically appear in your Lovelace card picker after installing the integration. See [CARDS.md](CARDS.md) for detailed configuration options.
 
 ## 🎯 Features
 
@@ -72,7 +78,7 @@ See [CARDS.md](CARDS.md) for detailed card documentation and configuration examp
 2. Search for and install the "anniversaries" integration.
 3. Configure the `anniversaries` sensor.
 4. Restart Home Assistant.
-5. **Custom cards are automatically available** - look for "Anniversary" cards in the Lovelace card picker!
+5. **Register custom cards** - go to Settings → Dashboards → Resources and add the card JavaScript files (see [CARDS.md](CARDS.md) for details)
 
 ## Custom Lovelace Cards
 
@@ -232,9 +238,10 @@ The integration automatically migrates existing entities to use the proper prefi
 - Ensure you have the latest version from HACS
 
 **Custom cards not appearing:**
+- Register the card resources in Settings → Dashboards → Resources first
+- Add each JavaScript file with type "JavaScript module"  
 - Clear your browser cache (Ctrl+F5 or Cmd+Shift+R)
-- Verify the integration has `"frontend": true` in manifest.json
-- Look for "Anniversary" in the custom cards section of the card picker
+- Verify files exist at `/local/custom_components/anniversaries/www/[filename].js`
 
 **Display Precision option showing for anniversary sensors:**
 - This has been fixed in recent versions - anniversary sensors now use `SensorDeviceClass.DURATION`

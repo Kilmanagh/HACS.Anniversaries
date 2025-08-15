@@ -5,8 +5,8 @@
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/pinkywafer/Anniversaries",
-  "frontend": true,
   "iot_class": "calculated",
+  "issue_tracker": "https://github.com/pinkywafer/Anniversaries/issues",
   "requirements": [
     "python-dateutil>=2.8.1",
     "integrationhelper>=0.2.2",

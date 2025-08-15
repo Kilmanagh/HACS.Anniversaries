@@ -1,6 +1,10 @@
 # Anniversary Custom Cards
 
-This integration includes 4 custom Lovelace cards for displaying anniversary information with rich visuals and emojis.
+This integration includes 4 custom Lovelace cards that are automatically loaded when the integration is installed. The cards provide rich visuals and emoji support for displaying anniversary information.
+
+## Automatic Installation
+
+The cards are automatically registered when you install the Anniversaries integration. They will appear in your Lovelace card picker without any manual configuration required.
 
 ## Card Types
 
@@ -97,20 +101,56 @@ show_charts: true
 
 ## Installation & Usage
 
-The cards are automatically available when you install the Anniversaries integration. No additional installation required!
+The cards need to be manually registered in Home Assistant since they're part of a custom integration.
 
-### Step-by-Step Usage:
+### Step-by-Step Setup:
 
 #### 1. Install/Update the Integration
 - Install Anniversaries via HACS or update to the latest version
 - Restart Home Assistant
 
-#### 2. Clear Browser Cache
-- **Chrome/Edge**: Press `Ctrl+Shift+R` (Windows) or `Cmd+Shift+R` (Mac)
-- **Firefox**: Press `Ctrl+F5` or `Cmd+Shift+R`
-- **Safari**: Press `Cmd+Option+R`
+#### 2. Register the Custom Cards
+You need to add the card JavaScript files as resources in Home Assistant:
 
-#### 3. Add Cards to Your Dashboard
+**Method A: Via UI (Recommended)**
+1. Go to **Settings** → **Dashboards** 
+2. Click the **⋮** menu (three dots) in top right
+3. Click **Resources**
+4. Click **Add Resource** and add these one by one:
+
+```
+/local/custom_components/anniversaries/www/anniversary-timeline-card.js
+/local/custom_components/anniversaries/www/anniversary-details-card.js  
+/local/custom_components/anniversaries/www/anniversary-calendar-card.js
+/local/custom_components/anniversaries/www/anniversary-stats-card.js
+```
+
+- Set **Resource type** to **JavaScript module** for each
+- Click **Create** for each resource
+
+**Method B: Via YAML Configuration**
+Add this to your `configuration.yaml`:
+
+```yaml
+lovelace:
+  resources:
+    - url: /local/custom_components/anniversaries/www/anniversary-timeline-card.js
+      type: module
+    - url: /local/custom_components/anniversaries/www/anniversary-details-card.js
+      type: module
+    - url: /local/custom_components/anniversaries/www/anniversary-calendar-card.js
+      type: module
+    - url: /local/custom_components/anniversaries/www/anniversary-stats-card.js
+      type: module
+```
+
+#### 3. Clear Browser Cache & Restart
+- **Clear browser cache**: Press `Ctrl+Shift+R` (Windows) or `Cmd+Shift+R` (Mac)
+- **Restart Home Assistant** to load the new resources
+
+#### 4. Add Cards to Your Dashboard
+
+**Now the cards will be available in the card picker:**
 
 **Method A: Visual Card Picker (Recommended)**
 1. Go to your dashboard and click **Edit Dashboard**
@@ -132,7 +172,7 @@ The cards are automatically available when you install the Anniversaries integra
 4. Paste one of the example configurations below
 5. Modify as needed and click **Save**
 
-#### 4. Configure Your Cards
+#### 5. Configure Your Cards
 Each card has different configuration options - see the examples below for the full syntax.
 
 ### Quick Start Examples
@@ -167,10 +207,15 @@ type: custom:anniversary-stats-card
 ### Troubleshooting
 
 **Cards not showing up in picker:**
-- Verify you've cleared browser cache
+- Verify you've **registered the resources** in Settings → Dashboards → Resources
+- Check that all 4 JavaScript files are listed with type "JavaScript module"
+- Clear browser cache (Ctrl+Shift+R) and restart Home Assistant
 - Check browser console (F12) for JavaScript errors
-- Make sure integration is updated to latest version
-- Try refreshing the page (`F5`)
+
+**"Cannot find card" errors:**
+- Ensure resource URLs are correct: `/local/custom_components/anniversaries/www/[filename].js`
+- Verify files exist by visiting the URL directly in browser
+- Make sure integration is installed and running properly
 
 **Cards not working properly:**
 - Ensure your anniversary sensors exist and are working

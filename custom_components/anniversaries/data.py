@@ -228,3 +228,33 @@ class AnniversaryData:
         if half_date:
             return (half_date - date.today()).days
         return None
+
+    @classmethod
+    def from_config(cls, config: dict) -> "AnniversaryData":
+        """Create AnniversaryData from config entry."""
+        from .const import CONF_DATE, CONF_NAME, CONF_ONE_TIME, CONF_COUNT_UP, CONF_HALF_ANNIVERSARY
+        
+        # Parse the date
+        date_str = config.get(CONF_DATE, "")
+        if date_str:
+            try:
+                anniversary_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+                unknown_year = False
+            except ValueError:
+                try:
+                    anniversary_date = datetime.strptime(date_str, "%m-%d").date().replace(year=1900)
+                    unknown_year = True
+                except ValueError:
+                    raise ValueError(f"Invalid date format: {date_str}")
+        else:
+            raise ValueError("Date is required")
+        
+        return cls(
+            name=config.get(CONF_NAME, "Unknown Anniversary"),
+            date=anniversary_date,
+            is_one_time=config.get(CONF_ONE_TIME, False),
+            is_count_up=config.get(CONF_COUNT_UP, False),
+            show_half_anniversary=config.get(CONF_HALF_ANNIVERSARY, False),
+            unknown_year=unknown_year,
+            config=config
+        )

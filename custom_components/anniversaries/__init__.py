@@ -1,162 +1,71 @@
-"""The Anniversaries Integration"""
+"""Anniversary integration for Home Assistant."""
+from __future__ import annotations
+
 import asyncio
 import logging
-from datetime import datetime
-import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_NAME, CONF_SENSORS, Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers.template import Template
-from homeassistant.helpers import entity_registry as er
 
-from .const import (
-    CONF_DATE,
-    CONF_DATE_TEMPLATE,
-    CONF_ONE_TIME,
-    CONF_COUNT_UP,
-    CONF_HALF_ANNIVERSARY,
-    DOMAIN,
-)
+from .const import DOMAIN, PLATFORMS
 from .coordinator import AnniversaryDataUpdateCoordinator
-from .data import AnniversaryData
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = [Platform.SENSOR, Platform.CALENDAR]
-
-def _validate_date(value):
-    """Validate a date string."""
-    try:
-        return datetime.strptime(value, "%Y-%m-%d").date()
-    except ValueError:
-        pass
-    try:
-        return datetime.strptime(value, "%m-%d").date().replace(year=1900)
-    except ValueError:
-        raise vol.Invalid(f"Invalid date: {value}")
-
-async def async_setup(hass: HomeAssistant, config: dict) -> bool:
-    """Set up the Anniversaries component from YAML."""
-    if DOMAIN not in config:
-        return True
-
-    for sensor_config in config[DOMAIN].get(CONF_SENSORS, []):
-        hass.async_create_task(
-            hass.config_entries.flow.async_init(
-                DOMAIN,
-                context={"source": "import"},
-                data=sensor_config,
-            )
-        )
-    return True
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up Anniversaries from a config entry."""
-    hass.data.setdefault(DOMAIN, {})
-
+    """Set up Anniversary from a config entry."""
+    # Create anniversary data from config entry
+    from .data import AnniversaryData
+    
+    # Convert config entry to AnniversaryData
     config = entry.options or entry.data
-    name = config[CONF_NAME]
-
-    try:
-        if CONF_DATE_TEMPLATE in config:
-            date_str = await Template(config[CONF_DATE_TEMPLATE], hass).async_render()
-            anniversary_date = _validate_date(date_str)
-        else:
-            anniversary_date = _validate_date(config[CONF_DATE])
-    except Exception as ex:
-        _LOGGER.error("Error parsing date for %s: %s", name, ex)
-        return False
-
-    unknown_year = anniversary_date.year == 1900
-
-    anniversary = AnniversaryData(
-        name=name,
-        date=anniversary_date,
-        is_one_time=config.get(CONF_ONE_TIME, False),
-        is_count_up=config.get(CONF_COUNT_UP, False),
-        show_half_anniversary=config.get(CONF_HALF_ANNIVERSARY, False),
-        unknown_year=unknown_year,
-        config=config,
-    )
-
-    lock = hass.data[DOMAIN].setdefault("coordinator_lock", asyncio.Lock())
-    async with lock:
-        if "coordinator" not in hass.data[DOMAIN]:
-            hass.data[DOMAIN]["coordinator"] = AnniversaryDataUpdateCoordinator(
-                hass, {}
-            )
-
-        coordinator = hass.data[DOMAIN]["coordinator"]
-        coordinator.anniversaries[entry.entry_id] = anniversary
-
+    anniversary_data = AnniversaryData.from_config(config)
+    anniversaries = {entry.entry_id: anniversary_data}
+    
+    # Initialize coordinator
+    coordinator = AnniversaryDataUpdateCoordinator(hass, anniversaries)
+    
+    # Initial data fetch
     await coordinator.async_config_entry_first_refresh()
 
+    # Store coordinator
+    hass.data.setdefault(DOMAIN, {})
+    hass.data[DOMAIN][entry.entry_id] = coordinator
+    hass.data[DOMAIN]["coordinator"] = coordinator  # For backward compatibility
+    hass.data[DOMAIN]["coordinator_lock"] = hass.data[DOMAIN].get("coordinator_lock", asyncio.Lock())
+
+    # Setup platforms
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
+    # Register update listener
     entry.async_on_unload(entry.add_update_listener(update_listener))
+    
+    # Setup custom cards
+    await _setup_cards(hass)
 
-    return True
-
-
-async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Migrate old config entries.
-
-    Version 1 -> 2: Ensure entity_ids have required anniversary_ prefix.
-    """
-    version = getattr(entry, "version", 1)
-    if version >= 2:
-        return True
-
-    _LOGGER.info("Migrating Anniversaries entry '%s' from version %s to 2", entry.entry_id, version)
-    registry = er.async_get(hass)
-    updated = 0
-    for entity_entry in list(registry.entities.values()):  # copy of values
-        if entity_entry.platform != DOMAIN:
-            continue
-        # sensor/calendar bound to this config entry by unique_id pattern
-        if not (entity_entry.unique_id.startswith(entry.entry_id) or entity_entry.unique_id == f"{DOMAIN}_summary_sensor"):
-            continue
-        object_id = entity_entry.object_id
-        domain = entity_entry.domain
-        if not object_id.startswith("anniversary_"):
-            # Normalize partial prefix forms
-            clean_object = object_id
-            if clean_object.startswith("anniversary") and not clean_object.startswith("anniversary_"):
-                clean_object = clean_object[len("anniversary"):].lstrip("_-")
-            new_object_id = f"anniversary_{clean_object}" if clean_object else "anniversary"
-            new_entity_id = f"{domain}.{new_object_id}"
-            try:
-                registry.async_update_entity(entity_entry.entity_id, new_entity_id=new_entity_id)
-                updated += 1
-            except Exception as exc:  # pragma: no cover - defensive
-                _LOGGER.warning("Failed to update entity_id %s: %s", entity_entry.entity_id, exc)
-
-    if updated:
-        _LOGGER.info("Updated %s entity_id(s) to include anniversary_ prefix", updated)
-
-    # Update entry version
-    hass.config_entries.async_update_entry(entry, version=2)
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-    if unload_ok and DOMAIN in hass.data:
-        lock = hass.data[DOMAIN].get("coordinator_lock")
-        if lock:
-            async with lock:
-                if DOMAIN in hass.data:  # Check again after acquiring lock
-                    if coordinator := hass.data[DOMAIN].get("coordinator"):
-                        coordinator.anniversaries.pop(entry.entry_id, None)
-                        if not coordinator.anniversaries:
-                            hass.data[DOMAIN].pop("coordinator", None)
-                            hass.data[DOMAIN].pop("summary_sensor_added", None)
+    if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
+        hass.data[DOMAIN].pop(entry.entry_id)
+
     return unload_ok
 
 
 async def update_listener(hass: HomeAssistant, entry: ConfigEntry):
     """Handle options update."""
     await hass.config_entries.async_reload(entry.entry_id)
+
+
+async def _setup_cards(hass: HomeAssistant) -> None:
+    """Set up custom cards for the integration."""
+    try:
+        # Import and setup cards module
+        from . import cards
+        await cards.async_setup(hass, {})
+        _LOGGER.info("Anniversary cards setup completed")
+    except Exception as e:
+        _LOGGER.error(f"Failed to setup anniversary cards: {e}")
