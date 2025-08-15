@@ -234,9 +234,6 @@ class AnniversaryData:
         """Create AnniversaryData from config entry."""
         from .const import CONF_DATE, CONF_NAME, CONF_ONE_TIME, CONF_COUNT_UP, CONF_HALF_ANNIVERSARY
         
-        # Debug what we got
-        print(f"DEBUG: from_config received: {config}")
-        
         # Parse the date
         date_str = config.get(CONF_DATE, "")
         if not date_str:

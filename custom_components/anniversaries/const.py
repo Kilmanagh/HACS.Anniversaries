@@ -31,7 +31,7 @@ DEFAULT_ICON_TODAY = "mdi:calendar-star"
 DEFAULT_ICON_SOON = "mdi:calendar"
 DEFAULT_SOON = 1
 DEFAULT_HALF_ANNIVERSARY = False
-DEFAULT_UNIT_OF_MEASUREMENT = "Days"
+DEFAULT_UNIT_OF_MEASUREMENT = "d"  # Changed from "Days" to "d" for duration device class
 DEFAULT_ONE_TIME = False
 DEFAULT_COUNT_UP = False
 

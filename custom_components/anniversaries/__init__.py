@@ -15,6 +15,13 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Anniversary from a config entry."""
+    # Check if this entry has valid configuration
+    config = entry.options or entry.data
+    if not config or (not config.get("name") and not config.get("date")):
+        _LOGGER.warning(f"Removing empty/invalid config entry: {entry.entry_id}")
+        hass.async_create_task(hass.config_entries.async_remove(entry.entry_id))
+        return False
+    
     # Initialize coordinator with single anniversary from this entry
     coordinator = AnniversaryDataUpdateCoordinator(hass, entry)
     
