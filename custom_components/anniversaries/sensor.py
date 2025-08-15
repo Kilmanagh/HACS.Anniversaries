@@ -63,7 +63,7 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
     """Sensor for a single anniversary."""
 
     _attr_attribution = ATTRIBUTION
-    _attr_device_class = SensorDeviceClass.DURATION
+    # Remove device class to allow custom unit like "Days"
 
     def __init__(
         self,
@@ -84,8 +84,8 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
         self._icon_today = self.config.get(CONF_ICON_TODAY, DEFAULT_ICON_TODAY)
         self._icon_soon = self.config.get(CONF_ICON_SOON, DEFAULT_ICON_SOON)
         self._soon_days = self.config.get(CONF_SOON, DEFAULT_SOON)
-        # Force correct unit for duration device class - override any old config values
-        self._attr_native_unit_of_measurement = "d"
+        # Use "Days" as the unit of measurement (no device class restriction)
+        self._attr_native_unit_of_measurement = "Days"
 
     async def async_added_to_hass(self) -> None:
         """Handle entity being added to hass."""
