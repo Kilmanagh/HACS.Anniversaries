@@ -42,7 +42,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     
     # Register static path for cards (simple approach)
     try:
-        hass.http.async_register_static_paths([
+        await hass.http.async_register_static_paths([
             {
                 "url_path": "/local/anniversaries",
                 "path": hass.config.path("custom_components/anniversaries/www"),
