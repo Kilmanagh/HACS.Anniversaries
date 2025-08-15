@@ -8,6 +8,7 @@ DOMAIN = "anniversaries"
 ATTRIBUTION = "Sensor data calculated by Anniversaries Integration"
 
 # Platforms
+PLATFORMS = ["sensor", "calendar"]
 CALENDAR_PLATFORM = "calendar"
 SENSOR_PLATFORM = "sensor"
 
