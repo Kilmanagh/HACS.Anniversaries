@@ -15,16 +15,8 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Anniversary from a config entry."""
-    # Create anniversary data from config entry
-    from .data import AnniversaryData
-    
-    # Convert config entry to AnniversaryData
-    config = entry.options or entry.data
-    anniversary_data = AnniversaryData.from_config(config)
-    anniversaries = {entry.entry_id: anniversary_data}
-    
-    # Initialize coordinator
-    coordinator = AnniversaryDataUpdateCoordinator(hass, anniversaries)
+    # Initialize coordinator with single anniversary from this entry
+    coordinator = AnniversaryDataUpdateCoordinator(hass, entry)
     
     # Initial data fetch
     await coordinator.async_config_entry_first_refresh()
