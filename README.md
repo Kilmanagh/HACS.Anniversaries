@@ -24,14 +24,14 @@ Any anniversaries entries configured will be added to the home assistant calenda
 
 ## ✨ Custom Lovelace Cards
 
-This integration includes **4 custom Lovelace cards** that are **automatically loaded** when you install the integration:
+This integration includes **4 custom Lovelace cards** with rich emoji/icon support:
 
 - 🗓️ **Timeline Card**: Chronological list with color coding and attribute badges
 - 🌟 **Details Card**: Rich single-anniversary view with animations and backgrounds  
 - 📅 **Calendar Card**: Interactive mini calendar with clickable dates
 - 📊 **Stats Card**: Summary statistics and distribution charts
 
-The cards will automatically appear in your Lovelace card picker after installing the integration. See [CARDS.md](CARDS.md) for detailed configuration options.
+**Manual Setup Required**: After installing the integration, you need to manually register the cards in **Settings** → **Dashboards** → **Resources**. See [CARDS.md](CARDS.md) for detailed installation and configuration instructions.
 
 ## 🎯 Features
 

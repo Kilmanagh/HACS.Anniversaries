@@ -41,8 +41,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Register update listener
     entry.async_on_unload(entry.add_update_listener(update_listener))
     
-    # Setup custom cards
-    await _setup_cards(hass)
+    # Register static path for cards (simple approach)
+    hass.http.register_static_path(
+        "/local/anniversaries",
+        hass.config.path("custom_components/anniversaries/www"),
+        cache_headers=False
+    )
 
     return True
 
@@ -58,14 +62,3 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 async def update_listener(hass: HomeAssistant, entry: ConfigEntry):
     """Handle options update."""
     await hass.config_entries.async_reload(entry.entry_id)
-
-
-async def _setup_cards(hass: HomeAssistant) -> None:
-    """Set up custom cards for the integration."""
-    try:
-        # Import and setup cards module
-        from . import cards
-        await cards.async_setup(hass, {})
-        _LOGGER.info("Anniversary cards setup completed")
-    except Exception as e:
-        _LOGGER.error(f"Failed to setup anniversary cards: {e}")

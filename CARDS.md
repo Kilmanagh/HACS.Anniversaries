@@ -1,10 +1,22 @@
 # Anniversary Custom Cards
 
-This integration includes 4 custom Lovelace cards that are automatically loaded when the integration is installed. The cards provide rich visuals and emoji support for displaying anniversary information.
+This integration includes 4 custom Lovelace cards that provide rich visuals and emoji support for displaying anniversary information.
 
-## Automatic Installation
+## Manual Installation Required
 
-The cards are automatically registered when you install the Anniversaries integration. They will appear in your Lovelace card picker without any manual configuration required.
+After installing the Anniversaries integration, you need to manually register the cards:
+
+1. Go to **Settings** → **Dashboards** → **Resources**
+2. Click **+ ADD RESOURCE**
+3. Add each card with these URLs:
+   - `/local/anniversaries/anniversary-timeline-card.js`
+   - `/local/anniversaries/anniversary-details-card.js`
+   - `/local/anniversaries/anniversary-calendar-card.js`
+   - `/local/anniversaries/anniversary-stats-card.js`
+4. Set Resource type to **JavaScript Module**
+5. Restart Home Assistant
+
+After adding the resources and restarting, the cards will appear in your Lovelace card picker.
 
 ## Card Types
 
