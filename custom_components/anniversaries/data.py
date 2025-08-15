@@ -234,20 +234,31 @@ class AnniversaryData:
         """Create AnniversaryData from config entry."""
         from .const import CONF_DATE, CONF_NAME, CONF_ONE_TIME, CONF_COUNT_UP, CONF_HALF_ANNIVERSARY
         
+        # Debug what we got
+        print(f"DEBUG: from_config received: {config}")
+        
         # Parse the date
         date_str = config.get(CONF_DATE, "")
-        if date_str:
+        if not date_str:
+            # Check for alternative date fields that might exist
+            possible_date_fields = ['date', 'anniversary_date', 'event_date']
+            for field in possible_date_fields:
+                if field in config and config[field]:
+                    date_str = config[field]
+                    break
+        
+        if not date_str:
+            raise ValueError(f"Date is required. Config keys: {list(config.keys())}")
+            
+        try:
+            anniversary_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+            unknown_year = False
+        except ValueError:
             try:
-                anniversary_date = datetime.strptime(date_str, "%Y-%m-%d").date()
-                unknown_year = False
+                anniversary_date = datetime.strptime(date_str, "%m-%d").date().replace(year=1900)
+                unknown_year = True
             except ValueError:
-                try:
-                    anniversary_date = datetime.strptime(date_str, "%m-%d").date().replace(year=1900)
-                    unknown_year = True
-                except ValueError:
-                    raise ValueError(f"Invalid date format: {date_str}")
-        else:
-            raise ValueError("Date is required")
+                raise ValueError(f"Invalid date format: {date_str}")
         
         return cls(
             name=config.get(CONF_NAME, "Unknown Anniversary"),

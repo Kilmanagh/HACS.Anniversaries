@@ -29,26 +29,42 @@ class AnniversaryDataUpdateCoordinator(DataUpdateCoordinator[dict[str, "Annivers
         """Fetch the latest data."""
         from .data import AnniversaryData
         
-        # Create anniversary data from config entry
-        config = self.entry.options or self.entry.data
-        anniversary_data = AnniversaryData.from_config(config)
-        
-        # Store in anniversaries dict using entry_id as key
-        self.anniversaries = {self.entry.entry_id: anniversary_data}
-        
-        today = date.today()
-        candidates = [
-            a for a in self.anniversaries.values()
-            if not (a.is_one_time and a.date < today)
-        ]
-        # Use days_remaining to ensure correct ordering for same-year rollover
-        self.upcoming = heapq.nsmallest(
-            5,
-            candidates,
-            key=lambda x: x.days_remaining,
-        )
-        # Return the anniversaries dict as the coordinator data
-        return self.anniversaries
+        try:
+            # Create anniversary data from config entry
+            config = self.entry.options or self.entry.data
+            
+            # Debug logging to see what's in the config
+            _LOGGER.debug(f"Config data: {config}")
+            
+            # Check if this is a properly configured entry
+            if not config:
+                _LOGGER.error(f"No config data found for entry {self.entry.entry_id}")
+                return {}
+                
+            anniversary_data = AnniversaryData.from_config(config)
+            
+            # Store in anniversaries dict using entry_id as key
+            self.anniversaries = {self.entry.entry_id: anniversary_data}
+            
+            today = date.today()
+            candidates = [
+                a for a in self.anniversaries.values()
+                if not (a.is_one_time and a.date < today)
+            ]
+            # Use days_remaining to ensure correct ordering for same-year rollover
+            self.upcoming = heapq.nsmallest(
+                5,
+                candidates,
+                key=lambda x: x.days_remaining,
+            )
+            # Return the anniversaries dict as the coordinator data
+            return self.anniversaries
+            
+        except Exception as e:
+            _LOGGER.error(f"Error processing anniversary data for entry {self.entry.entry_id}: {e}")
+            _LOGGER.error(f"Config: {self.entry.data}")
+            _LOGGER.error(f"Options: {self.entry.options}")
+            return {}
 
     @property
     def upcoming_anniversaries(self) -> list["AnniversaryData"]:
