@@ -9,14 +9,20 @@ After installing the Anniversaries integration, you need to manually register th
 1. Go to **Settings** → **Dashboards** → **Resources**
 2. Click **+ ADD RESOURCE**
 3. Add each card with these URLs:
-   - `/local/anniversaries/anniversary-timeline-card.js`
-   - `/local/anniversaries/anniversary-details-card.js`
-   - `/local/anniversaries/anniversary-calendar-card.js`
-   - `/local/anniversaries/anniversary-stats-card.js`
+   - `/local/community/anniversaries/anniversary-timeline-card.js`
+   - `/local/community/anniversaries/anniversary-details-card.js`
+   - `/local/community/anniversaries/anniversary-calendar-card.js`
+   - `/local/community/anniversaries/anniversary-stats-card.js`
 4. Set Resource type to **JavaScript Module**
 5. Restart Home Assistant
 
 After adding the resources and restarting, the cards will appear in your Lovelace card picker.
+
+**Note**: The `/local/community/anniversaries/` path is automatically registered by the integration and points to the `www/` folder inside the integration directory.
+
+**Alternative URLs to try if the above don't work:**
+- `/local/custom_components/anniversaries/www/[card-name].js`
+- `/hacsfiles/anniversaries/[card-name].js` (if installed via HACS)
 
 ## Card Types
 

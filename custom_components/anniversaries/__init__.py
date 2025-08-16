@@ -71,11 +71,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Register static path for cards (only once)
     if "static_path_registered" not in hass.data[DOMAIN]:
         try:
+            # Register the www directory to be accessible via /local/community/anniversaries/
             await hass.http.async_register_static_paths([{
-                "url_path": "/local/anniversaries",
-                "path": hass.config.path("custom_components/anniversaries/www")
+                "url_path": f"/local/community/{DOMAIN}",
+                "path": hass.config.path(f"custom_components/{DOMAIN}/www")
             }])
             hass.data[DOMAIN]["static_path_registered"] = True
+            _LOGGER.info(f"Registered static path: /local/community/{DOMAIN}/")
         except Exception as e:
             _LOGGER.warning(f"Failed to register static path for cards: {e}")
 
