@@ -4,7 +4,6 @@ import heapq
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
-from homeassistant.config_entries import ConfigEntry
 
 from .const import DOMAIN
 
@@ -13,7 +12,7 @@ _LOGGER = logging.getLogger(__name__)
 class AnniversaryDataUpdateCoordinator(DataUpdateCoordinator[dict[str, "AnniversaryData"]]):
     """A coordinator to manage anniversary data."""
 
-    def __init__(self, hass: HomeAssistant, entry: "ConfigEntry") -> None:
+    def __init__(self, hass: HomeAssistant, anniversaries: dict[str, "AnniversaryData"]) -> None:
         """Initialize the coordinator."""
         super().__init__(
             hass,
@@ -21,37 +20,12 @@ class AnniversaryDataUpdateCoordinator(DataUpdateCoordinator[dict[str, "Annivers
             name=DOMAIN,
             update_interval=timedelta(days=1),
         )
-        self.entry = entry
-        self.anniversaries = {}
+        self.anniversaries = anniversaries
         self.upcoming = []
 
     async def _async_update_data(self) -> dict[str, "AnniversaryData"]:
         """Fetch the latest data."""
-        from .data import AnniversaryData
-        from .const import CONF_NAME, CONF_DATE
-        
         try:
-            # Create anniversary data from config entry
-            config = self.entry.options or self.entry.data
-            
-            # Debug logging to see what's in the config
-            _LOGGER.debug(f"Config data for entry {self.entry.entry_id}: {config}")
-            
-            # Check if this is a properly configured entry
-            if not config:
-                _LOGGER.error(f"No config data found for entry {self.entry.entry_id}")
-                return {}
-            
-            # Check if this entry has the minimum required fields
-            if not config.get(CONF_NAME) and not config.get(CONF_DATE):
-                _LOGGER.warning(f"Entry {self.entry.entry_id} appears to be empty or incomplete - skipping")
-                return {}
-                
-            anniversary_data = AnniversaryData.from_config(config)
-            
-            # Store in anniversaries dict using entry_id as key
-            self.anniversaries = {self.entry.entry_id: anniversary_data}
-            
             today = date.today()
             candidates = [
                 a for a in self.anniversaries.values()
@@ -67,10 +41,8 @@ class AnniversaryDataUpdateCoordinator(DataUpdateCoordinator[dict[str, "Annivers
             return self.anniversaries
             
         except Exception as e:
-            _LOGGER.error(f"Error processing anniversary data for entry {self.entry.entry_id}: {e}")
-            _LOGGER.error(f"Config: {self.entry.data}")
-            _LOGGER.error(f"Options: {self.entry.options}")
-            return {}
+            _LOGGER.error(f"Error updating anniversary data: {e}")
+            return self.anniversaries
 
     @property
     def upcoming_anniversaries(self) -> list["AnniversaryData"]:
