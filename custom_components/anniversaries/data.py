@@ -82,6 +82,7 @@ class AnniversaryData:
     date: date
     is_one_time: bool = False
     show_half_anniversary: bool = False
+    category: str = "other"
     unknown_year: bool = False
     config: dict = field(default_factory=dict)
 
@@ -116,6 +117,12 @@ class AnniversaryData:
             60: "Diamond",
         }
         return named_anniversaries.get(self.next_years)
+
+    @property
+    def category_default_icon(self) -> str:
+        """Return the default icon for this anniversary's category."""
+        from .const import CATEGORY_ICONS, DEFAULT_ICON_NORMAL
+        return CATEGORY_ICONS.get(self.category, DEFAULT_ICON_NORMAL)
 
     @property
     def generation(self) -> str | None:
@@ -255,7 +262,7 @@ class AnniversaryData:
     @classmethod
     def from_config(cls, config: dict) -> "AnniversaryData":
         """Create AnniversaryData from config entry."""
-        from .const import CONF_DATE, CONF_NAME, CONF_ONE_TIME, CONF_HALF_ANNIVERSARY
+        from .const import CONF_DATE, CONF_NAME, CONF_ONE_TIME, CONF_HALF_ANNIVERSARY, CONF_CATEGORY, DEFAULT_CATEGORY
         
         # Parse the date
         date_str = config.get(CONF_DATE, "")
@@ -285,6 +292,7 @@ class AnniversaryData:
             date=anniversary_date,
             is_one_time=config.get(CONF_ONE_TIME, False),
             show_half_anniversary=config.get(CONF_HALF_ANNIVERSARY, False),
+            category=config.get(CONF_CATEGORY, DEFAULT_CATEGORY),
             unknown_year=unknown_year,
             config=config
         )

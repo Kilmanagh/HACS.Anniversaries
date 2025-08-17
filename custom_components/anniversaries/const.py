@@ -23,7 +23,41 @@ CONF_SOON = "days_as_soon"
 CONF_HALF_ANNIVERSARY = "show_half_anniversary"
 CONF_UNIT_OF_MEASUREMENT = "unit_of_measurement"
 CONF_ONE_TIME = "one_time"
+CONF_CATEGORY = "category"
 # Removed CONF_COUNT_UP - now using attributes instead
+
+# Category options
+CATEGORY_BIRTHDAY = "birthday"
+CATEGORY_ANNIVERSARY = "anniversary" 
+CATEGORY_MEMORIAL = "memorial"
+CATEGORY_HOLIDAY = "holiday"
+CATEGORY_WORK = "work"
+CATEGORY_ACHIEVEMENT = "achievement"
+CATEGORY_EVENT = "event"
+CATEGORY_OTHER = "other"
+
+CATEGORY_OPTIONS = [
+    CATEGORY_BIRTHDAY,
+    CATEGORY_ANNIVERSARY,
+    CATEGORY_MEMORIAL,
+    CATEGORY_HOLIDAY,
+    CATEGORY_WORK,
+    CATEGORY_ACHIEVEMENT,
+    CATEGORY_EVENT,
+    CATEGORY_OTHER,
+]
+
+# Category-specific default icons
+CATEGORY_ICONS = {
+    CATEGORY_BIRTHDAY: "mdi:cake-variant",
+    CATEGORY_ANNIVERSARY: "mdi:heart",
+    CATEGORY_MEMORIAL: "mdi:flower",
+    CATEGORY_HOLIDAY: "mdi:calendar-star",
+    CATEGORY_WORK: "mdi:briefcase",
+    CATEGORY_ACHIEVEMENT: "mdi:trophy",
+    CATEGORY_EVENT: "mdi:calendar-check",
+    CATEGORY_OTHER: "mdi:calendar-blank",
+}
 
 # Defaults
 DEFAULT_ICON_NORMAL = "mdi:calendar-blank"
@@ -33,6 +67,7 @@ DEFAULT_SOON = 1
 DEFAULT_HALF_ANNIVERSARY = False
 DEFAULT_UNIT_OF_MEASUREMENT = "Days"  # Back to "Days" as requested
 DEFAULT_ONE_TIME = False
+DEFAULT_CATEGORY = CATEGORY_OTHER
 # Removed DEFAULT_COUNT_UP - now using attributes instead
 
 # Attributes
@@ -49,6 +84,7 @@ ATTR_IS_MILESTONE = "is_milestone"
 ATTR_GENERATION = "generation"
 ATTR_BIRTHSTONE = "birthstone"
 ATTR_BIRTH_FLOWER = "birth_flower"
+ATTR_CATEGORY = "category"
 # New "since last" attributes
 ATTR_DAYS_SINCE_LAST = "days_since_last"
 ATTR_LAST_ANNIVERSARY_DATE = "last_anniversary_date"
@@ -78,6 +114,7 @@ CONFIG_SCHEMA = vol.Schema(
                                 vol.Optional(CONF_HALF_ANNIVERSARY, default=DEFAULT_HALF_ANNIVERSARY): cv.boolean,
                                 vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=DEFAULT_UNIT_OF_MEASUREMENT): cv.string,
                                 vol.Optional(CONF_ONE_TIME, default=DEFAULT_ONE_TIME): cv.boolean,
+                                vol.Optional(CONF_CATEGORY, default=DEFAULT_CATEGORY): vol.In(CATEGORY_OPTIONS),
                             }
                         )
                     ],

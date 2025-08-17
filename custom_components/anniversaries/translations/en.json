@@ -6,6 +6,7 @@
                 "data": {
                     "name": "Friendly name",
                     "date": "First Date (yyyy-mm-dd) or (mm-dd) if year is unknown",
+                    "category": "Category",
                     "one_time": "One Time Event (Non-recurring)",
                     "show_half_anniversary": "Show Half Anniversary Attributes",
                     "unit_of_measurement": "Text for unit_of_measurement",
@@ -34,6 +35,7 @@
                 "data": {
                     "name": "Friendly name",
                     "date": "First Date (yyyy-mm-dd) or (mm-yy) if year is unknown",
+                    "category": "Category",
                     "one_time": "One Time Event (Non-recurring)",
                     "show_half_anniversary": "Show Half Anniversary Attributes",
                     "upcoming_anniversaries_sensor": "Enable Upcoming Anniversaries Summary Sensor",

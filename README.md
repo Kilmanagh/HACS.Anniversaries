@@ -38,6 +38,7 @@ This integration includes **4 custom Lovelace cards** with rich emoji/icon suppo
 - ✅ **Automatic entity ID prefixing** with `anniversary_` for better organization
 - ✅ **Rich attributes**: zodiac signs ♈, birthstones 💎, generations 👥, milestones 🌟
 - ✅ **"Since last" tracking**: Always-available attributes to track time since last anniversary
+- ✅ **Category system**: Organize anniversaries by type with automatic icons 🎂💍🌹
 - ✅ **Calendar integration** with anniversary events
 - ✅ **Custom Lovelace cards** with animations and emoji support
 - ✅ **Upcoming anniversaries sensor** for dashboard summaries
@@ -156,10 +157,11 @@ When adding an anniversary, you will be presented with the following options:
 |:----------|----------|------------
 | `name` | No | Friendly name for the anniversary.
 |`date` | No | The date of the anniversary in `YYYY-MM-DD` or `MM-DD` format.
+| `category` | Yes | Category type: `birthday`, `anniversary`, `memorial`, `holiday`, `work`, `achievement`, `event`, or `other`. Affects default icon. **Default**: `other`
 | `one_time` | Yes | `true` or `false`. For a one-time event (non-recurring). **Default**: `false`
 | `show_half_anniversary` | Yes | `true` or `false`. Enables the half-anniversary attributes. **Default**: `false`
 | `unit_of_measurement` | Yes | Your choice of label for the sensor's unit. The sensor always returns days, but this allows for localization. **Default**: `Days`
-| `icon_normal` | Yes | The icon to display for the sensor in its normal state. **Default**:  `mdi:calendar-blank`
+| `icon_normal` | Yes | The icon to display for the sensor in its normal state. Uses category-specific icon if not specified. **Default**: Category-specific
 | `icon_today` | Yes | The icon to display when the anniversary is today. **Default**: `mdi:calendar-star`
 | `days_as_soon` | Yes | The number of days in advance to display the "soon" icon. **Default**: 1
 | `icon_soon` | Yes | The icon to display when the anniversary is "soon". **Default**: `mdi:calendar`
@@ -171,6 +173,21 @@ After creating an anniversary, you can click "Configure" to access additional op
 |Parameter |Optional|Description
 |:----------|----------|------------
 | `upcoming_anniversaries_sensor` | Yes | `true` or `false`. Enables a summary sensor showing the next 5 upcoming anniversaries. **Default**: `false`
+
+### Category-Specific Default Icons
+
+When no custom icon is specified, the integration automatically uses category-appropriate icons:
+
+| Category | Icon | Description |
+|:---------|:-----|:------------|
+| 🎂 `birthday` | `mdi:cake-variant` | Personal birthdays |
+| 💍 `anniversary` | `mdi:heart` | Wedding anniversaries, relationship milestones |
+| 🌹 `memorial` | `mdi:flower` | Memorial dates, remembrance days |
+| ⭐ `holiday` | `mdi:calendar-star` | Personal holidays, cultural celebrations |
+| 💼 `work` | `mdi:briefcase` | Work anniversaries, career milestones |
+| 🏆 `achievement` | `mdi:trophy` | Graduations, accomplishments |
+| ✅ `event` | `mdi:calendar-check` | General events, appointments |
+| 📅 `other` | `mdi:calendar-blank` | Custom/uncategorized anniversaries |
 
 ## State and Attributes
 
@@ -184,6 +201,7 @@ After creating an anniversary, you can click "Configure" to access additional op
 
 * `years_at_anniversary`: Number of years that will have passed at the next anniversary (not displayed if year is unknown).
 * `current_years`: Current age in years (not displayed if year is unknown).
+* `category`: The category type of the anniversary (birthday, anniversary, memorial, etc.).
 * `days_since_last`: Days since last anniversary (positive for recurring) or days since/until one-time event (negative if future).
 * `last_anniversary_date`: The date of the last anniversary occurrence.
 * `years_since_last`: Years since last anniversary (not displayed if year is unknown).

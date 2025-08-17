@@ -15,6 +15,7 @@ from .const import (
     DEFAULT_HALF_ANNIVERSARY,
     DEFAULT_UNIT_OF_MEASUREMENT,
     DEFAULT_ONE_TIME,
+    DEFAULT_CATEGORY,
     CONF_ICON_NORMAL,
     CONF_ICON_TODAY,
     CONF_ICON_SOON,
@@ -23,6 +24,8 @@ from .const import (
     CONF_HALF_ANNIVERSARY,
     CONF_UNIT_OF_MEASUREMENT,
     CONF_ONE_TIME,
+    CONF_CATEGORY,
+    CATEGORY_OPTIONS,
     CONF_UPCOMING_ANNIVERSARIES_SENSOR,
 )
 
@@ -68,6 +71,7 @@ class AnniversariesFlowHandler(config_entries.ConfigFlow):
             {
                 vol.Required(CONF_NAME): str,
                 vol.Required(CONF_DATE): str,
+                vol.Optional(CONF_CATEGORY, default=DEFAULT_CATEGORY): vol.In(CATEGORY_OPTIONS),
                 vol.Optional(CONF_ONE_TIME, default=DEFAULT_ONE_TIME): bool,
                 vol.Optional(CONF_HALF_ANNIVERSARY, default=DEFAULT_HALF_ANNIVERSARY): bool,
                 vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=DEFAULT_UNIT_OF_MEASUREMENT): str,
@@ -131,6 +135,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     CONF_UPCOMING_ANNIVERSARIES_SENSOR,
                     default=self._config_entry.options.get(CONF_UPCOMING_ANNIVERSARIES_SENSOR, False),
                 ): bool,
+                vol.Optional(
+                    CONF_CATEGORY,
+                    default=self._config_entry.options.get(CONF_CATEGORY, DEFAULT_CATEGORY),
+                ): vol.In(CATEGORY_OPTIONS),
                 vol.Optional(
                     CONF_ONE_TIME,
                     default=self._config_entry.options.get(CONF_ONE_TIME, DEFAULT_ONE_TIME),

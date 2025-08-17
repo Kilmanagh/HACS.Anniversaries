@@ -24,6 +24,7 @@ from .const import (
     ATTR_GENERATION,
     ATTR_BIRTHSTONE,
     ATTR_BIRTH_FLOWER,
+    ATTR_CATEGORY,
     ATTR_DAYS_SINCE_LAST,
     ATTR_LAST_ANNIVERSARY_DATE,
     ATTR_YEARS_SINCE_LAST,
@@ -87,6 +88,8 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
         self._icon_today = self.config.get(CONF_ICON_TODAY, DEFAULT_ICON_TODAY)
         self._icon_soon = self.config.get(CONF_ICON_SOON, DEFAULT_ICON_SOON)
         self._soon_days = self.config.get(CONF_SOON, DEFAULT_SOON)
+        # Check if using default icon (for category-specific fallback)
+        self._using_default_icon = self.config.get(CONF_ICON_NORMAL) is None
         # Use "Days" as the unit of measurement (no device class restriction)
         self._attr_native_unit_of_measurement = "Days"
 
@@ -135,12 +138,20 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
         """Return the icon to use in the frontend."""
         ann = self.anniversary
         if not ann:
-            return self._icon_normal
+            return self._get_default_icon()
         days = ann.days_remaining
         if days == 0:
             return self._icon_today
         if days <= self._soon_days:
             return self._icon_soon
+        return self._get_default_icon()
+
+    def _get_default_icon(self) -> str:
+        """Get the appropriate default icon (category-specific if using defaults)."""
+        if self._using_default_icon:
+            ann = self.anniversary
+            if ann and hasattr(ann, 'category_default_icon'):
+                return ann.category_default_icon
         return self._icon_normal
 
     @property
@@ -157,6 +168,7 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
             ATTR_GENERATION: ann.generation,
             ATTR_BIRTHSTONE: ann.birthstone,
             ATTR_BIRTH_FLOWER: ann.birth_flower,
+            ATTR_CATEGORY: ann.category,
             ATTR_DAYS_SINCE_LAST: ann.days_since_last,
             ATTR_LAST_ANNIVERSARY_DATE: ann.last_anniversary_date,
         }
