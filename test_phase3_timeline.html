@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anniversary Timeline Card - Phase 3 Advanced Options</title>
+    <style>
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background: #f5f5f5; 
+            margin: 20px;
+        }
+        .demo-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .demo-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .demo-description {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .config-example {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin-bottom: 15px;
+            border-left: 4px solid #4CAF50;
+        }
+        anniversary-timeline-card {
+            display: block;
+            margin: 10px 0;
+        }
+        .phase-header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="phase-header">
+        <h1>🚀 Anniversary Timeline Card v1.3.0</h1>
+        <h2>Phase 3: Advanced Options - Multi-Category, Statistics & Interactive Features</h2>
+    </div>
+    
+    <div class="demo-section">
+        <div class="demo-title">🎯 Multi-Category Timeline</div>
+        <div class="demo-description">
+            Display multiple category types in one timeline with automatic attribute merging.
+        </div>
+        <div class="config-example">
+type: custom:anniversary-timeline-card
+categories: ["birthday", "anniversary", "achievement"]
+title: "Personal Celebrations"
+max_items: 10
+        </div>
+        <anniversary-timeline-card id="multi-category-card"></anniversary-timeline-card>
+    </div>
+
+    <div class="demo-section">
+        <div class="demo-title">📊 Timeline with Statistics</div>
+        <div class="demo-description">
+            Overview of category distribution with counts, today's events, and milestones.
+        </div>
+        <div class="config-example">
+type: custom:anniversary-timeline-card
+show_category_stats: true
+show_category_badges: true
+max_items: 8
+        </div>
+        <anniversary-timeline-card id="stats-card"></anniversary-timeline-card>
+    </div>
+
+    <div class="demo-section">
+        <div class="demo-title">🗂️ Grouped by Category</div>
+        <div class="demo-description">
+            Organize anniversaries under category headers with visual grouping.
+        </div>
+        <div class="config-example">
+type: custom:anniversary-timeline-card
+show_category_headers: true
+group_by_category: true
+show_category_badges: false  # Less cluttered when grouped
+        </div>
+        <anniversary-timeline-card id="grouped-card"></anniversary-timeline-card>
+    </div>
+
+    <div class="demo-section">
+        <div class="demo-title">⭐ Priority Categories</div>
+        <div class="demo-description">
+            Show priority categories first, then others chronologically.
+        </div>
+        <div class="config-example">
+type: custom:anniversary-timeline-card
+priority_categories: ["birthday", "anniversary"]
+show_category_badges: true
+max_items: 10
+        </div>
+        <anniversary-timeline-card id="priority-card"></anniversary-timeline-card>
+    </div>
+
+    <div class="demo-section">
+        <div class="demo-title">💼 Work & Achievement Focus</div>
+        <div class="demo-description">
+            Professional timeline combining work anniversaries and achievements.
+        </div>
+        <div class="config-example">
+type: custom:anniversary-timeline-card
+categories: ["work", "achievement"]
+title: "🏆 Professional Milestones"
+show_category_stats: true
+category_color_scheme: true
+        </div>
+        <anniversary-timeline-card id="professional-card"></anniversary-timeline-card>
+    </div>
+
+    <div class="demo-section">
+        <div class="demo-title">🎂 Birthday Excellence (Preserved)</div>
+        <div class="demo-description">
+            The original birthday experience remains exactly as awesome as before.
+        </div>
+        <div class="config-example">
+type: custom:anniversary-timeline-card
+category: "birthday"
+# Still gets: zodiac_sign, birthstone, generation
+# Still gets: warm color theme
+# Still gets: "🎂 Upcoming Birthdays" title
+        </div>
+        <anniversary-timeline-card id="birthday-preserved-card"></anniversary-timeline-card>
+    </div>
+
+    <div class="demo-section">
+        <div class="demo-title">🎉 All Features Combined</div>
+        <div class="demo-description">
+            Comprehensive timeline showcasing all Phase 3 advanced features.
+        </div>
+        <div class="config-example">
+type: custom:anniversary-timeline-card
+title: "🌟 Complete Anniversary Dashboard"
+show_category_stats: true
+show_category_badges: true
+category_color_scheme: true
+priority_categories: ["birthday", "anniversary"]
+max_items: 12
+        </div>
+        <anniversary-timeline-card id="complete-card"></anniversary-timeline-card>
+    </div>
+
+    <script type="module" src="custom_components/anniversaries/www/anniversary-timeline-card.js"></script>
+    <script>
+        // Mock Home Assistant environment
+        window.customElements.whenDefined('anniversary-timeline-card').then(() => {
+            console.log('🎉 Anniversary Timeline Card v1.3.0 loaded successfully!');
+            
+            // Enhanced mock data for Phase 3 testing
+            const mockHass = {
+                states: {
+                    'sensor.anniversary_mom_birthday': {
+                        entity_id: 'sensor.anniversary_mom_birthday',
+                        state: '15',
+                        attributes: {
+                            friendly_name: 'Mom\'s Birthday',
+                            category: 'birthday',
+                            next_date: '2025-09-01',
+                            years_at_anniversary: 65,
+                            current_years: 64,
+                            zodiac_sign: 'Virgo',
+                            birthstone: 'Sapphire',
+                            generation: 'Baby Boomer',
+                            is_milestone: true
+                        }
+                    },
+                    'sensor.anniversary_dad_birthday': {
+                        entity_id: 'sensor.anniversary_dad_birthday',
+                        state: '0',
+                        attributes: {
+                            friendly_name: 'Dad\'s Birthday',
+                            category: 'birthday',
+                            next_date: '2025-08-17',
+                            years_at_anniversary: 68,
+                            current_years: 67,
+                            zodiac_sign: 'Leo',
+                            birthstone: 'Peridot',
+                            generation: 'Baby Boomer',
+                            is_milestone: false
+                        }
+                    },
+                    'sensor.anniversary_wedding_anniversary': {
+                        entity_id: 'sensor.anniversary_wedding_anniversary',
+                        state: '45',
+                        attributes: {
+                            friendly_name: 'Wedding Anniversary',
+                            category: 'anniversary',
+                            next_date: '2025-10-01',
+                            years_at_anniversary: 25,
+                            current_years: 24,
+                            zodiac_sign: 'Libra',
+                            named_anniversary: 'Silver Anniversary',
+                            is_milestone: true
+                        }
+                    },
+                    'sensor.anniversary_first_date': {
+                        entity_id: 'sensor.anniversary_first_date',
+                        state: '30',
+                        attributes: {
+                            friendly_name: 'First Date Anniversary',
+                            category: 'anniversary',
+                            next_date: '2025-09-16',
+                            years_at_anniversary: 27,
+                            current_years: 26,
+                            zodiac_sign: 'Virgo',
+                            named_anniversary: 'Bronze Anniversary',
+                            is_milestone: false
+                        }
+                    },
+                    'sensor.anniversary_grandpa_memorial': {
+                        entity_id: 'sensor.anniversary_grandpa_memorial',
+                        state: '90',
+                        attributes: {
+                            friendly_name: 'Grandpa Memorial',
+                            category: 'memorial',
+                            next_date: '2025-11-15',
+                            years_at_anniversary: 5,
+                            current_years: 4,
+                            birth_flower: 'Chrysanthemum',
+                            generation: 'Greatest Generation',
+                            is_milestone: false
+                        }
+                    },
+                    'sensor.anniversary_work_anniversary': {
+                        entity_id: 'sensor.anniversary_work_anniversary',
+                        state: '120',
+                        attributes: {
+                            friendly_name: 'Work Anniversary',
+                            category: 'work',
+                            next_date: '2025-12-15',
+                            years_at_anniversary: 10,
+                            current_years: 9,
+                            named_anniversary: 'Tin Anniversary',
+                            generation: 'Millennial',
+                            is_milestone: true
+                        }
+                    },
+                    'sensor.anniversary_college_graduation': {
+                        entity_id: 'sensor.anniversary_college_graduation',
+                        state: '7',
+                        attributes: {
+                            friendly_name: 'College Graduation',
+                            category: 'achievement',
+                            next_date: '2025-08-24',
+                            years_at_anniversary: 15,
+                            current_years: 14,
+                            named_anniversary: 'Crystal Anniversary',
+                            generation: 'Millennial',
+                            is_milestone: false
+                        }
+                    },
+                    'sensor.anniversary_phd_completion': {
+                        entity_id: 'sensor.anniversary_phd_completion',
+                        state: '60',
+                        attributes: {
+                            friendly_name: 'PhD Completion',
+                            category: 'achievement',
+                            next_date: '2025-10-16',
+                            years_at_anniversary: 8,
+                            current_years: 7,
+                            named_anniversary: 'Bronze Anniversary',
+                            generation: 'Millennial',
+                            is_milestone: false
+                        }
+                    },
+                    'sensor.anniversary_house_purchase': {
+                        entity_id: 'sensor.anniversary_house_purchase',
+                        state: '180',
+                        attributes: {
+                            friendly_name: 'House Purchase',
+                            category: 'event',
+                            next_date: '2026-02-13',
+                            years_at_anniversary: 12,
+                            current_years: 11,
+                            named_anniversary: 'Silk Anniversary',
+                            generation: 'Millennial',
+                            is_milestone: false
+                        }
+                    }
+                }
+            };
+
+            // Initialize cards with different Phase 3 configurations
+            const configs = {
+                'multi-category-card': {
+                    categories: ['birthday', 'anniversary', 'achievement'],
+                    title: '🎯 Personal Celebrations',
+                    max_items: 10
+                },
+                'stats-card': {
+                    show_category_stats: true,
+                    show_category_badges: true,
+                    title: '📊 Anniversary Statistics',
+                    max_items: 8
+                },
+                'grouped-card': {
+                    show_category_headers: true,
+                    group_by_category: true,
+                    show_category_badges: false,
+                    title: '🗂️ Grouped Anniversaries'
+                },
+                'priority-card': {
+                    priority_categories: ['birthday', 'anniversary'],
+                    show_category_badges: true,
+                    title: '⭐ Priority Anniversaries',
+                    max_items: 10
+                },
+                'professional-card': {
+                    categories: ['work', 'achievement'],
+                    title: '🏆 Professional Milestones',
+                    show_category_stats: true,
+                    category_color_scheme: true
+                },
+                'birthday-preserved-card': {
+                    category: 'birthday'
+                    // Should auto-title to "🎂 Upcoming Birthdays"
+                    // Should use zodiac_sign, birthstone, generation
+                },
+                'complete-card': {
+                    title: '🌟 Complete Anniversary Dashboard',
+                    show_category_stats: true,
+                    show_category_badges: true,
+                    category_color_scheme: true,
+                    priority_categories: ['birthday', 'anniversary'],
+                    max_items: 12
+                }
+            };
+
+            // Set up each card
+            Object.entries(configs).forEach(([cardId, config]) => {
+                const card = document.getElementById(cardId);
+                if (card) {
+                    card.setConfig(config);
+                    card.hass = mockHass;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

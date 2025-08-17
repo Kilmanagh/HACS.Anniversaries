@@ -14,14 +14,142 @@ class AnniversaryTimelineCard extends HTMLElement {
       throw new Error('Invalid configuration');
     }
     this.config = {
-      title: config.title || 'Upcoming Anniversaries',
+      title: config.title || this.getDefaultTitle(config.category || config.categories),
       max_items: config.max_items || 5,
-      show_attributes: config.show_attributes || ['zodiac_sign', 'birthstone', 'generation'],
+      show_attributes: config.show_attributes || this.getDefaultAttributes(config.category || config.categories),
       entity_filter: config.entity_filter || 'sensor.anniversary_*',
       show_icons: config.show_icons !== false,
       color_coding: config.color_coding !== false,
+      category: config.category || null, // Single category filter
+      categories: config.categories || null, // Multi-category filter (Phase 3)
+      show_category_badges: config.show_category_badges !== false,
+      category_color_scheme: config.category_color_scheme !== false,
+      enhanced_attributes: config.enhanced_attributes !== false,
+      // Phase 3 Advanced Options
+      show_category_headers: config.show_category_headers || false,
+      group_by_category: config.group_by_category || false,
+      show_category_stats: config.show_category_stats || false,
+      show_category_filter: config.show_category_filter || false,
+      priority_categories: config.priority_categories || null,
+      expandable_categories: config.expandable_categories || false,
       ...config
     };
+  }
+
+  getDefaultTitle(categoryOrCategories) {
+    // Handle single category
+    if (typeof categoryOrCategories === 'string') {
+      const categoryTitles = {
+        'birthday': '🎂 Upcoming Birthdays',
+        'anniversary': '💍 Upcoming Anniversaries',
+        'memorial': '🌸 Memorial Dates',
+        'holiday': '🎉 Upcoming Holidays',
+        'work': '💼 Work Anniversaries',
+        'achievement': '🏆 Achievement Anniversaries',
+        'event': '📅 Upcoming Events',
+        'other': '📋 Other Anniversaries'
+      };
+      return categoryTitles[categoryOrCategories] || 'Upcoming Anniversaries';
+    }
+    
+    // Handle multiple categories (Phase 3)
+    if (Array.isArray(categoryOrCategories) && categoryOrCategories.length > 0) {
+      if (categoryOrCategories.length === 1) {
+        return this.getDefaultTitle(categoryOrCategories[0]);
+      } else {
+        const categoryEmojis = {
+          'birthday': '🎂', 'anniversary': '💍', 'memorial': '🌸', 'holiday': '🎉',
+          'work': '💼', 'achievement': '🏆', 'event': '📅', 'other': '📋'
+        };
+        const emojis = categoryOrCategories.map(cat => categoryEmojis[cat] || '📅').join('');
+        return `${emojis} Multiple Anniversary Types`;
+      }
+    }
+    
+    return 'Upcoming Anniversaries';
+  }
+
+  getDefaultAttributes(categoryOrCategories) {
+    const categoryAttributes = {
+      'birthday': ['zodiac_sign', 'birthstone', 'generation'], // Keep the awesome original
+      'anniversary': ['current_years', 'named_anniversary', 'zodiac_sign'], // Enhanced with zodiac
+      'memorial': ['current_years', 'birth_flower', 'generation'], // Enhanced with meaningful attributes
+      'holiday': ['current_years', 'generation', 'named_anniversary'], // Enhanced
+      'work': ['current_years', 'named_anniversary', 'generation'], // Enhanced
+      'achievement': ['current_years', 'named_anniversary', 'generation'], // Enhanced
+      'event': ['current_years', 'named_anniversary', 'generation'], // Enhanced
+      'other': ['current_years', 'zodiac_sign', 'birthstone'] // Enhanced to match birthday quality
+    };
+    
+    // Handle single category
+    if (typeof categoryOrCategories === 'string') {
+      return categoryAttributes[categoryOrCategories] || ['zodiac_sign', 'birthstone', 'generation'];
+    }
+    
+    // Handle multiple categories (Phase 3) - merge unique attributes
+    if (Array.isArray(categoryOrCategories) && categoryOrCategories.length > 0) {
+      const allAttributes = new Set();
+      categoryOrCategories.forEach(cat => {
+        const attrs = categoryAttributes[cat] || ['current_years'];
+        attrs.forEach(attr => allAttributes.add(attr));
+      });
+      return Array.from(allAttributes);
+    }
+    
+    return ['zodiac_sign', 'birthstone', 'generation'];
+  }
+
+  getCategoryConfig(category) {
+    return {
+      'birthday': { 
+        color: '#FF69B4', 
+        emoji: '🎂', 
+        label: 'Birthday',
+        theme: 'warm'
+      },
+      'anniversary': { 
+        color: '#E91E63', 
+        emoji: '💍', 
+        label: 'Anniversary',
+        theme: 'romantic'
+      },
+      'memorial': { 
+        color: '#9C27B0', 
+        emoji: '🌸', 
+        label: 'Memorial',
+        theme: 'respectful'
+      },
+      'holiday': { 
+        color: '#FF9800', 
+        emoji: '🎉', 
+        label: 'Holiday',
+        theme: 'festive'
+      },
+      'work': { 
+        color: '#2196F3', 
+        emoji: '💼', 
+        label: 'Work',
+        theme: 'professional'
+      },
+      'achievement': { 
+        color: '#4CAF50', 
+        emoji: '🏆', 
+        label: 'Achievement',
+        theme: 'success'
+      },
+      'event': { 
+        color: '#607D8B', 
+        emoji: '📅', 
+        label: 'Event',
+        theme: 'neutral'
+      },
+      'other': { 
+        color: '#795548', 
+        emoji: '📋', 
+        label: 'Other',
+        theme: 'neutral'
+      }
+    }[category] || { color: '#795548', emoji: '📋', label: 'Other', theme: 'neutral' };
   }
 
   set hass(hass) {
@@ -41,8 +169,45 @@ class AnniversaryTimelineCard extends HTMLElement {
                !entityId.includes('upcoming_anniversaries');
       })
       .map(entityId => this._hass.states[entityId])
-      .filter(entity => entity && entity.state !== 'unavailable')
-      .sort((a, b) => parseInt(a.state) - parseInt(b.state))
+      .filter(entity => {
+        if (!entity || entity.state === 'unavailable') return false;
+        
+        // Filter by category/categories if specified (Phase 3 enhancement)
+        const entityCategory = entity.attributes.category || 'other';
+        
+        // Single category filter (Phase 1/2)
+        if (this.config.category) {
+          if (entityCategory !== this.config.category) return false;
+        }
+        
+        // Multi-category filter (Phase 3)
+        if (this.config.categories && Array.isArray(this.config.categories)) {
+          if (!this.config.categories.includes(entityCategory)) return false;
+        }
+        
+        return true;
+      })
+      .sort((a, b) => {
+        // Priority categories sorting (Phase 3)
+        if (this.config.priority_categories && Array.isArray(this.config.priority_categories)) {
+          const aCat = a.attributes.category || 'other';
+          const bCat = b.attributes.category || 'other';
+          const aPriority = this.config.priority_categories.indexOf(aCat);
+          const bPriority = this.config.priority_categories.indexOf(bCat);
+          
+          // If one has priority and other doesn't
+          if (aPriority !== -1 && bPriority === -1) return -1;
+          if (bPriority !== -1 && aPriority === -1) return 1;
+          
+          // If both have priority, sort by priority order
+          if (aPriority !== -1 && bPriority !== -1 && aPriority !== bPriority) {
+            return aPriority - bPriority;
+          }
+        }
+        
+        // Default sort by days (chronological)
+        return parseInt(a.state) - parseInt(b.state);
+      })
       .slice(0, this.config.max_items);
     
     return entities;
@@ -50,23 +215,29 @@ class AnniversaryTimelineCard extends HTMLElement {
 
   getIcon(entity) {
     const days = parseInt(entity.state);
-    const name = entity.attributes.friendly_name || entity.entity_id;
+    const category = entity.attributes.category || 'other';
     
-    // Custom icons based on name/type
-    if (name.toLowerCase().includes('birthday') || name.toLowerCase().includes('birth')) return '🎂';
-    if (name.toLowerCase().includes('wedding') || name.toLowerCase().includes('anniversary')) return '💍';
-    if (name.toLowerCase().includes('graduation')) return '🎓';
-    if (name.toLowerCase().includes('work') || name.toLowerCase().includes('job')) return '💼';
+    // Category-specific icons (matching const.py CATEGORY_ICONS)
+    const categoryIcons = {
+      'birthday': '🎂',
+      'anniversary': '💍',
+      'memorial': '🌸',
+      'holiday': '�',
+      'work': '💼',
+      'achievement': '🏆',
+      'event': '📅',
+      'other': '�'
+    };
     
-    // Days-based icons
-    if (days === 0) return '🌟';
-    if (days <= 7) return '🔥';
-    if (days <= 30) return '⏰';
+    // Special day indicators override category icons
+    if (days === 0) return '🌟'; // Today
+    if (days <= 7) return '🔥';  // This week
     
-    // Milestone icons
+    // Milestone icons for special anniversaries
     if (entity.attributes.is_milestone) return '💎';
     
-    return '📅';
+    // Return category-specific icon or fallback
+    return categoryIcons[category] || '📅';
   }
 
   getZodiacEmoji(sign) {
@@ -87,8 +258,15 @@ class AnniversaryTimelineCard extends HTMLElement {
     return stoneEmojis[stone] || '💍';
   }
 
-  getColorForDays(days) {
+  getColorForDays(days, category = null) {
     if (!this.config.color_coding) return '#1976d2';
+    
+    // Use category-aware colors if category provided and color scheme enabled
+    if (category && this.config.category_color_scheme) {
+      return this.getCategoryThemeColors(category, days);
+    }
+    
+    // Default color scheme (preserves original birthday experience)
     if (days === 0) return '#f44336';      // Red - today
     if (days <= 7) return '#ff9800';       // Orange - this week  
     if (days <= 30) return '#ffc107';      // Yellow - this month
@@ -173,32 +351,296 @@ class AnniversaryTimelineCard extends HTMLElement {
           color: var(--secondary-text-color);
           padding: 20px;
         }
+        /* Phase 3 Advanced Styles */
+        .category-stats {
+          margin-bottom: 16px;
+          padding: 12px;
+          background: var(--secondary-background-color);
+          border-radius: 8px;
+        }
+        .stats-header {
+          font-weight: bold;
+          margin-bottom: 8px;
+          color: var(--primary-text-color);
+        }
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+          gap: 8px;
+          margin-bottom: 8px;
+        }
+        .stat-item {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          padding: 4px 8px;
+          background: var(--card-background-color);
+          border-radius: 4px;
+          font-size: 0.9em;
+        }
+        .stat-emoji { font-size: 1.1em; }
+        .stat-label { flex: 1; font-weight: 500; }
+        .stat-count { font-weight: bold; color: var(--primary-color); }
+        .stat-today { color: #f44336; font-size: 0.8em; }
+        .stat-milestones { color: #9c27b0; font-size: 0.8em; }
+        .stats-totals {
+          font-size: 0.8em;
+          color: var(--secondary-text-color);
+          text-align: center;
+          padding-top: 8px;
+          border-top: 1px solid var(--divider-color);
+        }
+        .category-section {
+          margin-bottom: 16px;
+        }
+        .category-header {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 12px;
+          margin-bottom: 8px;
+          border-radius: 6px;
+          font-weight: bold;
+          color: var(--primary-text-color);
+        }
+        .category-header-icon { font-size: 1.2em; }
+        .category-header-label { flex: 1; }
+        .category-header-count { 
+          font-size: 0.9em; 
+          color: var(--secondary-text-color); 
+        }
+        .category-items {
+          margin-left: 8px;
+        }
       </style>
       
       <div class="card">
         <div class="card-header">${this.config.title}</div>
+        ${this.renderCategoryStats(entities)}
         ${entities.length === 0 ? 
           '<div class="no-anniversaries">No upcoming anniversaries</div>' :
-          entities.map(entity => this.renderTimelineItem(entity)).join('')
+          this.config.group_by_category ? 
+            this.renderCategoryHeaders(entities) :
+            entities.map(entity => this.renderTimelineItem(entity)).join('')
         }
       </div>
     `;
+  }
+
+  getCategoryStatistics(entities) {
+    const stats = {};
+    const totalStats = { total: 0, today: 0, thisWeek: 0, thisMonth: 0, milestones: 0 };
+    
+    entities.forEach(entity => {
+      const category = entity.attributes.category || 'other';
+      const days = parseInt(entity.state);
+      const isMilestone = entity.attributes.is_milestone;
+      
+      if (!stats[category]) {
+        stats[category] = { count: 0, today: 0, thisWeek: 0, thisMonth: 0, milestones: 0 };
+      }
+      
+      stats[category].count++;
+      totalStats.total++;
+      
+      if (days === 0) {
+        stats[category].today++;
+        totalStats.today++;
+      } else if (days <= 7) {
+        stats[category].thisWeek++;
+        totalStats.thisWeek++;
+      } else if (days <= 30) {
+        stats[category].thisMonth++;
+        totalStats.thisMonth++;
+      }
+      
+      if (isMilestone) {
+        stats[category].milestones++;
+        totalStats.milestones++;
+      }
+    });
+    
+    return { categories: stats, totals: totalStats };
+  }
+
+  renderCategoryStats(entities) {
+    if (!this.config.show_category_stats) return '';
+    
+    const stats = this.getCategoryStatistics(entities);
+    const categoryConfigs = {};
+    
+    // Get category configs for display
+    Object.keys(stats.categories).forEach(cat => {
+      categoryConfigs[cat] = this.getCategoryConfig(cat);
+    });
+    
+    return `
+      <div class="category-stats">
+        <div class="stats-header">📊 Category Overview</div>
+        <div class="stats-grid">
+          ${Object.entries(stats.categories).map(([category, stat]) => {
+            const config = categoryConfigs[category];
+            return `
+              <div class="stat-item" style="border-left: 3px solid ${config.color}">
+                <span class="stat-emoji">${config.emoji}</span>
+                <span class="stat-label">${config.label}</span>
+                <span class="stat-count">${stat.count}</span>
+                ${stat.today > 0 ? `<span class="stat-today">🌟${stat.today}</span>` : ''}
+                ${stat.milestones > 0 ? `<span class="stat-milestones">💎${stat.milestones}</span>` : ''}
+              </div>
+            `;
+          }).join('')}
+        </div>
+        <div class="stats-totals">
+          Total: ${stats.totals.total} | Today: ${stats.totals.today} | This Week: ${stats.totals.thisWeek} | Milestones: ${stats.totals.milestones}
+        </div>
+      </div>
+    `;
+  }
+
+  renderCategoryHeaders(entities) {
+    if (!this.config.show_category_headers || !this.config.group_by_category) return '';
+    
+    // Group entities by category
+    const grouped = {};
+    entities.forEach(entity => {
+      const category = entity.attributes.category || 'other';
+      if (!grouped[category]) grouped[category] = [];
+      grouped[category].push(entity);
+    });
+    
+    return Object.entries(grouped).map(([category, categoryEntities]) => {
+      const config = this.getCategoryConfig(category);
+      const count = categoryEntities.length;
+      
+      return `
+        <div class="category-section">
+          <div class="category-header" style="background: linear-gradient(90deg, ${config.color}20, transparent)">
+            <span class="category-header-icon">${config.emoji}</span>
+            <span class="category-header-label">${config.label}</span>
+            <span class="category-header-count">(${count})</span>
+          </div>
+          <div class="category-items">
+            ${categoryEntities.map(entity => this.renderTimelineItem(entity)).join('')}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  renderCategoryBadge(category) {
+    if (!this.config.show_category_badges || !category || category === 'other') return '';
+    
+    const categoryConfig = this.getCategoryConfig(category);
+    return `
+      <span class="category-badge" style="
+        background: ${categoryConfig.color}; 
+        color: white; 
+        padding: 2px 6px; 
+        border-radius: 8px; 
+        font-size: 0.7em; 
+        font-weight: bold;
+        margin-left: 8px;
+        display: inline-block;
+      ">
+        ${categoryConfig.emoji} ${categoryConfig.label}
+      </span>
+    `;
+  }
+
+  getCategoryThemeColors(category, days) {
+    const baseConfig = this.getCategoryConfig(category);
+    const themes = {
+      'warm': { // Birthday theme - keep it awesome!
+        today: '#FF1493',
+        week: '#FF69B4', 
+        month: '#FFA500',
+        future: '#90EE90'
+      },
+      'romantic': { // Anniversary theme
+        today: '#E91E63',
+        week: '#F06292',
+        month: '#F8BBD9',
+        future: '#FCE4EC'
+      },
+      'respectful': { // Memorial theme - gentle colors
+        today: '#9C27B0',
+        week: '#AB47BC',
+        month: '#BA68C8',
+        future: '#CE93D8'
+      },
+      'festive': { // Holiday theme
+        today: '#FF5722',
+        week: '#FF9800',
+        month: '#FFB74D',
+        future: '#FFCC02'
+      },
+      'professional': { // Work theme
+        today: '#1976D2',
+        week: '#2196F3',
+        month: '#42A5F5',
+        future: '#90CAF9'
+      },
+      'success': { // Achievement theme
+        today: '#388E3C',
+        week: '#4CAF50',
+        month: '#66BB6A',
+        future: '#A5D6A7'
+      },
+      'neutral': { // Event/Other theme
+        today: '#455A64',
+        week: '#607D8B',
+        month: '#90A4AE',
+        future: '#B0BEC5'
+      }
+    };
+
+    const themeColors = themes[baseConfig.theme] || themes.neutral;
+    
+    if (days === 0) return themeColors.today;
+    if (days <= 7) return themeColors.week;
+    if (days <= 30) return themeColors.month;
+    return themeColors.future;
+  }
+
+  formatDate(dateString) {
+    if (!dateString) return '';
+    
+    try {
+      // Parse the date string (expected format: YYYY-MM-DD)
+      const [year, month, day] = dateString.split('-');
+      const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      
+      // Format to local language long date (e.g., "January 1, 2004")
+      return date.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      // Fallback to original string if parsing fails
+      return dateString;
+    }
   }
 
   renderTimelineItem(entity) {
     const days = parseInt(entity.state);
     const attrs = entity.attributes;
     const icon = this.config.show_icons ? this.getIcon(entity) : '📅';
-    const color = this.getColorForDays(days);
+    const category = attrs.category || 'other';
+    const color = this.getColorForDays(days, category);
     const isMilestone = attrs.is_milestone;
     
     return `
       <div class="timeline-item">
         <div class="timeline-icon ${isMilestone ? 'milestone-indicator' : ''}">${icon}</div>
         <div class="timeline-content">
-          <div class="timeline-name">${attrs.friendly_name || entity.entity_id}</div>
+          <div class="timeline-name">
+            ${attrs.friendly_name || entity.entity_id}
+            ${this.renderCategoryBadge(category)}
+          </div>
           <div class="timeline-date">
-            ${attrs.next_date} 
+            ${this.formatDate(attrs.next_date)} 
             ${attrs.years_at_anniversary ? `(${attrs.years_at_anniversary} years)` : ''}
           </div>
           <div class="timeline-attributes">
@@ -258,12 +700,12 @@ window.customCards = window.customCards || [];
 window.customCards.push({
   type: 'anniversary-timeline-card',
   name: 'Anniversary Timeline Card',
-  description: 'Shows upcoming anniversaries in chronological order',
+  description: 'Advanced anniversary timeline with multi-category support, statistics, and interactive features',
   preview: true
 });
 
 console.info(
-  '%c  ANNIVERSARY-TIMELINE-CARD  %c  Version 1.0.0  ',
+  '%c  ANNIVERSARY-TIMELINE-CARD  %c  Version 1.3.0 - Advanced Options  ',
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray'
 );

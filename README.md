@@ -46,6 +46,29 @@ This integration includes **4 custom Lovelace cards** with rich emoji/icon suppo
 - ✅ **One-time events** for non-recurring dates
 - ✅ **Multi-language support** with translations
 
+## 🆕 Latest Updates
+
+**Timeline Card v1.3.0** - Advanced options with multi-category support:
+- 🎯 **Multi-category timelines**: Display multiple anniversary types in one card (`categories: ["birthday", "anniversary"]`)
+- 📊 **Category statistics**: Overview with counts, today's events, and milestones
+- 🗂️ **Category grouping**: Organize under headers with visual separation (`group_by_category: true`)
+- ⭐ **Priority categories**: Show important types first (`priority_categories: ["birthday"]`)
+- 🎂 **Birthday excellence preserved**: Original zodiac/birthstone experience unchanged
+
+**Timeline Card v1.2.0** - Enhanced category system:
+- ✨ **Enhanced attributes**: All categories now have rich, meaningful attributes (not just birthdays!)
+- 🏷️ **Category badges**: Visual indicators for easy category identification  
+- 🎨 **Theme-aware colors**: Category-specific color schemes that match anniversary type
+- � **Preserved excellence**: Birthday timeline remains as awesome as ever with unchanged attributes
+- 📅 **Long date format**: Dates display in local language (e.g., "January 1, 2025")
+- � **Smart defaults**: Auto-titles, icons, and attributes based on category selection
+
+**Example**: Birthday timeline keeps `zodiac_sign`, `birthstone`, `generation` while work anniversaries get `current_years`, `named_anniversary`, `generation` with professional blue theme.
+
+**Timeline Card v1.1.0** - Category filtering foundation:
+- 🎯 **Category filtering**: Show only specific anniversary types per card
+- 🏷️ **8 category types**: birthday, anniversary, memorial, holiday, work, achievement, event, other
+
 ## Table of Contents
 
 * [Installation](#installation)
@@ -87,9 +110,39 @@ This integration includes 4 beautiful custom cards that automatically install wi
 
 ### 🗓️ Timeline Card (`anniversary-timeline-card`)
 Shows upcoming anniversaries in chronological order with:
-- Color coding by urgency (red=today, orange=week, yellow=month, green=future)
-- Optional attribute badges (zodiac ♈, birthstone 💎, generation 👥)
-- Smart emoji icons (🎂 birthdays, 💍 weddings, 📅 general)
+- **Multi-category support**: Display multiple anniversary types in one timeline (`categories: ["birthday", "work"]`)
+- **Category statistics**: Overview with counts, today's events, and milestones (`show_category_stats: true`)
+- **Category grouping**: Organize under headers with visual separation (`group_by_category: true`)
+- **Priority categories**: Show important types first (`priority_categories: ["birthday"]`)
+- **Enhanced category system**: All categories now have rich attributes (not just birthdays!)
+- **Category badges**: Visual indicators with emoji for easy identification
+- **Theme-aware colors**: Category-specific color schemes (romantic pink, professional blue, etc.)
+- **Category filtering**: Display only specific anniversary types (birthdays, work anniversaries, etc.)
+- **Smart category defaults**: Automatic titles, icons, and attributes based on category selection
+- **Long date formatting**: Dates displayed in local language format (e.g., "January 1, 2025")
+- **Preserved birthday excellence**: Original birthday experience unchanged with zodiac ♈, birthstone 💎, generation 👥
+
+**Category Examples**:
+```yaml
+# Birthday-focused timeline (unchanged excellence!)
+type: custom:anniversary-timeline-card
+category: "birthday"
+# Auto-title: "🎂 Upcoming Birthdays"
+# Auto-attributes: zodiac_sign, birthstone, generation
+
+# Work anniversaries with enhanced attributes
+type: custom:anniversary-timeline-card
+category: "work"
+title: "Team Milestones"
+# Auto-attributes: current_years, named_anniversary, generation
+# Theme: professional blue colors
+
+# Memorial dates with respectful theme
+type: custom:anniversary-timeline-card
+category: "memorial"  
+# Auto-attributes: current_years, birth_flower, generation
+# Theme: gentle purple colors
+```
 
 ### 🌟 Details Card (`anniversary-details-card`)  
 Rich single-anniversary view featuring:

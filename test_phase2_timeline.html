@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anniversary Timeline Card - Phase 2 Enhanced Categories</title>
+    <style>
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background: #f5f5f5; 
+            margin: 20px;
+        }
+        .demo-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .demo-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .demo-description {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .config-example {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin-bottom: 15px;
+            border-left: 4px solid #2196F3;
+        }
+        anniversary-timeline-card {
+            display: block;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Anniversary Timeline Card v1.2.0 - Phase 2 Enhanced Categories</h1>
+    
+    <div class="demo-section">
+        <div class="demo-title">🎂 Birthday Timeline (Preserved Original Excellence)</div>
+        <div class="demo-description">
+            The beloved birthday experience remains exactly as awesome as before, with rich attributes.
+        </div>
+        <div class="config-example">
+type: custom:anniversary-timeline-card
+category: "birthday"
+# Auto-title: "🎂 Upcoming Birthdays"
+# Auto-attributes: zodiac_sign, birthstone, generation
+# Theme: warm colors (pink/orange/yellow)
+        </div>
+        <anniversary-timeline-card id="birthday-card"></anniversary-timeline-card>
+    </div>
+
+    <div class="demo-section">
+        <div class="demo-title">💍 Anniversary Timeline (Enhanced)</div>
+        <div class="demo-description">
+            Now includes zodiac signs and enhanced romantic color theme.
+        </div>
+        <div class="config-example">
+type: custom:anniversary-timeline-card
+category: "anniversary"
+# Auto-attributes: current_years, named_anniversary, zodiac_sign
+# Theme: romantic colors (pink/magenta)
+        </div>
+        <anniversary-timeline-card id="anniversary-card"></anniversary-timeline-card>
+    </div>
+
+    <div class="demo-section">
+        <div class="demo-title">🌸 Memorial Timeline (Enhanced)</div>
+        <div class="demo-description">
+            Respectful theme with birth flowers and gentle purple colors.
+        </div>
+        <div class="config-example">
+type: custom:anniversary-timeline-card
+category: "memorial"
+# Auto-attributes: current_years, birth_flower, generation
+# Theme: respectful colors (purple tones)
+        </div>
+        <anniversary-timeline-card id="memorial-card"></anniversary-timeline-card>
+    </div>
+
+    <div class="demo-section">
+        <div class="demo-title">💼 Work Timeline (Enhanced)</div>
+        <div class="demo-description">
+            Professional theme with service years and achievement tracking.
+        </div>
+        <div class="config-example">
+type: custom:anniversary-timeline-card
+category: "work"
+# Auto-attributes: current_years, named_anniversary, generation
+# Theme: professional colors (blue tones)
+        </div>
+        <anniversary-timeline-card id="work-card"></anniversary-timeline-card>
+    </div>
+
+    <div class="demo-section">
+        <div class="demo-title">🏆 Achievement Timeline (Enhanced)</div>
+        <div class="demo-description">
+            Success theme with accomplishment tracking and green color scheme.
+        </div>
+        <div class="config-example">
+type: custom:anniversary-timeline-card
+category: "achievement"
+# Auto-attributes: current_years, named_anniversary, generation
+# Theme: success colors (green tones)
+        </div>
+        <anniversary-timeline-card id="achievement-card"></anniversary-timeline-card>
+    </div>
+
+    <div class="demo-section">
+        <div class="demo-title">🎉 All Categories with Badges (Enhanced)</div>
+        <div class="demo-description">
+            Shows all categories together with category badges for easy identification.
+        </div>
+        <div class="config-example">
+type: custom:anniversary-timeline-card
+# No category = show all
+show_category_badges: true
+category_color_scheme: true
+        </div>
+        <anniversary-timeline-card id="all-categories-card"></anniversary-timeline-card>
+    </div>
+
+    <script type="module" src="custom_components/anniversaries/www/anniversary-timeline-card.js"></script>
+    <script>
+        // Mock Home Assistant environment
+        window.customElements.whenDefined('anniversary-timeline-card').then(() => {
+            console.log('🎉 Anniversary Timeline Card v1.2.0 loaded successfully!');
+            
+            // Mock anniversary data for testing Phase 2 features
+            const mockHass = {
+                states: {
+                    'sensor.anniversary_mom_birthday': {
+                        entity_id: 'sensor.anniversary_mom_birthday',
+                        state: '15',
+                        attributes: {
+                            friendly_name: 'Mom\'s Birthday',
+                            category: 'birthday',
+                            next_date: '2025-09-01',
+                            years_at_anniversary: 65,
+                            current_years: 64,
+                            zodiac_sign: 'Virgo',
+                            birthstone: 'Sapphire',
+                            generation: 'Baby Boomer',
+                            is_milestone: false
+                        }
+                    },
+                    'sensor.anniversary_wedding_anniversary': {
+                        entity_id: 'sensor.anniversary_wedding_anniversary',
+                        state: '45',
+                        attributes: {
+                            friendly_name: 'Wedding Anniversary',
+                            category: 'anniversary',
+                            next_date: '2025-10-01',
+                            years_at_anniversary: 25,
+                            current_years: 24,
+                            zodiac_sign: 'Libra',
+                            named_anniversary: 'Silver Anniversary',
+                            is_milestone: true
+                        }
+                    },
+                    'sensor.anniversary_grandpa_memorial': {
+                        entity_id: 'sensor.anniversary_grandpa_memorial',
+                        state: '90',
+                        attributes: {
+                            friendly_name: 'Grandpa Memorial',
+                            category: 'memorial',
+                            next_date: '2025-11-15',
+                            years_at_anniversary: 5,
+                            current_years: 4,
+                            birth_flower: 'Chrysanthemum',
+                            generation: 'Greatest Generation',
+                            is_milestone: false
+                        }
+                    },
+                    'sensor.anniversary_work_anniversary': {
+                        entity_id: 'sensor.anniversary_work_anniversary',
+                        state: '120',
+                        attributes: {
+                            friendly_name: 'Work Anniversary',
+                            category: 'work',
+                            next_date: '2025-12-15',
+                            years_at_anniversary: 10,
+                            current_years: 9,
+                            named_anniversary: 'Tin Anniversary',
+                            generation: 'Millennial',
+                            is_milestone: true
+                        }
+                    },
+                    'sensor.anniversary_graduation': {
+                        entity_id: 'sensor.anniversary_graduation',
+                        state: '30',
+                        attributes: {
+                            friendly_name: 'College Graduation',
+                            category: 'achievement',
+                            next_date: '2025-09-16',
+                            years_at_anniversary: 15,
+                            current_years: 14,
+                            named_anniversary: 'Crystal Anniversary',
+                            generation: 'Millennial',
+                            is_milestone: false
+                        }
+                    }
+                }
+            };
+
+            // Initialize cards with different configurations
+            const configs = {
+                'birthday-card': {
+                    category: 'birthday'
+                },
+                'anniversary-card': {
+                    category: 'anniversary'
+                },
+                'memorial-card': {
+                    category: 'memorial'
+                },
+                'work-card': {
+                    category: 'work'
+                },
+                'achievement-card': {
+                    category: 'achievement'
+                },
+                'all-categories-card': {
+                    title: 'All Anniversaries with Enhanced Features',
+                    show_category_badges: true,
+                    category_color_scheme: true,
+                    max_items: 8
+                }
+            };
+
+            // Set up each card
+            Object.entries(configs).forEach(([cardId, config]) => {
+                const card = document.getElementById(cardId);
+                if (card) {
+                    card.setConfig(config);
+                    card.hass = mockHass;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

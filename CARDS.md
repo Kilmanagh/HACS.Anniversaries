@@ -27,12 +27,19 @@ After adding the resources and restarting, the cards will appear in your Lovelac
 ## Card Types
 
 ### 1. Anniversary Timeline Card (`anniversary-timeline-card`)
-Shows upcoming anniversaries in chronological order with color coding and attribute badges.
+Shows upcoming anniversaries in chronological order with category filtering, badges, theme-aware colors, and advanced features.
+
+**✨ Phase 3 Features - Advanced Options:**
+- **Multi-category support**: Display multiple anniversary types in one timeline
+- **Category statistics**: Overview with counts, today's events, and milestones
+- **Category grouping**: Organize under headers with visual separation
+- **Priority categories**: Show important categories first
+- **Interactive features**: Configurable display modes and layouts
 
 **Configuration:**
 ```yaml
 type: custom:anniversary-timeline-card
-title: "Upcoming Anniversaries"
+title: "Upcoming Anniversaries"  # Optional: auto-generated based on category
 max_items: 5
 show_attributes: 
   - zodiac_sign
@@ -41,10 +48,105 @@ show_attributes:
   - named_anniversary
 show_icons: true
 color_coding: true
-# Optional: specify specific entities
+
+# Single Category (Phase 1/2)
+category: null  # birthday, anniversary, memorial, etc.
+
+# Multi-Category (Phase 3)
+categories: null  # ["birthday", "anniversary", "achievement"]
+
+# Phase 2 Options
+show_category_badges: true     # Show category badges next to names
+category_color_scheme: true    # Use category-specific color themes
+enhanced_attributes: true      # Use rich attribute sets per category
+
+# Phase 3 Advanced Options
+show_category_stats: false     # Display category statistics overview
+show_category_headers: false   # Show category section headers
+group_by_category: false       # Group anniversaries by category
+priority_categories: null      # ["birthday", "anniversary"] - show these first
+expandable_categories: false   # Collapsible category sections (future)
+show_category_filter: false    # Interactive category toggles (future)
+
+# Optional: specify specific entities (overrides category filtering)
 entities:
   - sensor.anniversary_birthday_mom
   - sensor.anniversary_wedding_anniversary
+```
+
+**Phase 3 Advanced Examples:**
+
+```yaml
+# � Multi-Category Timeline
+type: custom:anniversary-timeline-card
+categories: ["birthday", "anniversary", "achievement"]
+title: "Personal Celebrations"
+show_category_badges: true
+max_items: 10
+
+# � Statistics Dashboard
+type: custom:anniversary-timeline-card
+show_category_stats: true
+show_category_badges: true
+category_color_scheme: true
+title: "Anniversary Overview"
+
+# 🗂️ Grouped by Category
+type: custom:anniversary-timeline-card
+show_category_headers: true
+group_by_category: true
+show_category_badges: false  # Less cluttered when grouped
+
+# ⭐ Priority System
+type: custom:anniversary-timeline-card
+priority_categories: ["birthday", "anniversary"]
+show_category_badges: true
+title: "Important Anniversaries First"
+
+# 💼 Professional Dashboard
+type: custom:anniversary-timeline-card
+categories: ["work", "achievement"]
+title: "Professional Milestones"
+show_category_stats: true
+category_color_scheme: true
+
+# � Birthday Excellence (PRESERVED)
+type: custom:anniversary-timeline-card
+category: "birthday"
+# Auto-title: "🎂 Upcoming Birthdays"
+# Auto-attributes: zodiac_sign, birthstone, generation (unchanged!)
+# Theme: warm colors (unchanged!)
+```
+
+**Category Enhancement Summary:**
+
+| Category | Enhanced Attributes | Color Theme | Badge | Use Case |
+|----------|-------------------|-------------|-------|----------|
+| **birthday** | `zodiac_sign`, `birthstone`, `generation` | 🌈 Warm (preserved) | 🎂 Birthday | Personal celebrations |
+| **anniversary** | `current_years`, `named_anniversary`, `zodiac_sign` | 💖 Romantic | 💍 Anniversary | Relationship milestones |
+| **memorial** | `current_years`, `birth_flower`, `generation` | 🟣 Respectful | 🌸 Memorial | Remembrance dates |
+| **holiday** | `current_years`, `generation`, `named_anniversary` | 🟠 Festive | 🎉 Holiday | Seasonal celebrations |
+| **work** | `current_years`, `named_anniversary`, `generation` | 🔵 Professional | 💼 Work | Career milestones |
+| **achievement** | `current_years`, `named_anniversary`, `generation` | 🟢 Success | 🏆 Achievement | Personal accomplishments |
+| **event** | `current_years`, `named_anniversary`, `generation` | ⚫ Neutral | 📅 Event | General events |
+| **other** | `current_years`, `zodiac_sign`, `birthstone` | ⚫ Neutral | 📋 Other | Miscellaneous |
+
+**Feature Progression:**
+
+```yaml
+# Phase 1: Basic category filtering
+category: "birthday"
+
+# Phase 2: Enhanced categories with badges and themes
+category: "work"
+show_category_badges: true
+category_color_scheme: true
+
+# Phase 3: Advanced multi-category with statistics
+categories: ["birthday", "anniversary", "work"]
+show_category_stats: true
+priority_categories: ["birthday"]
+group_by_category: true
 ```
 
 ### 2. Anniversary Details Card (`anniversary-details-card`)
