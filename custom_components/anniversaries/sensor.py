@@ -77,7 +77,10 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
     ) -> None:
         super().__init__(coordinator)
         self._entry = entry
-        self.config = entry.options or entry.data
+        # Properly merge data and options (options override data)
+        self.config = {**entry.data}
+        if entry.options:
+            self.config.update(entry.options)
         name = self.config.get("name", "anniversary")
         slug = slugify(name)
         short_id = entry.entry_id.split("-")[0]

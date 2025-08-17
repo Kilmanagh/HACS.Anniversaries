@@ -262,7 +262,12 @@ class AnniversaryData:
     @classmethod
     def from_config(cls, config: dict) -> "AnniversaryData":
         """Create AnniversaryData from config entry."""
-        from .const import CONF_DATE, CONF_NAME, CONF_ONE_TIME, CONF_HALF_ANNIVERSARY, CONF_CATEGORY, DEFAULT_CATEGORY
+        from .const import CONF_DATE, CONF_NAME, CONF_ONE_TIME, CONF_HALF_ANNIVERSARY, CONF_CATEGORY, DEFAULT_CATEGORY, CATEGORY_OPTIONS
+        
+        # Debug logging
+        import logging
+        _LOGGER = logging.getLogger(__name__)
+        _LOGGER.debug(f"Creating anniversary from config: {config}")
         
         # Parse the date
         date_str = config.get(CONF_DATE, "")
@@ -287,12 +292,18 @@ class AnniversaryData:
             except ValueError:
                 raise ValueError(f"Invalid date format: {date_str}")
         
+        # Validate and sanitize category
+        category = config.get(CONF_CATEGORY, DEFAULT_CATEGORY)
+        if category not in CATEGORY_OPTIONS:
+            _LOGGER.warning(f"Invalid category '{category}', using default '{DEFAULT_CATEGORY}'")
+            category = DEFAULT_CATEGORY
+        
         return cls(
             name=config.get(CONF_NAME, "Unknown Anniversary"),
             date=anniversary_date,
             is_one_time=config.get(CONF_ONE_TIME, False),
             show_half_anniversary=config.get(CONF_HALF_ANNIVERSARY, False),
-            category=config.get(CONF_CATEGORY, DEFAULT_CATEGORY),
+            category=category,
             unknown_year=unknown_year,
             config=config
         )

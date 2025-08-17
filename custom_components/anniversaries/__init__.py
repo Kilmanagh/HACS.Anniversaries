@@ -33,7 +33,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         all_anniversaries = {}
         for config_entry in hass.config_entries.async_entries(DOMAIN):
             if config_entry.state == "loaded" or config_entry.entry_id == entry.entry_id:
-                entry_config = config_entry.options or config_entry.data
+                # Properly merge data and options (options override data)
+                entry_config = {**config_entry.data}
+                if config_entry.options:
+                    entry_config.update(config_entry.options)
+                
                 if entry_config and (entry_config.get("name") or entry_config.get("date")):
                     try:
                         anniversary_data = AnniversaryData.from_config(entry_config)
@@ -52,6 +56,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         coordinator = hass.data[DOMAIN]["coordinator"]
         try:
             from .data import AnniversaryData
+            # Properly merge data and options (options override data)
+            config = {**entry.data}
+            if entry.options:
+                config.update(entry.options)
             anniversary_data = AnniversaryData.from_config(config)
             coordinator.anniversaries[entry.entry_id] = anniversary_data
             await coordinator.async_refresh()
@@ -103,4 +111,30 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def update_listener(hass: HomeAssistant, entry: ConfigEntry):
     """Handle options update."""
-    await hass.config_entries.async_reload(entry.entry_id)
+    try:
+        from .data import AnniversaryData
+        
+        # Get the shared coordinator
+        if "coordinator" not in hass.data[DOMAIN]:
+            _LOGGER.error("No coordinator found for update")
+            return
+            
+        coordinator = hass.data[DOMAIN]["coordinator"]
+        
+        # Properly merge data and options (options override data)
+        config = {**entry.data}
+        if entry.options:
+            config.update(entry.options)
+            
+        # Update the anniversary data in the coordinator
+        anniversary_data = AnniversaryData.from_config(config)
+        coordinator.anniversaries[entry.entry_id] = anniversary_data
+        
+        # Refresh the coordinator to update all entities
+        await coordinator.async_refresh()
+        _LOGGER.debug(f"Updated anniversary {entry.entry_id} with new configuration")
+        
+    except Exception as e:
+        _LOGGER.error(f"Failed to update anniversary {entry.entry_id}: {e}")
+        # Fall back to full reload if update fails
+        await hass.config_entries.async_reload(entry.entry_id)
