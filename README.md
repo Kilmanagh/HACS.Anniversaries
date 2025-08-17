@@ -37,11 +37,11 @@ This integration includes **4 custom Lovelace cards** with rich emoji/icon suppo
 
 - ✅ **Automatic entity ID prefixing** with `anniversary_` for better organization
 - ✅ **Rich attributes**: zodiac signs ♈, birthstones 💎, generations 👥, milestones 🌟
+- ✅ **"Since last" tracking**: Always-available attributes to track time since last anniversary
 - ✅ **Calendar integration** with anniversary events
 - ✅ **Custom Lovelace cards** with animations and emoji support
 - ✅ **Upcoming anniversaries sensor** for dashboard summaries
 - ✅ **Half-anniversary support** for special dates
-- ✅ **Count-up mode** to track years since events
 - ✅ **One-time events** for non-recurring dates
 - ✅ **Multi-language support** with translations
 
@@ -156,7 +156,6 @@ When adding an anniversary, you will be presented with the following options:
 |:----------|----------|------------
 | `name` | No | Friendly name for the anniversary.
 |`date` | No | The date of the anniversary in `YYYY-MM-DD` or `MM-DD` format.
-| `count_up` | Yes | `true` or `false`. Changes the sensor to count up from the anniversary date. **Default**: `false`
 | `one_time` | Yes | `true` or `false`. For a one-time event (non-recurring). **Default**: `false`
 | `show_half_anniversary` | Yes | `true` or `false`. Enables the half-anniversary attributes. **Default**: `false`
 | `unit_of_measurement` | Yes | Your choice of label for the sensor's unit. The sensor always returns days, but this allows for localization. **Default**: `Days`
@@ -179,12 +178,15 @@ After creating an anniversary, you can click "Configure" to access additional op
 
 #### State
 
-* The number of days remaining until the next occurrence (or days since the last occurrence if `count_up` is enabled).
+* The number of days remaining until the next occurrence.
 
 #### Attributes
 
 * `years_at_anniversary`: Number of years that will have passed at the next anniversary (not displayed if year is unknown).
 * `current_years`: Current age in years (not displayed if year is unknown).
+* `days_since_last`: Days since last anniversary (positive for recurring) or days since/until one-time event (negative if future).
+* `last_anniversary_date`: The date of the last anniversary occurrence.
+* `years_since_last`: Years since last anniversary (not displayed if year is unknown).
 * `date`: The date of the first occurrence (not displayed if year is unknown).
 * `next_date`: The date of the next occurrence.
 * `weeks_remaining`: The number of weeks until the anniversary.

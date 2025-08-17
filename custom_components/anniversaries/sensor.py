@@ -24,6 +24,9 @@ from .const import (
     ATTR_GENERATION,
     ATTR_BIRTHSTONE,
     ATTR_BIRTH_FLOWER,
+    ATTR_DAYS_SINCE_LAST,
+    ATTR_LAST_ANNIVERSARY_DATE,
+    ATTR_YEARS_SINCE_LAST,
     DOMAIN,
     DEFAULT_ICON_NORMAL,
     DEFAULT_ICON_TODAY,
@@ -154,6 +157,8 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
             ATTR_GENERATION: ann.generation,
             ATTR_BIRTHSTONE: ann.birthstone,
             ATTR_BIRTH_FLOWER: ann.birth_flower,
+            ATTR_DAYS_SINCE_LAST: ann.days_since_last,
+            ATTR_LAST_ANNIVERSARY_DATE: ann.last_anniversary_date,
         }
         if ann.named_anniversary:
             attrs[ATTR_NAMED_ANNIVERSARY] = ann.named_anniversary
@@ -166,6 +171,8 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
             attrs[ATTR_HALF_DAYS] = ann.days_until_half_anniversary
         if not ann.unknown_year:
             attrs[ATTR_DATE] = ann.date
+            if ann.years_since_last is not None:
+                attrs[ATTR_YEARS_SINCE_LAST] = ann.years_since_last
         return attrs
 
 

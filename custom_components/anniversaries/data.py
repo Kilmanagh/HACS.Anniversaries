@@ -81,7 +81,6 @@ class AnniversaryData:
     name: str
     date: date
     is_one_time: bool = False
-    is_count_up: bool = False
     show_half_anniversary: bool = False
     unknown_year: bool = False
     config: dict = field(default_factory=dict)
@@ -146,9 +145,6 @@ class AnniversaryData:
         """Calculate the number of days remaining until the next anniversary."""
         today = date.today()
         next_anniversary = self.next_anniversary_date
-        if self.is_count_up:
-            last_anniversary = self.last_anniversary_date
-            return (today - last_anniversary).days
         return (next_anniversary - today).days
 
     @property
@@ -229,10 +225,37 @@ class AnniversaryData:
             return (half_date - date.today()).days
         return None
 
+    @property
+    def days_since_last(self) -> int:
+        """Calculate days since last anniversary (positive) or days until one-time event (negative for future)."""
+        today = date.today()
+        
+        if self.is_one_time:
+            # For one-time events: negative if future, positive if past
+            return (today - self.date).days
+        else:
+            # For recurring anniversaries: always positive days since last occurrence
+            last_anniversary = self.last_anniversary_date
+            return (today - last_anniversary).days
+
+    @property
+    def years_since_last(self) -> int | None:
+        """Calculate years since last anniversary. Returns None for unknown year anniversaries."""
+        if self.unknown_year:
+            return None
+        
+        if self.is_one_time:
+            # For one-time events: return years from the event date
+            return relativedelta(date.today(), self.date).years
+        else:
+            # For recurring anniversaries: return years at last anniversary
+            last_anniversary = self.last_anniversary_date
+            return relativedelta(last_anniversary, self.date).years
+
     @classmethod
     def from_config(cls, config: dict) -> "AnniversaryData":
         """Create AnniversaryData from config entry."""
-        from .const import CONF_DATE, CONF_NAME, CONF_ONE_TIME, CONF_COUNT_UP, CONF_HALF_ANNIVERSARY
+        from .const import CONF_DATE, CONF_NAME, CONF_ONE_TIME, CONF_HALF_ANNIVERSARY
         
         # Parse the date
         date_str = config.get(CONF_DATE, "")
@@ -261,7 +284,6 @@ class AnniversaryData:
             name=config.get(CONF_NAME, "Unknown Anniversary"),
             date=anniversary_date,
             is_one_time=config.get(CONF_ONE_TIME, False),
-            is_count_up=config.get(CONF_COUNT_UP, False),
             show_half_anniversary=config.get(CONF_HALF_ANNIVERSARY, False),
             unknown_year=unknown_year,
             config=config

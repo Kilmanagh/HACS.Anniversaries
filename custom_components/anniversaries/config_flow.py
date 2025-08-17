@@ -7,7 +7,6 @@ from datetime import datetime
 import uuid
 
 from .const import (
-    DEFAULT_COUNT_UP,
     DOMAIN,
     DEFAULT_ICON_NORMAL,
     DEFAULT_ICON_SOON,
@@ -24,7 +23,6 @@ from .const import (
     CONF_HALF_ANNIVERSARY,
     CONF_UNIT_OF_MEASUREMENT,
     CONF_ONE_TIME,
-    CONF_COUNT_UP,
     CONF_UPCOMING_ANNIVERSARIES_SENSOR,
 )
 
@@ -71,7 +69,6 @@ class AnniversariesFlowHandler(config_entries.ConfigFlow):
                 vol.Required(CONF_NAME): str,
                 vol.Required(CONF_DATE): str,
                 vol.Optional(CONF_ONE_TIME, default=DEFAULT_ONE_TIME): bool,
-                vol.Optional(CONF_COUNT_UP, default=DEFAULT_COUNT_UP): bool,
                 vol.Optional(CONF_HALF_ANNIVERSARY, default=DEFAULT_HALF_ANNIVERSARY): bool,
                 vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=DEFAULT_UNIT_OF_MEASUREMENT): str,
                 vol.Optional(CONF_ICON_NORMAL, default=DEFAULT_ICON_NORMAL): selector.IconSelector(),
@@ -133,10 +130,6 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 vol.Optional(
                     CONF_UPCOMING_ANNIVERSARIES_SENSOR,
                     default=self._config_entry.options.get(CONF_UPCOMING_ANNIVERSARIES_SENSOR, False),
-                ): bool,
-                vol.Optional(
-                    CONF_COUNT_UP,
-                    default=self._config_entry.options.get(CONF_COUNT_UP, DEFAULT_COUNT_UP),
                 ): bool,
                 vol.Optional(
                     CONF_ONE_TIME,

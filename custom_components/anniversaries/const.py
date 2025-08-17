@@ -23,7 +23,7 @@ CONF_SOON = "days_as_soon"
 CONF_HALF_ANNIVERSARY = "show_half_anniversary"
 CONF_UNIT_OF_MEASUREMENT = "unit_of_measurement"
 CONF_ONE_TIME = "one_time"
-CONF_COUNT_UP = "count_up"
+# Removed CONF_COUNT_UP - now using attributes instead
 
 # Defaults
 DEFAULT_ICON_NORMAL = "mdi:calendar-blank"
@@ -33,7 +33,7 @@ DEFAULT_SOON = 1
 DEFAULT_HALF_ANNIVERSARY = False
 DEFAULT_UNIT_OF_MEASUREMENT = "Days"  # Back to "Days" as requested
 DEFAULT_ONE_TIME = False
-DEFAULT_COUNT_UP = False
+# Removed DEFAULT_COUNT_UP - now using attributes instead
 
 # Attributes
 ATTR_YEARS_NEXT = "years_at_anniversary"
@@ -49,6 +49,10 @@ ATTR_IS_MILESTONE = "is_milestone"
 ATTR_GENERATION = "generation"
 ATTR_BIRTHSTONE = "birthstone"
 ATTR_BIRTH_FLOWER = "birth_flower"
+# New "since last" attributes
+ATTR_DAYS_SINCE_LAST = "days_since_last"
+ATTR_LAST_ANNIVERSARY_DATE = "last_anniversary_date"
+ATTR_YEARS_SINCE_LAST = "years_since_last"
 
 # Configuration
 CONF_UPCOMING_ANNIVERSARIES_SENSOR = "upcoming_anniversaries_sensor"
@@ -74,7 +78,6 @@ CONFIG_SCHEMA = vol.Schema(
                                 vol.Optional(CONF_HALF_ANNIVERSARY, default=DEFAULT_HALF_ANNIVERSARY): cv.boolean,
                                 vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=DEFAULT_UNIT_OF_MEASUREMENT): cv.string,
                                 vol.Optional(CONF_ONE_TIME, default=DEFAULT_ONE_TIME): cv.boolean,
-                                vol.Optional(CONF_COUNT_UP, default=DEFAULT_COUNT_UP): cv.boolean,
                             }
                         )
                     ],
