@@ -99,6 +99,20 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
     async def async_added_to_hass(self) -> None:
         """Handle entity being added to hass."""
         await super().async_added_to_hass()
+        
+        # Ensure coordinator has our anniversary data
+        if self._internal_key not in self.coordinator.anniversaries:
+            # Try to add our anniversary data to the coordinator
+            try:
+                from .data import AnniversaryData
+                config = {**self._entry.data}
+                if self._entry.options:
+                    config.update(self._entry.options)
+                anniversary_data = AnniversaryData.from_config(config)
+                self.coordinator.anniversaries[self._internal_key] = anniversary_data
+            except Exception as e:
+                _LOGGER.error(f"Failed to add anniversary data for {self._internal_key}: {e}")
+        
         current_eid = self.entity_id
         try:
             domain, object_id = current_eid.split(".")
@@ -122,19 +136,26 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
     @property
     def available(self) -> bool:
         """Return if entity is available."""
-        return self.anniversary is not None
+        # Always return True - entity should always be available even if anniversary data is temporarily missing
+        return True
 
     @property
     def name(self) -> str:
         """Return the name of the sensor."""
         ann = self.anniversary
-        return ann.name if ann else "Unknown Anniversary"
+        if ann:
+            return ann.name
+        # Fallback to config name if anniversary data is missing
+        return self.config.get("name", "Unknown Anniversary")
 
     @property
     def native_value(self) -> int | None:
         """Return the state of the sensor."""
         ann = self.anniversary
-        return ann.days_remaining if ann else None
+        if ann:
+            return ann.days_remaining
+        # Fallback: return 0 if anniversary data is missing
+        return 0
 
     @property
     def icon(self) -> str:
