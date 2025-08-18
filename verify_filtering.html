@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Timeline Card Category Filtering</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .config-display {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Timeline Card Category Filtering - Verification Test</h1>
+    
+    <!-- Test 1: Birthday Only -->
+    <div class="test-container">
+        <h2>Test 1: Birthday Category Filter</h2>
+        <div class="config-display">
+category: "birthday"
+debug_filtering: true
+        </div>
+        <anniversary-timeline-card id="birthday-card"></anniversary-timeline-card>
+        <div id="birthday-result" class="result"></div>
+    </div>
+
+    <!-- Test 2: Work Only -->
+    <div class="test-container">
+        <h2>Test 2: Work Category Filter</h2>
+        <div class="config-display">
+category: "work"
+debug_filtering: true
+        </div>
+        <anniversary-timeline-card id="work-card"></anniversary-timeline-card>
+        <div id="work-result" class="result"></div>
+    </div>
+
+    <!-- Test 3: No Filter -->
+    <div class="test-container">
+        <h2>Test 3: No Category Filter (All)</h2>
+        <div class="config-display">
+# No category filter = show all
+debug_filtering: true
+        </div>
+        <anniversary-timeline-card id="all-card"></anniversary-timeline-card>
+        <div id="all-result" class="result"></div>
+    </div>
+
+    <!-- Load the card script -->
+    <script src="custom_components/anniversaries/www/anniversary-timeline-card.js"></script>
+
+    <script>
+        // Mock Home Assistant environment
+        window.customCards = window.customCards || [];
+        window.customCards.push({
+            type: "anniversary-timeline-card",
+            name: "Anniversary Timeline Card",
+            description: "Display anniversaries in timeline format"
+        });
+
+        // Mock anniversary entities exactly as they would appear in Home Assistant
+        const mockHass = {
+            states: {
+                'sensor.anniversary_john_birthday': {
+                    entity_id: 'sensor.anniversary_john_birthday',
+                    state: '45',
+                    attributes: {
+                        friendly_name: 'John\'s Birthday',
+                        category: 'birthday',
+                        date: '2025-10-02',
+                        zodiac_sign: 'Libra',
+                        birthstone: 'Opal',
+                        current_years: 28,
+                        unit_of_measurement: 'days'
+                    }
+                },
+                'sensor.anniversary_sarah_birthday': {
+                    entity_id: 'sensor.anniversary_sarah_birthday',
+                    state: '67',
+                    attributes: {
+                        friendly_name: 'Sarah\'s Birthday',
+                        category: 'birthday',
+                        date: '2025-10-24',
+                        zodiac_sign: 'Scorpio',
+                        birthstone: 'Topaz',
+                        current_years: 22,
+                        unit_of_measurement: 'days'
+                    }
+                },
+                'sensor.anniversary_company_work': {
+                    entity_id: 'sensor.anniversary_company_work',
+                    state: '120',
+                    attributes: {
+                        friendly_name: 'Company Anniversary',
+                        category: 'work',
+                        date: '2025-12-16',
+                        current_years: 5,
+                        named_anniversary: 'Wooden Anniversary',
+                        unit_of_measurement: 'days'
+                    }
+                },
+                'sensor.anniversary_promotion_work': {
+                    entity_id: 'sensor.anniversary_promotion_work',
+                    state: '89',
+                    attributes: {
+                        friendly_name: 'Promotion Anniversary',
+                        category: 'work',
+                        date: '2025-11-15',
+                        current_years: 2,
+                        unit_of_measurement: 'days'
+                    }
+                },
+                'sensor.anniversary_wedding_anniversary': {
+                    entity_id: 'sensor.anniversary_wedding_anniversary',
+                    state: '156',
+                    attributes: {
+                        friendly_name: 'Wedding Anniversary',
+                        category: 'anniversary',
+                        date: '2026-01-21',
+                        current_years: 15,
+                        named_anniversary: 'Crystal Anniversary',
+                        unit_of_measurement: 'days'
+                    }
+                },
+                'sensor.anniversary_mom_memorial': {
+                    entity_id: 'sensor.anniversary_mom_memorial',
+                    state: '200',
+                    attributes: {
+                        friendly_name: 'Mom\'s Memorial',
+                        category: 'memorial',
+                        date: '2026-03-05',
+                        current_years: 3,
+                        birth_flower: 'Daffodil',
+                        unit_of_measurement: 'days'
+                    }
+                }
+            }
+        };
+
+        // Function to test filtering logic
+        function testCategoryFiltering(config, expectedEntities) {
+            const allEntities = Object.keys(mockHass.states)
+                .filter(entityId => entityId.match(/^sensor\.anniversary_.*/) && !entityId.includes('upcoming_anniversaries'))
+                .map(entityId => mockHass.states[entityId])
+                .filter(entity => entity && entity.state !== 'unavailable');
+
+            let filteredEntities = allEntities.filter(entity => {
+                const entityCategory = entity.attributes.category || 'other';
+                
+                // Single category filter
+                if (config.category) {
+                    return entityCategory === config.category;
+                }
+                
+                // Multi-category filter
+                if (config.categories && Array.isArray(config.categories)) {
+                    return config.categories.includes(entityCategory);
+                }
+                
+                return true; // No filter = show all
+            });
+
+            return {
+                totalEntities: allEntities.length,
+                filteredEntities: filteredEntities.length,
+                filteredEntityIds: filteredEntities.map(e => e.entity_id),
+                expectedEntityIds: expectedEntities,
+                success: JSON.stringify(filteredEntities.map(e => e.entity_id).sort()) === 
+                        JSON.stringify(expectedEntities.sort())
+            };
+        }
+
+        // Set up test cards and run verification
+        setTimeout(() => {
+            // Test 1: Birthday filter
+            const birthdayCard = document.getElementById('birthday-card');
+            birthdayCard.setConfig({
+                category: "birthday",
+                debug_filtering: true,
+                title: "Birthday Filter Test"
+            });
+            birthdayCard.hass = mockHass;
+
+            const birthdayTest = testCategoryFiltering(
+                { category: "birthday" },
+                ['sensor.anniversary_john_birthday', 'sensor.anniversary_sarah_birthday']
+            );
+            
+            const birthdayResult = document.getElementById('birthday-result');
+            if (birthdayTest.success) {
+                birthdayResult.className = 'result success';
+                birthdayResult.innerHTML = `✅ SUCCESS: Filtered ${birthdayTest.filteredEntities}/${birthdayTest.totalEntities} entities correctly<br>Found: ${birthdayTest.filteredEntityIds.join(', ')}`;
+            } else {
+                birthdayResult.className = 'result error';
+                birthdayResult.innerHTML = `❌ FAILED: Expected ${birthdayTest.expectedEntityIds.join(', ')}<br>Got: ${birthdayTest.filteredEntityIds.join(', ')}`;
+            }
+
+            // Test 2: Work filter
+            const workCard = document.getElementById('work-card');
+            workCard.setConfig({
+                category: "work",
+                debug_filtering: true,
+                title: "Work Filter Test"
+            });
+            workCard.hass = mockHass;
+
+            const workTest = testCategoryFiltering(
+                { category: "work" },
+                ['sensor.anniversary_company_work', 'sensor.anniversary_promotion_work']
+            );
+            
+            const workResult = document.getElementById('work-result');
+            if (workTest.success) {
+                workResult.className = 'result success';
+                workResult.innerHTML = `✅ SUCCESS: Filtered ${workTest.filteredEntities}/${workTest.totalEntities} entities correctly<br>Found: ${workTest.filteredEntityIds.join(', ')}`;
+            } else {
+                workResult.className = 'result error';
+                workResult.innerHTML = `❌ FAILED: Expected ${workTest.expectedEntityIds.join(', ')}<br>Got: ${workTest.filteredEntityIds.join(', ')}`;
+            }
+
+            // Test 3: No filter (all)
+            const allCard = document.getElementById('all-card');
+            allCard.setConfig({
+                debug_filtering: true,
+                title: "No Filter Test (All Categories)"
+            });
+            allCard.hass = mockHass;
+
+            const allTest = testCategoryFiltering(
+                {},
+                [
+                    'sensor.anniversary_john_birthday',
+                    'sensor.anniversary_sarah_birthday', 
+                    'sensor.anniversary_company_work',
+                    'sensor.anniversary_promotion_work',
+                    'sensor.anniversary_wedding_anniversary',
+                    'sensor.anniversary_mom_memorial'
+                ]
+            );
+            
+            const allResult = document.getElementById('all-result');
+            if (allTest.success) {
+                allResult.className = 'result success';
+                allResult.innerHTML = `✅ SUCCESS: Showed all ${allTest.filteredEntities} entities correctly<br>Found: ${allTest.filteredEntityIds.length} entities`;
+            } else {
+                allResult.className = 'result error';
+                allResult.innerHTML = `❌ FAILED: Expected ${allTest.expectedEntityIds.length} entities<br>Got: ${allTest.filteredEntityIds.length} entities`;
+            }
+
+            // Log detailed results to console
+            console.log('🔍 Birthday Test:', birthdayTest);
+            console.log('🔍 Work Test:', workTest);
+            console.log('🔍 All Test:', allTest);
+
+        }, 500);
+    </script>
+</body>
+</html>

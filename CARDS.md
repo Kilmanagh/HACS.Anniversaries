@@ -27,127 +27,271 @@ After adding the resources and restarting, the cards will appear in your Lovelac
 ## Card Types
 
 ### 1. Anniversary Timeline Card (`anniversary-timeline-card`)
-Shows upcoming anniversaries in chronological order with category filtering, badges, theme-aware colors, and advanced features.
+Shows upcoming anniversaries in chronological order with powerful filtering and customization options.
 
-**✨ Phase 3 Features - Advanced Options:**
+**✨ Key Features:**
+- **Category filtering**: Show only specific anniversary types (birthdays, work anniversaries, etc.)
 - **Multi-category support**: Display multiple anniversary types in one timeline
 - **Category statistics**: Overview with counts, today's events, and milestones
 - **Category grouping**: Organize under headers with visual separation
-- **Priority categories**: Show important categories first
-- **Interactive features**: Configurable display modes and layouts
+- **Flexible date formatting**: Multiple format styles with locale support
+- **Rich attributes**: Smart attribute display based on anniversary category
+- **Visual enhancements**: Category badges, theme-aware colors, and icons
 
-**Configuration:**
+**🎯 Important: Configure Anniversary Categories First!**
+
+Before using category filtering, make sure your anniversaries have the correct categories set:
+
+1. Go to **Settings** → **Devices & Services** → **Anniversaries**
+2. Click on each anniversary entity
+3. Set the **Category** field to the appropriate type:
+   - `birthday` - Personal birthdays
+   - `anniversary` - Wedding anniversaries, relationship milestones  
+   - `memorial` - Memorial dates, remembrance days
+   - `holiday` - Personal holidays, cultural celebrations
+   - `work` - Work anniversaries, career milestones
+   - `achievement` - Graduations, accomplishments
+   - `event` - General events, appointments
+   - `other` - Custom/uncategorized anniversaries
+4. Save and restart Home Assistant
+
+**Basic Configuration:**
 ```yaml
 type: custom:anniversary-timeline-card
 title: "Upcoming Anniversaries"  # Optional: auto-generated based on category
 max_items: 5
-show_attributes: 
-  - zodiac_sign
-  - birthstone
-  - generation
-  - named_anniversary
 show_icons: true
 color_coding: true
-
-# Single Category (Phase 1/2)
-category: null  # birthday, anniversary, memorial, etc.
-
-# Multi-Category (Phase 3)
-categories: null  # ["birthday", "anniversary", "achievement"]
-
-# Phase 2 Options
-show_category_badges: true     # Show category badges next to names
-category_color_scheme: true    # Use category-specific color themes
-enhanced_attributes: true      # Use rich attribute sets per category
-
-# Phase 3 Advanced Options
-show_category_stats: false     # Display category statistics overview
-show_category_headers: false   # Show category section headers
-group_by_category: false       # Group anniversaries by category
-priority_categories: null      # ["birthday", "anniversary"] - show these first
-expandable_categories: false   # Collapsible category sections (future)
-show_category_filter: false    # Interactive category toggles (future)
-
-# Optional: specify specific entities (overrides category filtering)
-entities:
-  - sensor.anniversary_birthday_mom
-  - sensor.anniversary_wedding_anniversary
 ```
 
-**Phase 3 Advanced Examples:**
+**Category Filtering Options:**
+type: custom:anniversary-timeline-card
+date_format: "numeric"
+show_day_of_week: true
+
+# Clean without day of week: January 1, 2025
+type: custom:anniversary-timeline-card
+date_format: "long"
+show_day_of_week: false
+
+# Custom ISO format: 2025-01-01
+type: custom:anniversary-timeline-card
+date_format: "custom"
+custom_date_format: "YYYY-MM-DD"
+show_day_of_week: false
+
+# European format: 01.01.2025
+type: custom:anniversary-timeline-card
+date_format: "custom"
+custom_date_format: "DD.MM.YYYY"
+
+# German locale: Montag, 1. Januar 2025
+type: custom:anniversary-timeline-card
+```yaml
+# Single Category - Show only birthdays
+type: custom:anniversary-timeline-card
+category: "birthday"
+# Auto-title: "🎂 Upcoming Birthdays"
+# Auto-attributes: zodiac_sign, birthstone, generation
+
+# Single Category - Show only work anniversaries  
+type: custom:anniversary-timeline-card
+category: "work"
+# Auto-title: "💼 Work Anniversaries"
+# Auto-attributes: current_years, named_anniversary, generation
+
+# Multiple Categories - Show birthdays and anniversaries
+type: custom:anniversary-timeline-card
+categories: ["birthday", "anniversary"]
+# Auto-title: "🎂💍 Multiple Anniversary Types"
+
+# All Categories - Show everything (default)
+type: custom:anniversary-timeline-card
+# Shows all anniversaries regardless of category
+```
+
+**Date Formatting Options:**
 
 ```yaml
-# � Multi-Category Timeline
+# Long format (default): Monday, January 1, 2025
+type: custom:anniversary-timeline-card
+date_format: "long"
+show_day_of_week: true
+
+# Short format: Monday, Jan 1, 2025
+type: custom:anniversary-timeline-card
+date_format: "short"
+show_day_of_week: true
+
+# Numeric format: Monday, 1/1/2025 (respects locale)
+type: custom:anniversary-timeline-card
+date_format: "numeric"
+show_day_of_week: true
+
+# Full format: Monday, January 1, 2025 (day of week built-in)
+type: custom:anniversary-timeline-card
+date_format: "full"
+
+# Custom format: 2025-01-01
+type: custom:anniversary-timeline-card
+date_format: "custom"
+custom_date_format: "YYYY-MM-DD"
+show_day_of_week: false
+
+# German locale: Montag, 1. Januar 2025
+type: custom:anniversary-timeline-card
+date_format: "long"
+locale: "de-DE"
+
+# Japanese locale: 2025年1月1日月曜日
+type: custom:anniversary-timeline-card
+date_format: "long"
+locale: "ja-JP"
+```
+
+**Custom Date Format Patterns:**
+
+| Pattern | Output | Description |
+|---------|--------|-------------|
+| `YYYY` | 2025 | Full year |
+| `YY` | 25 | Short year |
+| `MMMM` | January | Full month name |
+| `MMM` | Jan | Short month name |
+| `MM` | 01 | Month number (padded) |
+| `M` | 1 | Month number |
+| `DD` | 01 | Day number (padded) |
+| `D` | 1 | Day number |
+| `dddd` | Monday | Full day name |
+| `ddd` | Mon | Short day name |
+| `dd` | Mo | Narrow day name |
+
+**Advanced Date Examples:**
+
+```yaml
+# Compact: Jan 1 '25
+type: custom:anniversary-timeline-card
+date_format: "custom"
+custom_date_format: "MMM D 'YY"
+
+# Verbose: Monday, the 1st of January, 2025  
+type: custom:anniversary-timeline-card
+date_format: "custom"
+custom_date_format: "dddd, MMMM D, YYYY"
+
+# European style: 01.01.2025
+type: custom:anniversary-timeline-card
+date_format: "custom"
+custom_date_format: "DD.MM.YYYY"
+
+# ISO standard: 2025-01-01
+type: custom:anniversary-timeline-card
+date_format: "custom"
+custom_date_format: "YYYY-MM-DD"
+```
+
+**Advanced Timeline Features:**
+
+```yaml
+# Multi-Category Timeline with Statistics
 type: custom:anniversary-timeline-card
 categories: ["birthday", "anniversary", "achievement"]
 title: "Personal Celebrations"
 show_category_badges: true
+show_category_stats: true
 max_items: 10
 
-# � Statistics Dashboard
+# Category Statistics Dashboard
 type: custom:anniversary-timeline-card
 show_category_stats: true
 show_category_badges: true
 category_color_scheme: true
 title: "Anniversary Overview"
 
-# 🗂️ Grouped by Category
+# Grouped by Category with Headers
+type: custom:anniversary-timeline-card
+show_category_headers: true
+type: custom:anniversary-timeline-card
+show_category_headers: true
+# Grouped by Category with Headers
 type: custom:anniversary-timeline-card
 show_category_headers: true
 group_by_category: true
 show_category_badges: false  # Less cluttered when grouped
 
-# ⭐ Priority System
+# Priority System - Show important categories first
 type: custom:anniversary-timeline-card
 priority_categories: ["birthday", "anniversary"]
 show_category_badges: true
 title: "Important Anniversaries First"
 
-# 💼 Professional Dashboard
+# Professional Dashboard
 type: custom:anniversary-timeline-card
 categories: ["work", "achievement"]
 title: "Professional Milestones"
 show_category_stats: true
 category_color_scheme: true
 
-# � Birthday Excellence (PRESERVED)
+# Debug Mode - Troubleshoot category filtering
 type: custom:anniversary-timeline-card
 category: "birthday"
-# Auto-title: "🎂 Upcoming Birthdays"
-# Auto-attributes: zodiac_sign, birthstone, generation (unchanged!)
-# Theme: warm colors (unchanged!)
+debug_filtering: true
+title: "Debug: Should Show Only Birthdays"
 ```
 
-**Category Enhancement Summary:**
-
-| Category | Enhanced Attributes | Color Theme | Badge | Use Case |
-|----------|-------------------|-------------|-------|----------|
-| **birthday** | `zodiac_sign`, `birthstone`, `generation` | 🌈 Warm (preserved) | 🎂 Birthday | Personal celebrations |
-| **anniversary** | `current_years`, `named_anniversary`, `zodiac_sign` | 💖 Romantic | 💍 Anniversary | Relationship milestones |
-| **memorial** | `current_years`, `birth_flower`, `generation` | 🟣 Respectful | 🌸 Memorial | Remembrance dates |
-| **holiday** | `current_years`, `generation`, `named_anniversary` | 🟠 Festive | 🎉 Holiday | Seasonal celebrations |
-| **work** | `current_years`, `named_anniversary`, `generation` | 🔵 Professional | 💼 Work | Career milestones |
-| **achievement** | `current_years`, `named_anniversary`, `generation` | 🟢 Success | 🏆 Achievement | Personal accomplishments |
-| **event** | `current_years`, `named_anniversary`, `generation` | ⚫ Neutral | 📅 Event | General events |
-| **other** | `current_years`, `zodiac_sign`, `birthstone` | ⚫ Neutral | 📋 Other | Miscellaneous |
-
-**Feature Progression:**
+**All Configuration Options:**
 
 ```yaml
-# Phase 1: Basic category filtering
-category: "birthday"
+type: custom:anniversary-timeline-card
 
-# Phase 2: Enhanced categories with badges and themes
-category: "work"
-show_category_badges: true
-category_color_scheme: true
+# Basic Options
+title: "Custom Title"              # Auto-generated if not specified
+max_items: 5                       # Number of anniversaries to show
+show_icons: true                   # Show category-specific icons
+color_coding: true                 # Color-code by days remaining
 
-# Phase 3: Advanced multi-category with statistics
-categories: ["birthday", "anniversary", "work"]
-show_category_stats: true
-priority_categories: ["birthday"]
-group_by_category: true
+# Category Filtering
+category: "birthday"               # Single category filter
+categories: ["birthday", "work"]   # Multiple category filter
+entities: ["sensor.anniversary_*"] # Specific entities (overrides category filters)
+
+# Display Enhancements
+show_attributes: ["zodiac_sign", "birthstone"] # Custom attribute list (auto-selected by category if not specified)
+show_category_badges: true         # Show category badges next to names
+category_color_scheme: true        # Use category-specific color themes
+enhanced_attributes: true          # Use rich attribute sets per category
+
+# Advanced Features
+show_category_stats: false         # Display category statistics overview
+show_category_headers: false       # Show category section headers
+group_by_category: false          # Group anniversaries by category
+priority_categories: ["birthday"] # Show these categories first
+expandable_categories: false      # Collapsible category sections (future feature)
+show_category_filter: false       # Interactive category toggles (future feature)
+
+# Date Formatting
+date_format: "long"               # "long", "short", "numeric", "full", "custom"
+show_day_of_week: true            # Add day of week to date display
+custom_date_format: "YYYY-MM-DD" # Custom pattern when date_format is "custom"
+locale: "en-US"                   # Force specific locale, null = auto-detect
+
+# Debug
+debug_filtering: false            # Show debug info for troubleshooting category filters
 ```
+
+**Category-Specific Auto-Settings:**
+
+When you specify a category, the card automatically optimizes settings:
+
+| Category | Auto-Title | Auto-Attributes | Color Theme |
+|----------|------------|----------------|-------------|
+| **birthday** | 🎂 Upcoming Birthdays | zodiac_sign, birthstone, generation | Warm rainbow |
+| **anniversary** | 💍 Upcoming Anniversaries | current_years, named_anniversary, zodiac_sign | Romantic pink |
+| **memorial** | 🌸 Memorial Dates | current_years, birth_flower, generation | Respectful purple |
+| **holiday** | 🎉 Upcoming Holidays | current_years, generation, named_anniversary | Festive orange |
+| **work** | 💼 Work Anniversaries | current_years, named_anniversary, generation | Professional blue |
+| **achievement** | 🏆 Achievement Anniversaries | current_years, named_anniversary, generation | Success green |
+| **event** | 📅 Upcoming Events | current_years, named_anniversary, generation | Neutral gray |
+| **other** | 📋 Other Anniversaries | current_years, zodiac_sign, birthstone | Neutral brown |
 
 ### 2. Anniversary Details Card (`anniversary-details-card`)
 Detailed view of a single anniversary with rich attributes and animations.

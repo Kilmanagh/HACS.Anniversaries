@@ -48,6 +48,13 @@ This integration includes **4 custom Lovelace cards** with rich emoji/icon suppo
 
 ## 🆕 Latest Updates
 
+**Timeline Card v1.3.1** - Enhanced date formatting options:
+- 📅 **Flexible date formats**: `long`, `short`, `numeric`, `full`, and `custom` patterns
+- 🌍 **Locale support**: Force specific locales (German, French, Japanese, etc.) or auto-detect
+- 📆 **Day of week control**: Toggle day names on/off independently
+- 🎨 **Custom patterns**: Create your own date formats (ISO: `YYYY-MM-DD`, European: `DD.MM.YYYY`, etc.)
+- 🔧 **User choice**: Default to beautiful long format while allowing full customization
+
 **Timeline Card v1.3.0** - Advanced options with multi-category support:
 - 🎯 **Multi-category timelines**: Display multiple anniversary types in one card (`categories: ["birthday", "anniversary"]`)
 - 📊 **Category statistics**: Overview with counts, today's events, and milestones
@@ -110,6 +117,7 @@ This integration includes 4 beautiful custom cards that automatically install wi
 
 ### 🗓️ Timeline Card (`anniversary-timeline-card`)
 Shows upcoming anniversaries in chronological order with:
+- **Flexible date formatting**: Choose from `long`, `short`, `numeric`, `full`, or custom patterns with locale support
 - **Multi-category support**: Display multiple anniversary types in one timeline (`categories: ["birthday", "work"]`)
 - **Category statistics**: Overview with counts, today's events, and milestones (`show_category_stats: true`)
 - **Category grouping**: Organize under headers with visual separation (`group_by_category: true`)
@@ -119,7 +127,6 @@ Shows upcoming anniversaries in chronological order with:
 - **Theme-aware colors**: Category-specific color schemes (romantic pink, professional blue, etc.)
 - **Category filtering**: Display only specific anniversary types (birthdays, work anniversaries, etc.)
 - **Smart category defaults**: Automatic titles, icons, and attributes based on category selection
-- **Long date formatting**: Dates displayed in local language format (e.g., "January 1, 2025")
 - **Preserved birthday excellence**: Original birthday experience unchanged with zodiac ♈, birthstone 💎, generation 👥
 
 **Category Examples**:

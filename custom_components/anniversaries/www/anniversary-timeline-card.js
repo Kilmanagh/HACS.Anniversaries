@@ -1,5 +1,5 @@
 /**
- * Anniversary Timeline Card
+ * Anniversary Timeline Card v1.3.2
  * Shows upcoming anniversaries in chronological order with all attributes
  */
 
@@ -32,6 +32,13 @@ class AnniversaryTimelineCard extends HTMLElement {
       show_category_filter: config.show_category_filter || false,
       priority_categories: config.priority_categories || null,
       expandable_categories: config.expandable_categories || false,
+      // Date Formatting Options
+      date_format: config.date_format || 'long', // 'long', 'short', 'numeric', 'full', 'custom'
+      show_day_of_week: config.show_day_of_week !== false, // Default: true
+      custom_date_format: config.custom_date_format || null, // For advanced customization
+      locale: config.locale || null, // Force specific locale, null = auto-detect
+      // Debug Options
+      debug_filtering: config.debug_filtering || false, // Show filtering debug info
       ...config
     };
   }
@@ -175,14 +182,31 @@ class AnniversaryTimelineCard extends HTMLElement {
         // Filter by category/categories if specified (Phase 3 enhancement)
         const entityCategory = entity.attributes.category || 'other';
         
+        // Debug logging
+        if (this.config.debug_filtering) {
+          console.log(`🔍 [Timeline Card] Entity: ${entity.entity_id}, Category: ${entityCategory}, Config Category: ${this.config.category}, Config Categories: [${(this.config.categories || []).join(', ')}]`);
+        }
+        
         // Single category filter (Phase 1/2)
         if (this.config.category) {
-          if (entityCategory !== this.config.category) return false;
+          const matches = entityCategory === this.config.category;
+          if (this.config.debug_filtering) {
+            console.log(`🔍 [Timeline Card] Single category filter: ${entityCategory} === ${this.config.category} = ${matches}`);
+          }
+          if (!matches) return false;
         }
         
         // Multi-category filter (Phase 3)
         if (this.config.categories && Array.isArray(this.config.categories)) {
-          if (!this.config.categories.includes(entityCategory)) return false;
+          const matches = this.config.categories.includes(entityCategory);
+          if (this.config.debug_filtering) {
+            console.log(`🔍 [Timeline Card] Multi-category filter: [${this.config.categories.join(', ')}].includes(${entityCategory}) = ${matches}`);
+          }
+          if (!matches) return false;
+        }
+        
+        if (this.config.debug_filtering) {
+          console.log(`✅ [Timeline Card] Entity ${entity.entity_id} passed all filters`);
         }
         
         return true;
@@ -416,6 +440,7 @@ class AnniversaryTimelineCard extends HTMLElement {
       
       <div class="card">
         <div class="card-header">${this.config.title}</div>
+        ${this.config.debug_filtering ? this.renderDebugInfo(entities) : ''}
         ${this.renderCategoryStats(entities)}
         ${entities.length === 0 ? 
           '<div class="no-anniversaries">No upcoming anniversaries</div>' :
@@ -461,6 +486,36 @@ class AnniversaryTimelineCard extends HTMLElement {
     });
     
     return { categories: stats, totals: totalStats };
+  }
+
+  renderDebugInfo(entities) {
+    if (!this.config.debug_filtering) return '';
+    
+    const allEntities = Object.keys(this._hass.states)
+      .filter(entityId => {
+        if (this.config.entities) {
+          return this.config.entities.includes(entityId);
+        }
+        return entityId.match(/^sensor\.anniversary_.*/) && 
+               !entityId.includes('upcoming_anniversaries');
+      })
+      .map(entityId => this._hass.states[entityId])
+      .filter(entity => entity && entity.state !== 'unavailable');
+    
+    const allCategories = allEntities.map(e => e.attributes.category || 'other');
+    const filteredCategories = entities.map(e => e.attributes.category || 'other');
+    
+    return `
+      <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; padding: 8px; margin: 8px 0; font-size: 12px;">
+        <strong>🔍 Debug Info:</strong><br>
+        <strong>Config Category:</strong> ${this.config.category || 'none'}<br>
+        <strong>Config Categories:</strong> [${(this.config.categories || []).join(', ')}]<br>
+        <strong>All Entities Found:</strong> ${allEntities.length} (categories: ${[...new Set(allCategories)].join(', ')})<br>
+        <strong>After Filtering:</strong> ${entities.length} (categories: ${[...new Set(filteredCategories)].join(', ')})<br>
+        <strong>All Entity Details:</strong><br>
+        ${allEntities.map(e => `&nbsp;&nbsp;• ${e.entity_id}: category="${e.attributes.category || 'other'}"`).join('<br>')}
+      </div>
+    `;
   }
 
   renderCategoryStats(entities) {
@@ -611,16 +666,103 @@ class AnniversaryTimelineCard extends HTMLElement {
       const [year, month, day] = dateString.split('-');
       const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
       
-      // Format to local language long date (e.g., "January 1, 2004")
-      return date.toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
+      // Get locale (user-specified or auto-detect)
+      const locale = this.config.locale || navigator.language || 'en-US';
+      
+      // Handle different date format options
+      let formattedDate;
+      
+      switch (this.config.date_format) {
+        case 'short':
+          // Short format: Jan 1, 2025
+          formattedDate = date.toLocaleDateString(locale, {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          });
+          break;
+          
+        case 'numeric':
+          // Numeric format: 1/1/2025 (respects locale)
+          formattedDate = date.toLocaleDateString(locale, {
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric'
+          });
+          break;
+          
+        case 'full':
+          // Full format: Monday, January 1, 2025
+          formattedDate = date.toLocaleDateString(locale, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            weekday: 'long'
+          });
+          break;
+          
+        case 'custom':
+          // Custom format using provided pattern
+          if (this.config.custom_date_format) {
+            formattedDate = this.applyCustomDateFormat(date, this.config.custom_date_format, locale);
+          } else {
+            // Fallback to long if custom format not provided
+            formattedDate = date.toLocaleDateString(locale, {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            });
+          }
+          break;
+          
+        case 'long':
+        default:
+          // Long format: January 1, 2025 (default)
+          formattedDate = date.toLocaleDateString(locale, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+          break;
+      }
+      
+      // Add day of week if requested and not already included
+      if (this.config.show_day_of_week && this.config.date_format !== 'full') {
+        const dayOfWeek = date.toLocaleDateString(locale, { weekday: 'long' });
+        formattedDate = `${dayOfWeek}, ${formattedDate}`;
+      }
+      
+      return formattedDate;
+      
     } catch (error) {
-      // Fallback to original string if parsing fails
+      console.warn('Anniversary Timeline Card: Date formatting error:', error);
+      // Graceful fallback to original string if parsing fails
       return dateString;
     }
+  }
+
+  applyCustomDateFormat(date, format, locale) {
+    // Custom date format patterns
+    const patterns = {
+      'YYYY': date.getFullYear(),
+      'YY': String(date.getFullYear()).slice(-2),
+      'MM': String(date.getMonth() + 1).padStart(2, '0'),
+      'M': date.getMonth() + 1,
+      'MMMM': date.toLocaleDateString(locale, { month: 'long' }),
+      'MMM': date.toLocaleDateString(locale, { month: 'short' }),
+      'DD': String(date.getDate()).padStart(2, '0'),
+      'D': date.getDate(),
+      'dddd': date.toLocaleDateString(locale, { weekday: 'long' }),
+      'ddd': date.toLocaleDateString(locale, { weekday: 'short' }),
+      'dd': date.toLocaleDateString(locale, { weekday: 'narrow' })
+    };
+    
+    let result = format;
+    Object.entries(patterns).forEach(([pattern, value]) => {
+      result = result.replace(new RegExp(pattern, 'g'), value);
+    });
+    
+    return result;
   }
 
   renderTimelineItem(entity) {
@@ -705,7 +847,7 @@ window.customCards.push({
 });
 
 console.info(
-  '%c  ANNIVERSARY-TIMELINE-CARD  %c  Version 1.3.0 - Advanced Options  ',
+  '%c  ANNIVERSARY-TIMELINE-CARD  %c  Version 1.3.1 - Enhanced Date Formatting  ',
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray'
 );

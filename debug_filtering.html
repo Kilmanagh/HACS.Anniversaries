@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline Card Debug - Category Filtering Issue</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .config-display {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        .instructions {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Timeline Card Debug - Category Filtering Issue</h1>
+    
+    <div class="instructions">
+        <h3>🚨 Debug Instructions:</h3>
+        <ol>
+            <li><strong>Enable Debug Mode:</strong> Add <code>debug_filtering: true</code> to your timeline card config</li>
+            <li><strong>Check Console:</strong> Open your browser's Developer Tools → Console tab</li>
+            <li><strong>Look for Debug Info:</strong> You'll see a yellow debug box in the card showing filtering details</li>
+            <li><strong>Check Entity Categories:</strong> Make sure your anniversaries have the correct category attribute</li>
+        </ol>
+        
+        <h4>🎯 Example Configuration (copy to your dashboard):</h4>
+        <div class="config-display">
+type: custom:anniversary-timeline-card
+category: "birthday"
+debug_filtering: true
+title: "Birthday Debug Test"
+        </div>
+        
+        <h4>🔧 What to Look For:</h4>
+        <ul>
+            <li><strong>Console messages:</strong> <code>🔍 [Timeline Card] Entity: sensor.anniversary_xxx, Category: birthday</code></li>
+            <li><strong>Debug box:</strong> Shows all entities found and their categories</li>
+            <li><strong>Mismatched categories:</strong> Entities might have category "other" instead of "birthday"</li>
+        </ul>
+    </div>
+
+    <!-- Test with Debug Mode Enabled -->
+    <div class="test-container">
+        <h2>🎂 Debug Test: Birthday Category Filter</h2>
+        <div class="config-display">
+type: custom:anniversary-timeline-card
+category: "birthday"
+debug_filtering: true
+title: "DEBUG: Birthday Filter Test"
+        </div>
+        <anniversary-timeline-card id="debug-test"></anniversary-timeline-card>
+    </div>
+
+    <!-- Load the card script -->
+    <script src="custom_components/anniversaries/www/anniversary-timeline-card.js"></script>
+
+    <script>
+        // Mock Home Assistant environment
+        window.customCards = window.customCards || [];
+        window.customCards.push({
+            type: "anniversary-timeline-card",
+            name: "Anniversary Timeline Card",
+            description: "Display anniversaries in timeline format"
+        });
+
+        // Mock anniversary entities - this simulates what you might see in Home Assistant
+        const mockHass = {
+            states: {
+                'sensor.anniversary_john_birthday': {
+                    entity_id: 'sensor.anniversary_john_birthday',
+                    state: '45',
+                    attributes: {
+                        friendly_name: 'John\'s Birthday',
+                        category: 'birthday', // ✅ This should show with birthday filter
+                        date: '2025-10-02',
+                        zodiac_sign: 'Libra',
+                        birthstone: 'Opal',
+                        current_years: 28,
+                        unit_of_measurement: 'days'
+                    }
+                },
+                'sensor.anniversary_sarah_birthday': {
+                    entity_id: 'sensor.anniversary_sarah_birthday',
+                    state: '67',
+                    attributes: {
+                        friendly_name: 'Sarah\'s Birthday',
+                        category: 'other', // ❌ This WON'T show with birthday filter (wrong category)
+                        date: '2025-10-24',
+                        zodiac_sign: 'Scorpio',
+                        birthstone: 'Topaz',
+                        current_years: 22,
+                        unit_of_measurement: 'days'
+                    }
+                },
+                'sensor.anniversary_mike_birthday': {
+                    entity_id: 'sensor.anniversary_mike_birthday',
+                    state: '89',
+                    attributes: {
+                        friendly_name: 'Mike\'s Birthday',
+                        // category: undefined, // ❌ This WON'T show (no category = defaults to 'other')
+                        date: '2025-11-15',
+                        zodiac_sign: 'Scorpio',
+                        birthstone: 'Topaz',
+                        current_years: 35,
+                        unit_of_measurement: 'days'
+                    }
+                },
+                'sensor.anniversary_company_work': {
+                    entity_id: 'sensor.anniversary_company_work',
+                    state: '120',
+                    attributes: {
+                        friendly_name: 'Company Anniversary',
+                        category: 'work', // ❌ This WON'T show with birthday filter
+                        date: '2025-12-16',
+                        current_years: 5,
+                        unit_of_measurement: 'days'
+                    }
+                }
+            }
+        };
+
+        // Set up the debug test card
+        setTimeout(() => {
+            const debugCard = document.getElementById('debug-test');
+            debugCard.setConfig({
+                category: "birthday",
+                debug_filtering: true,
+                title: "DEBUG: Birthday Filter Test"
+            });
+            debugCard.hass = mockHass;
+        }, 500);
+    </script>
+
+    <div class="instructions" style="background: #f3e5f5; border-color: #9c27b0;">
+        <h3>🎯 Expected Results:</h3>
+        <p><strong>With birthday filter above, you should see:</strong></p>
+        <ul>
+            <li>✅ <strong>John's Birthday</strong> (category: "birthday")</li>
+            <li>❌ <strong>NOT Sarah's Birthday</strong> (category: "other")</li>
+            <li>❌ <strong>NOT Mike's Birthday</strong> (no category = "other")</li>
+            <li>❌ <strong>NOT Company Anniversary</strong> (category: "work")</li>
+        </ul>
+        
+        <h4>🔧 If you see ALL anniversaries instead of just birthdays:</h4>
+        <ol>
+            <li><strong>Check the debug box</strong> - it will show which categories your entities actually have</li>
+            <li><strong>Check your anniversary configuration</strong> - make sure you set the category to "birthday"</li>
+            <li><strong>Check console logs</strong> - they show the exact filtering logic</li>
+            <li><strong>Verify your card config</strong> - make sure you have <code>category: "birthday"</code></li>
+        </ol>
+    </div>
+</body>
+</html>

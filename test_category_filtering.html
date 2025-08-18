@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anniversary Timeline Card - Category Filtering Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .config-display {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        .debug-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Anniversary Timeline Card - Category Filtering Debug</h1>
+    
+    <!-- Test 1: Birthday Only -->
+    <div class="test-container">
+        <h2>🎂 Test 1: Birthday Category Only</h2>
+        <div class="config-display">
+type: custom:anniversary-timeline-card
+category: "birthday"
+title: "Birthday Test - Should Show ONLY Birthdays"
+        </div>
+        <div id="birthday-test-debug" class="debug-info">
+            <strong>Debug Info:</strong> <span id="birthday-debug-text">Loading...</span>
+        </div>
+        <anniversary-timeline-card id="birthday-test"></anniversary-timeline-card>
+    </div>
+
+    <!-- Test 2: Work Only -->
+    <div class="test-container">
+        <h2>💼 Test 2: Work Category Only</h2>
+        <div class="config-display">
+type: custom:anniversary-timeline-card
+category: "work"
+title: "Work Test - Should Show ONLY Work Anniversaries"
+        </div>
+        <div id="work-test-debug" class="debug-info">
+            <strong>Debug Info:</strong> <span id="work-debug-text">Loading...</span>
+        </div>
+        <anniversary-timeline-card id="work-test"></anniversary-timeline-card>
+    </div>
+
+    <!-- Test 3: Memorial Only -->
+    <div class="test-container">
+        <h2>🌸 Test 3: Memorial Category Only</h2>
+        <div class="config-display">
+type: custom:anniversary-timeline-card
+category: "memorial"
+title: "Memorial Test - Should Show ONLY Memorial Dates"
+        </div>
+        <div id="memorial-test-debug" class="debug-info">
+            <strong>Debug Info:</strong> <span id="memorial-debug-text">Loading...</span>
+        </div>
+        <anniversary-timeline-card id="memorial-test"></anniversary-timeline-card>
+    </div>
+
+    <!-- Test 4: Multi-Category -->
+    <div class="test-container">
+        <h2>🎂💼 Test 4: Multi-Category (Birthday + Work)</h2>
+        <div class="config-display">
+type: custom:anniversary-timeline-card
+categories: ["birthday", "work"]
+title: "Multi-Category Test - Should Show ONLY Birthdays and Work"
+        </div>
+        <div id="multi-test-debug" class="debug-info">
+            <strong>Debug Info:</strong> <span id="multi-debug-text">Loading...</span>
+        </div>
+        <anniversary-timeline-card id="multi-test"></anniversary-timeline-card>
+    </div>
+
+    <!-- Test 5: No Filter (All Categories) -->
+    <div class="test-container">
+        <h2>📋 Test 5: No Category Filter (Should Show All)</h2>
+        <div class="config-display">
+type: custom:anniversary-timeline-card
+title: "All Categories Test - Should Show Everything"
+        </div>
+        <div id="all-test-debug" class="debug-info">
+            <strong>Debug Info:</strong> <span id="all-debug-text">Loading...</span>
+        </div>
+        <anniversary-timeline-card id="all-test"></anniversary-timeline-card>
+    </div>
+
+    <!-- Load the card script -->
+    <script src="custom_components/anniversaries/www/anniversary-timeline-card.js"></script>
+
+    <script>
+        // Mock Home Assistant environment
+        window.customCards = window.customCards || [];
+        window.customCards.push({
+            type: "anniversary-timeline-card",
+            name: "Anniversary Timeline Card",
+            description: "Display anniversaries in timeline format"
+        });
+
+        // Mock anniversary entities with different categories
+        const mockHass = {
+            states: {
+                'sensor.anniversary_john_birthday': {
+                    entity_id: 'sensor.anniversary_john_birthday',
+                    state: '45', // 45 days until birthday
+                    attributes: {
+                        friendly_name: 'John\'s Birthday',
+                        category: 'birthday',
+                        date: '2025-10-02',
+                        zodiac_sign: 'Libra',
+                        birthstone: 'Opal',
+                        generation: 'Millennial',
+                        current_years: 28,
+                        unit_of_measurement: 'days'
+                    }
+                },
+                'sensor.anniversary_sarah_birthday': {
+                    entity_id: 'sensor.anniversary_sarah_birthday',
+                    state: '67', // 67 days until birthday
+                    attributes: {
+                        friendly_name: 'Sarah\'s Birthday',
+                        category: 'birthday',
+                        date: '2025-10-24',
+                        zodiac_sign: 'Scorpio',
+                        birthstone: 'Topaz',
+                        generation: 'Gen Z',
+                        current_years: 22,
+                        unit_of_measurement: 'days'
+                    }
+                },
+                'sensor.anniversary_company_work': {
+                    entity_id: 'sensor.anniversary_company_work',
+                    state: '120', // 120 days until work anniversary
+                    attributes: {
+                        friendly_name: 'Company Anniversary',
+                        category: 'work',
+                        date: '2025-12-16',
+                        current_years: 5,
+                        named_anniversary: 'Wooden Anniversary',
+                        generation: 'Millennial',
+                        unit_of_measurement: 'days'
+                    }
+                },
+                'sensor.anniversary_mom_memorial': {
+                    entity_id: 'sensor.anniversary_mom_memorial',
+                    state: '89', // 89 days until memorial
+                    attributes: {
+                        friendly_name: 'Mom\'s Memorial',
+                        category: 'memorial',
+                        date: '2025-11-15',
+                        current_years: 3,
+                        birth_flower: 'Chrysanthemum',
+                        generation: 'Baby Boomer',
+                        unit_of_measurement: 'days'
+                    }
+                },
+                'sensor.anniversary_wedding_anniversary': {
+                    entity_id: 'sensor.anniversary_wedding_anniversary',
+                    state: '156', // 156 days until anniversary
+                    attributes: {
+                        friendly_name: 'Wedding Anniversary',
+                        category: 'anniversary',
+                        date: '2026-01-21',
+                        current_years: 15,
+                        named_anniversary: 'Crystal Anniversary',
+                        zodiac_sign: 'Aquarius',
+                        unit_of_measurement: 'days'
+                    }
+                },
+                'sensor.anniversary_christmas_holiday': {
+                    entity_id: 'sensor.anniversary_christmas_holiday',
+                    state: '129', // 129 days until Christmas
+                    attributes: {
+                        friendly_name: 'Christmas',
+                        category: 'holiday',
+                        date: '2025-12-25',
+                        current_years: 2025,
+                        named_anniversary: 'Annual Holiday',
+                        generation: 'Traditional',
+                        unit_of_measurement: 'days'
+                    }
+                }
+            }
+        };
+
+        // Debug function to show what entities are being processed
+        function debugEntityFiltering(cardElement, testName, expectedCategory) {
+            setTimeout(() => {
+                const config = cardElement.config;
+                const allEntities = Object.keys(mockHass.states)
+                    .filter(entityId => entityId.match(/^sensor\.anniversary_.*/) && !entityId.includes('upcoming_anniversaries'))
+                    .map(entityId => mockHass.states[entityId]);
+                
+                let filteredEntities = allEntities.filter(entity => {
+                    if (!entity || entity.state === 'unavailable') return false;
+                    
+                    const entityCategory = entity.attributes.category || 'other';
+                    
+                    // Single category filter
+                    if (config.category) {
+                        return entityCategory === config.category;
+                    }
+                    
+                    // Multi-category filter
+                    if (config.categories && Array.isArray(config.categories)) {
+                        return config.categories.includes(entityCategory);
+                    }
+                    
+                    return true; // No filter = show all
+                });
+
+                const debugElement = document.getElementById(`${testName}-debug-text`);
+                if (debugElement) {
+                    const allCategories = allEntities.map(e => e.attributes.category).join(', ');
+                    const filteredCategories = filteredEntities.map(e => e.attributes.category).join(', ');
+                    
+                    debugElement.innerHTML = `
+                        <br><strong>Config:</strong> category="${config.category || 'none'}", categories=[${(config.categories || []).join(', ')}]
+                        <br><strong>All entities found:</strong> ${allEntities.length} (categories: ${allCategories})
+                        <br><strong>After filtering:</strong> ${filteredEntities.length} (categories: ${filteredCategories})
+                        <br><strong>Expected:</strong> ${expectedCategory || 'all categories'}
+                        <br><strong>Status:</strong> ${filteredEntities.length > 0 ? '✅ Entities found' : '❌ No entities match filter'}
+                    `;
+                }
+            }, 100);
+        }
+
+        // Set up test cards
+        setTimeout(() => {
+            // Test 1: Birthday only
+            const birthdayCard = document.getElementById('birthday-test');
+            birthdayCard.setConfig({
+                category: "birthday",
+                title: "Birthday Test - Should Show ONLY Birthdays"
+            });
+            birthdayCard.hass = mockHass;
+            debugEntityFiltering(birthdayCard, 'birthday-test', 'birthday only');
+
+            // Test 2: Work only
+            const workCard = document.getElementById('work-test');
+            workCard.setConfig({
+                category: "work",
+                title: "Work Test - Should Show ONLY Work Anniversaries"
+            });
+            workCard.hass = mockHass;
+            debugEntityFiltering(workCard, 'work-test', 'work only');
+
+            // Test 3: Memorial only
+            const memorialCard = document.getElementById('memorial-test');
+            memorialCard.setConfig({
+                category: "memorial",
+                title: "Memorial Test - Should Show ONLY Memorial Dates"
+            });
+            memorialCard.hass = mockHass;
+            debugEntityFiltering(memorialCard, 'memorial-test', 'memorial only');
+
+            // Test 4: Multi-category
+            const multiCard = document.getElementById('multi-test');
+            multiCard.setConfig({
+                categories: ["birthday", "work"],
+                title: "Multi-Category Test - Should Show ONLY Birthdays and Work"
+            });
+            multiCard.hass = mockHass;
+            debugEntityFiltering(multiCard, 'multi-test', 'birthday + work only');
+
+            // Test 5: No filter
+            const allCard = document.getElementById('all-test');
+            allCard.setConfig({
+                title: "All Categories Test - Should Show Everything"
+            });
+            allCard.hass = mockHass;
+            debugEntityFiltering(allCard, 'all-test', 'all categories');
+
+        }, 500);
+    </script>
+</body>
+</html>
