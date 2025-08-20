@@ -674,6 +674,8 @@ class AnniversaryTimelineCard extends HTMLElement {
   formatDate(dateString) {
     if (!dateString) return '';
     
+    console.log(`🔧 [Timeline Card] formatDate called with: "${dateString}", config.date_format: "${this.config.date_format}"`);
+    
     try {
       // Parse the date string (expected format: YYYY-MM-DD)
       const [year, month, day] = dateString.split('-');
@@ -681,6 +683,8 @@ class AnniversaryTimelineCard extends HTMLElement {
       
       // Get locale (user-specified or auto-detect)
       const locale = this.config.locale || navigator.language || 'en-US';
+      
+      console.log(`🔧 [Timeline Card] Parsed date: ${date}, locale: ${locale}`);
       
       // Handle different date format options
       let formattedDate;
@@ -745,6 +749,7 @@ class AnniversaryTimelineCard extends HTMLElement {
         formattedDate = `${dayOfWeek}, ${formattedDate}`;
       }
       
+      console.log(`🔧 [Timeline Card] Final formatted date: "${formattedDate}"`);
       return formattedDate;
       
     } catch (error) {
