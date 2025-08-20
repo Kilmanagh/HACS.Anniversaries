@@ -13,6 +13,9 @@ class AnniversaryTimelineCard extends HTMLElement {
     if (!config) {
       throw new Error('Invalid configuration');
     }
+    
+    console.log('🔧 [Timeline Card] setConfig called with:', config);
+    
     this.config = {
       title: config.title || this.getDefaultTitle(config.category || config.categories),
       max_items: config.max_items || 5,
@@ -41,6 +44,8 @@ class AnniversaryTimelineCard extends HTMLElement {
       debug_filtering: config.debug_filtering || false, // Show filtering debug info
       ...config
     };
+    
+    console.log('🔧 [Timeline Card] Final config:', this.config);
   }
 
   getDefaultTitle(categoryOrCategories) {
