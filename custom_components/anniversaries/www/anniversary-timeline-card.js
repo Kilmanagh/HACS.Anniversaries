@@ -41,8 +41,7 @@ class AnniversaryTimelineCard extends HTMLElement {
       custom_date_format: config.custom_date_format || null, // For advanced customization
       locale: config.locale || null, // Force specific locale, null = auto-detect
       // Debug Options
-      debug_filtering: config.debug_filtering || false, // Show filtering debug info
-      ...config
+      debug_filtering: config.debug_filtering || false // Show filtering debug info
     };
     
     console.log('🔧 [Timeline Card] Final config:', this.config);
@@ -171,6 +170,8 @@ class AnniversaryTimelineCard extends HTMLElement {
 
   getAnniversaryEntities() {
     if (!this._hass) return [];
+    
+    console.log('🔧 [Timeline Card] getAnniversaryEntities called, this.config:', this.config);
     
     const entities = Object.keys(this._hass.states)
       .filter(entityId => {
