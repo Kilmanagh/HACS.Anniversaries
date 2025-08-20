@@ -179,6 +179,13 @@ class AnniversaryTimelineCard extends HTMLElement {
       .filter(entity => {
         if (!entity || entity.state === 'unavailable') return false;
         
+        // Debug logging for configuration
+        if (this.config.debug_filtering) {
+          console.log(`🔧 [Timeline Card] Config:`, this.config);
+          console.log(`🔧 [Timeline Card] Config category:`, this.config.category);
+          console.log(`🔧 [Timeline Card] Config categories:`, this.config.categories);
+        }
+        
         // Filter by category/categories if specified (Phase 3 enhancement)
         const entityCategory = entity.attributes.category || 'other';
         
