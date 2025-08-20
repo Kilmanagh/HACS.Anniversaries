@@ -196,11 +196,17 @@ class AnniversaryTimelineCard extends HTMLElement {
         
         // Single category filter (Phase 1/2)
         if (this.config.category) {
+          console.log(`🔍 [Timeline Card] Testing single category filter: "${entityCategory}" === "${this.config.category}"`);
           const matches = entityCategory === this.config.category;
           if (this.config.debug_filtering) {
             console.log(`🔍 [Timeline Card] Single category filter: ${entityCategory} === ${this.config.category} = ${matches}`);
           }
-          if (!matches) return false;
+          if (!matches) {
+            console.log(`❌ [Timeline Card] Filtered out ${entity.entity_id} (category: ${entityCategory})`);
+            return false;
+          } else {
+            console.log(`✅ [Timeline Card] Passed filter ${entity.entity_id} (category: ${entityCategory})`);
+          }
         }
         
         // Multi-category filter (Phase 3)
