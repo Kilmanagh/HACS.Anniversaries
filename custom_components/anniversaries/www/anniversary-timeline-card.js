@@ -45,6 +45,11 @@ class AnniversaryTimelineCard extends HTMLElement {
     };
     
     console.log('🔧 [Timeline Card] Final config:', this.config);
+    
+    // Render if hass is already available
+    if (this._hass) {
+      this.render();
+    }
   }
 
   getDefaultTitle(categoryOrCategories) {
@@ -165,11 +170,13 @@ class AnniversaryTimelineCard extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
-    this.render();
+    if (this.config) { // Only render if config exists
+      this.render();
+    }
   }
 
   getAnniversaryEntities() {
-    if (!this._hass) return [];
+    if (!this._hass || !this.config) return [];
     
     console.log('🔧 [Timeline Card] getAnniversaryEntities called, this.config:', this.config);
     
