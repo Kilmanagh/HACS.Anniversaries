@@ -7,6 +7,7 @@ class AnniversaryTimelineCard extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
+    this._renderTimeout = null; // For debouncing renders
   }
 
   setConfig(config) {
@@ -48,8 +49,19 @@ class AnniversaryTimelineCard extends HTMLElement {
     
     // Render if hass is already available
     if (this._hass) {
-      this.render();
+      this.scheduleRender();
     }
+  }
+
+  scheduleRender() {
+    // Debounce renders to prevent race conditions
+    if (this._renderTimeout) {
+      clearTimeout(this._renderTimeout);
+    }
+    this._renderTimeout = setTimeout(() => {
+      this.render();
+      this._renderTimeout = null;
+    }, 0);
   }
 
   getDefaultTitle(categoryOrCategories) {
@@ -171,7 +183,7 @@ class AnniversaryTimelineCard extends HTMLElement {
   set hass(hass) {
     this._hass = hass;
     if (this.config) { // Only render if config exists
-      this.render();
+      this.scheduleRender();
     }
   }
 
@@ -324,6 +336,9 @@ class AnniversaryTimelineCard extends HTMLElement {
   }
 
   render() {
+    // Prevent race conditions by ensuring both config and hass exist
+    if (!this.config || !this._hass) return;
+    
     const entities = this.getAnniversaryEntities();
     
     this.shadowRoot.innerHTML = `
