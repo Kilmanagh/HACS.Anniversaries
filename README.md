@@ -48,6 +48,13 @@ This integration includes **4 custom Lovelace cards** with rich emoji/icon suppo
 
 ## 🆕 Latest Updates
 
+**Timeline Card v1.3.2** - Critical configuration fixes:
+- 🔧 **Card registration fix**: All cards now properly register with `custom:` prefix for correct YAML parsing
+- ⚙️ **Configuration validation**: Fixed category filtering and date formatting not working due to config issues
+- 🔄 **Race condition fixes**: Improved timing between configuration and Home Assistant state initialization
+- 🛠️ **Enhanced debugging**: Better error handling and fallback logic for date formatting
+- ⚠️ **Breaking change**: After updating, restart Home Assistant and hard refresh browser (Ctrl+F5) to clear cache
+
 **Timeline Card v1.3.1** - Enhanced date formatting options:
 - 📅 **Flexible date formats**: `long`, `short`, `numeric`, `full`, and `custom` patterns
 - 🌍 **Locale support**: Force specific locales (German, French, Japanese, etc.) or auto-detect

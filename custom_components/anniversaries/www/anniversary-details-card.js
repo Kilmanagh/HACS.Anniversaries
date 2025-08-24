@@ -282,7 +282,7 @@ customElements.define('anniversary-details-card', AnniversaryDetailsCard);
 // Register the card
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: 'anniversary-details-card',
+  type: 'custom:anniversary-details-card',
   name: 'Anniversary Details Card',
   description: 'Detailed view of a single anniversary with rich attributes',
   preview: true

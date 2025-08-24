@@ -345,7 +345,7 @@ customElements.define('anniversary-calendar-card', AnniversaryCalendarCard);
 // Register the card
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: 'anniversary-calendar-card',
+  type: 'custom:anniversary-calendar-card',
   name: 'Anniversary Calendar Card',
   description: 'Mini calendar view highlighting anniversary dates',
   preview: true

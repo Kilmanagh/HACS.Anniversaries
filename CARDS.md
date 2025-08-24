@@ -543,3 +543,67 @@ views:
 - **Entity filtering**: Specify exact entities in timeline/calendar cards for custom grouping
 - **Color coordination**: Cards automatically color-code by urgency across all card types
 - **Mobile friendly**: All cards are responsive and work great on phones/tablets
+
+## 🔧 Troubleshooting & Updates
+
+### Recent Critical Fixes (v1.3.2)
+
+**⚠️ If your cards stopped working or aren't reading YAML configuration:**
+
+The v1.3.2 update fixed critical card registration issues. After updating:
+
+1. **Restart Home Assistant** completely
+2. **Hard refresh browser**: Press `Ctrl+Shift+R` (Windows) or `Cmd+Shift+R` (Mac)
+3. **Clear browser cache** if problems persist
+4. Check browser console (F12) for error messages
+
+**Configuration not working (category, date_format, etc.):**
+- The cards now properly register with `custom:` prefix for correct YAML parsing
+- Previously, configurations like `category: birthday` or `date_format: long` might not have been applied
+- After restart + cache clear, all YAML options should work correctly
+
+### Common Issues
+
+**Cards not showing up in picker:**
+- Verify you've **registered the resources** in Settings → Dashboards → Resources
+- Check that all 4 JavaScript files are listed with type "JavaScript module"
+- Clear browser cache (Ctrl+Shift+R) and restart Home Assistant
+- Check browser console (F12) for JavaScript errors
+
+**"Cannot find card" errors:**
+- Ensure resource URLs are correct: `/local/custom_components/anniversaries/www/[filename].js`
+- Verify files exist by visiting the URL directly in browser
+- Make sure integration is installed and running properly
+
+**Cards not working properly:**
+- Ensure your anniversary sensors exist and are working
+- Check entity names in your card configuration
+- Verify the card type names are correct (e.g., `custom:anniversary-timeline-card`)
+
+**Date formatting not working:**
+- Ensure you're using `date_format: "long"` (quoted strings in YAML)
+- Check browser console for formatting error messages
+- Try basic format first: `date_format: "long"` without custom options
+
+**Category filtering not working:**
+- Make sure your anniversary entities have the `category` attribute set
+- Use browser console (F12) to see debug messages about filtering
+- Add `debug_filtering: true` to your card config to see detailed filter logs
+- Verify entity attributes in Developer Tools → States
+
+### Debugging Steps
+
+1. **Check the browser console** (F12 → Console tab) for error messages
+2. **Use debug mode** by adding `debug_filtering: true` to timeline cards
+3. **Verify entities** in Developer Tools → States → search for "anniversary"
+4. **Test simple config** first, then add advanced options gradually
+5. **Check resource registration** in Settings → Dashboards → Resources
+
+### Version Information
+
+- **Timeline Card**: v1.3.2 (Config fixes, enhanced debugging)
+- **Details Card**: v1.0.0 (Stable)
+- **Calendar Card**: v1.0.0 (Stable)  
+- **Stats Card**: v1.0.0 (Stable)
+
+Check browser console for version messages when cards load.

@@ -339,7 +339,7 @@ customElements.define('anniversary-stats-card', AnniversaryStatsCard);
 // Register the card
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: 'anniversary-stats-card',
+  type: 'custom:anniversary-stats-card',
   name: 'Anniversary Stats Card',
   description: 'Summary statistics and overview of all anniversaries',
   preview: true

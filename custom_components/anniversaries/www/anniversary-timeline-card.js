@@ -16,6 +16,8 @@ class AnniversaryTimelineCard extends HTMLElement {
     }
     
     console.log('🔧 [Timeline Card] setConfig called with:', config);
+    console.log('🔧 [Timeline Card] Raw config.category:', config.category);
+    console.log('🔧 [Timeline Card] Raw config.date_format:', config.date_format);
     
     this.config = {
       title: config.title || this.getDefaultTitle(config.category || config.categories),
@@ -744,6 +746,22 @@ class AnniversaryTimelineCard extends HTMLElement {
   formatDate(dateString) {
     if (!dateString) return '';
     
+    // Safety check: if config is not available, return basic formatting
+    if (!this.config) {
+      console.warn('Timeline Card: formatDate called before config is set, using fallback');
+      try {
+        const [year, month, day] = dateString.split('-');
+        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      } catch (error) {
+        return dateString; // Fallback to original string
+      }
+    }
+    
     console.log(`🔧 [Timeline Card] formatDate called with: "${dateString}", config.date_format: "${this.config.date_format}"`);
     
     try {
@@ -824,8 +842,21 @@ class AnniversaryTimelineCard extends HTMLElement {
       
     } catch (error) {
       console.warn('Anniversary Timeline Card: Date formatting error:', error);
-      // Graceful fallback to original string if parsing fails
-      return dateString;
+      console.warn('Anniversary Timeline Card: Falling back to basic date formatting');
+      
+      // Better fallback: try basic date formatting instead of returning raw string
+      try {
+        const [year, month, day] = dateString.split('-');
+        const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long', 
+          day: 'numeric'
+        });
+      } catch (fallbackError) {
+        console.error('Anniversary Timeline Card: Even fallback formatting failed:', fallbackError);
+        return dateString; // Last resort: return original string
+      }
     }
   }
 
@@ -928,14 +959,14 @@ customElements.define('anniversary-timeline-card', AnniversaryTimelineCard);
 // Register the card
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: 'anniversary-timeline-card',
+  type: 'custom:anniversary-timeline-card',
   name: 'Anniversary Timeline Card',
   description: 'Advanced anniversary timeline with multi-category support, statistics, and interactive features',
   preview: true
 });
 
 console.info(
-  '%c  ANNIVERSARY-TIMELINE-CARD  %c  Version 1.3.1 - Enhanced Date Formatting  ',
+  '%c  ANNIVERSARY-TIMELINE-CARD  %c  Version 1.3.2 - Config Debug Fix  ',
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray'
 );
