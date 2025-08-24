@@ -126,8 +126,15 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
     async def async_step_init(self, user_input=None):
         """Manage the options."""
+        errors = {}
         if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
+            # Validate date if it was provided
+            if CONF_DATE in user_input and user_input[CONF_DATE]:
+                if is_not_date(user_input[CONF_DATE], user_input.get(CONF_ONE_TIME, False)):
+                    errors[CONF_DATE] = "invalid"
+            
+            if not errors:
+                return self.async_create_entry(title="", data=user_input)
 
         # Properly merge data and options to get current values
         current_config = {**self._config_entry.data}
@@ -136,6 +143,10 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
         data_schema = vol.Schema(
             {
+                vol.Optional(
+                    CONF_DATE,
+                    default=current_config.get(CONF_DATE, ""),
+                ): str,
                 vol.Optional(
                     CONF_UPCOMING_ANNIVERSARIES_SENSOR,
                     default=current_config.get(CONF_UPCOMING_ANNIVERSARIES_SENSOR, False),
@@ -174,4 +185,4 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 ): selector.IconSelector(),
             }
         )
-        return self.async_show_form(step_id="init", data_schema=data_schema)
+        return self.async_show_form(step_id="init", data_schema=data_schema, errors=errors)
