@@ -2,27 +2,40 @@
 
 This integration includes 4 custom Lovelace cards that provide rich visuals and emoji support for displaying anniversary information.
 
-## Manual Installation Required
+## Installation & Deployment
 
-After installing the Anniversaries integration, you need to manually register the cards:
+### HACS Installation (Recommended)
+
+1. **Install via HACS**: Add this repository to HACS custom repositories
+2. **Download integration**: The cards are automatically installed to `/config/www/community/anniversaries/`
+3. **Register resources**: Manually add the JavaScript resources (see below)
+4. **For developers**: When testing local changes, manually copy updated files to `/config/www/community/anniversaries/`
+
+### Manual Resource Registration Required
+
+⚠️ **Critical**: After installing via HACS, you must manually register the card resources:
 
 1. Go to **Settings** → **Dashboards** → **Resources**
 2. Click **+ ADD RESOURCE**
-3. Add each card with these URLs:
+3. Add each card with these URLs (for HACS installations):
    - `/local/community/anniversaries/anniversary-timeline-card.js`
    - `/local/community/anniversaries/anniversary-details-card.js`
    - `/local/community/anniversaries/anniversary-calendar-card.js`
    - `/local/community/anniversaries/anniversary-stats-card.js`
 4. Set Resource type to **JavaScript Module**
-5. Restart Home Assistant
+5. **Restart Home Assistant**
+6. **Hard refresh browser** (Ctrl+Shift+R) to clear cache
 
 After adding the resources and restarting, the cards will appear in your Lovelace card picker.
 
-**Note**: The `/local/community/anniversaries/` path is automatically registered by the integration and points to the `www/` folder inside the integration directory.
+### Development & Testing
 
-**Alternative URLs to try if the above don't work:**
-- `/local/custom_components/anniversaries/www/[card-name].js`
-- `/hacsfiles/anniversaries/[card-name].js` (if installed via HACS)
+For developers testing local changes:
+
+1. **Edit files** in the development workspace
+2. **Copy updated files** to your Home Assistant instance at `/config/www/community/anniversaries/`
+3. **Hard refresh browser** (Ctrl+Shift+R) to bypass JavaScript cache
+4. **Check browser console** (F12) for debug messages and errors
 
 ## Card Types
 
@@ -552,15 +565,30 @@ views:
 
 The v1.3.2 update fixed critical card registration issues. After updating:
 
-1. **Restart Home Assistant** completely
-2. **Hard refresh browser**: Press `Ctrl+Shift+R` (Windows) or `Cmd+Shift+R` (Mac)
-3. **Clear browser cache** if problems persist
-4. Check browser console (F12) for error messages
+1. **For HACS users**: Wait for HACS to update files, or manually copy updated files to `/config/www/community/anniversaries/`
+2. **Restart Home Assistant** completely
+3. **Hard refresh browser**: Press `Ctrl+Shift+R` (Windows) or `Cmd+Shift+R` (Mac)
+4. **Clear browser cache** if problems persist
+5. Check browser console (F12) for error messages
 
 **Configuration not working (category, date_format, etc.):**
 - The cards now properly register with `custom:` prefix for correct YAML parsing
 - Previously, configurations like `category: birthday` or `date_format: long` might not have been applied
 - After restart + cache clear, all YAML options should work correctly
+
+### Deployment Issues
+
+**Files not updating after changes:**
+- **HACS installations**: Files are in `/config/www/community/anniversaries/` - ensure updated files are copied there
+- **Development testing**: Copy files manually from development workspace to live Home Assistant instance
+- **Cache issues**: Always hard refresh browser (Ctrl+Shift+R) after file changes
+- **Resource registration**: Verify resource URLs point to `/local/community/anniversaries/[filename].js`
+
+**YAML configuration completely ignored:**
+- **File not loading**: Check browser console (F12) for JavaScript loading errors
+- **Wrong file version**: Ensure you're running the updated files with v1.3.2 fixes
+- **Resource URL wrong**: Verify resource registration uses correct `/local/community/anniversaries/` path
+- **Card type mismatch**: Use `type: custom:anniversary-timeline-card` (with `custom:` prefix)
 
 ### Common Issues
 

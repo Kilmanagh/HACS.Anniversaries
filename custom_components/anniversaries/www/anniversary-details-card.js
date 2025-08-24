@@ -1,3 +1,6 @@
+console.error('🚨🚨🚨 DETAILS CARD JAVASCRIPT FILE LOADED! 🚨🚨🚨');
+console.error('🚨 File timestamp:', new Date().toISOString());
+
 /**
  * Anniversary Details Card
  * Focus on a single anniversary with rich details and all attributes
@@ -6,6 +9,7 @@
 class AnniversaryDetailsCard extends HTMLElement {
   constructor() {
     super();
+    console.error('🚨🚨🚨 DETAILS CARD CONSTRUCTOR CALLED! 🚨🚨🚨');
     this.attachShadow({ mode: 'open' });
   }
 
@@ -13,6 +17,11 @@ class AnniversaryDetailsCard extends HTMLElement {
     if (!config || !config.entity) {
       throw new Error('You need to define an entity');
     }
+    
+    // VERY OBVIOUS DEBUG MESSAGE
+    console.error('🚨🚨🚨 DETAILS CARD setConfig() WAS CALLED! 🚨🚨🚨');
+    console.error('🔧 [Details Card] setConfig called with:', config);
+    
     this.config = {
       entity: config.entity,
       show_attributes: config.show_attributes !== false,

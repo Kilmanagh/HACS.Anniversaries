@@ -1,3 +1,5 @@
+console.error('🚨🚨🚨 STATS CARD JAVASCRIPT FILE LOADED! 🚨🚨🚨');
+
 /**
  * Anniversary Stats Card
  * Summary statistics and quick overview of anniversaries
@@ -6,6 +8,7 @@
 class AnniversaryStatsCard extends HTMLElement {
   constructor() {
     super();
+    console.error('🚨🚨🚨 STATS CARD CONSTRUCTOR CALLED! 🚨🚨🚨');
     this.attachShadow({ mode: 'open' });
   }
 

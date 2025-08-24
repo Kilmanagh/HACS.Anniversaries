@@ -1,3 +1,5 @@
+console.error('🚨🚨🚨 CALENDAR CARD JAVASCRIPT FILE LOADED! 🚨🚨🚨');
+
 /**
  * Anniversary Calendar Card
  * Mini calendar view highlighting anniversary dates with popup details
@@ -6,6 +8,7 @@
 class AnniversaryCalendarCard extends HTMLElement {
   constructor() {
     super();
+    console.error('🚨🚨🚨 CALENDAR CARD CONSTRUCTOR CALLED! 🚨🚨🚨');
     this.attachShadow({ mode: 'open' });
     this.currentMonth = new Date();
   }

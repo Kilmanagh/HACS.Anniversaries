@@ -31,7 +31,11 @@ This integration includes **4 custom Lovelace cards** with rich emoji/icon suppo
 - 📅 **Calendar Card**: Interactive mini calendar with clickable dates
 - 📊 **Stats Card**: Summary statistics and distribution charts
 
-**Manual Setup Required**: After installing the integration, you need to manually register the cards in **Settings** → **Dashboards** → **Resources**. See [CARDS.md](CARDS.md) for detailed installation and configuration instructions.
+**Installation Notes**: 
+- Cards are automatically installed to `/config/www/community/anniversaries/` via HACS
+- **Manual resource registration required** in Settings → Dashboards → Resources
+- **For developers**: Copy updated files manually to `/config/www/community/anniversaries/` for testing
+- See [CARDS.md](CARDS.md) for complete installation and configuration instructions
 
 ## 🎯 Features
 
@@ -328,7 +332,7 @@ The integration automatically migrates existing entities to use the proper prefi
 - Register the card resources in Settings → Dashboards → Resources first
 - Add each JavaScript file with type "JavaScript module"  
 - Clear your browser cache (Ctrl+F5 or Cmd+Shift+R)
-- Verify files exist at `/local/custom_components/anniversaries/www/[filename].js`
+- Verify files exist at `/local/community/anniversaries/[filename].js` (for HACS)
 
 **Display Precision option showing for anniversary sensors:**
 - This has been fixed in recent versions - anniversary sensors now use `SensorDeviceClass.DURATION`
@@ -338,6 +342,28 @@ The integration automatically migrates existing entities to use the proper prefi
 - The integration automatically migrates entities on startup
 - Check Configuration → Entities to verify the new entity IDs
 - Old automations/scripts may need entity ID updates
+
+## 🔧 Development & Testing
+
+**For developers working with this integration:**
+
+### Local Development Setup
+1. **Clone repository** to development environment
+2. **Edit files** in `custom_components/anniversaries/www/` 
+3. **Copy updated files** to Home Assistant at `/config/www/community/anniversaries/`
+4. **Hard refresh browser** (Ctrl+Shift+R) to bypass cache
+5. **Check browser console** (F12) for debug messages
+
+### File Deployment
+- **HACS users**: Files auto-install to `/config/www/community/anniversaries/`
+- **Manual testing**: Copy workspace files to live HA instance
+- **Resource URLs**: Use `/local/community/anniversaries/[filename].js`
+- **Cache issues**: Always hard refresh after file changes
+
+### Debugging Cards
+- Browser console (F12) shows card loading and configuration issues
+- Check resource registration in Settings → Dashboards → Resources
+- Verify card types use `custom:` prefix (e.g., `custom:anniversary-timeline-card`)
 
 [patreon-shield]: https://c5.patreon.com/external/logo/become_a_patron_button.png
 [patreon]: https://www.patreon.com/pinkywafer
