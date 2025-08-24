@@ -194,11 +194,23 @@ class AnniversaryTimelineCard extends HTMLElement {
     
     const entities = Object.keys(this._hass.states)
       .filter(entityId => {
+        // Custom entity list takes priority
         if (this.config.entities) {
           return this.config.entities.includes(entityId);
         }
-        return entityId.match(/^sensor\.anniversary_.*/) && 
-               !entityId.includes('upcoming_anniversaries');
+        
+        // Get the entity object
+        const entity = this._hass.states[entityId];
+        if (!entity) return false;
+        
+        // Check if it's a sensor entity
+        if (!entityId.startsWith('sensor.')) return false;
+        
+        // Exclude known non-anniversary sensors
+        if (entityId.includes('upcoming_anniversaries')) return false;
+        
+        // Verify it's an anniversary entity by checking for anniversary-specific attributes
+        return this.isAnniversaryEntity(entity);
       })
       .map(entityId => this._hass.states[entityId])
       .filter(entity => {
@@ -273,6 +285,36 @@ class AnniversaryTimelineCard extends HTMLElement {
       .slice(0, this.config.max_items);
     
     return entities;
+  }
+
+  isAnniversaryEntity(entity) {
+    /**
+     * Determine if an entity is an anniversary entity by checking for 
+     * anniversary-specific attributes instead of relying on entity ID patterns.
+     * This is more reliable and matches how the integration actually works.
+     */
+    if (!entity || !entity.attributes) return false;
+    
+    const attrs = entity.attributes;
+    
+    // Anniversary entities have these specific attributes
+    const hasAnniversaryAttributes = (
+      attrs.next_date !== undefined &&           // All anniversaries have next_date
+      attrs.current_years !== undefined &&       // All anniversaries track years
+      attrs.category !== undefined &&            // All anniversaries have categories
+      (attrs.zodiac_sign !== undefined ||        // Most have zodiac signs
+       attrs.named_anniversary !== undefined ||   // Or named anniversaries
+       attrs.birth_flower !== undefined)         // Or birth flowers
+    );
+    
+    // Additional validation: check if it behaves like an anniversary entity
+    const hasValidState = (
+      entity.state !== 'unavailable' &&
+      !isNaN(parseInt(entity.state)) &&          // State should be days (number)
+      parseInt(entity.state) >= 0                // Days should be non-negative
+    );
+    
+    return hasAnniversaryAttributes && hasValidState;
   }
 
   getIcon(entity) {
