@@ -1,8 +1,3 @@
-console.error('🔥 TIMELINE CARD LOADED');
-
-/**
- * Anniversary Timeline Card v1.3.2ole.error('� TIMELINE CARD LOADED');
-
 /**
  * Anniversary Timeline Card v1.3.2
  * Shows upcoming anniversaries in chronological order with all attributes
@@ -11,7 +6,6 @@ console.error('🔥 TIMELINE CARD LOADED');
 class AnniversaryTimelineCard extends HTMLElement {
   constructor() {
     super();
-    console.error('� TIMELINE CARD CONSTRUCTOR');
     this.attachShadow({ mode: 'open' });
     this._renderTimeout = null; // For debouncing renders
   }
@@ -21,7 +15,9 @@ class AnniversaryTimelineCard extends HTMLElement {
       throw new Error('Invalid configuration');
     }
     
-    console.error('� TIMELINE setConfig:', config);
+    console.log('🔧 [Timeline Card] setConfig called with:', config);
+    console.log('🔧 [Timeline Card] Raw config.category:', config.category);
+    console.log('🔧 [Timeline Card] Raw config.date_format:', config.date_format);
     
     this.config = {
       title: config.title || this.getDefaultTitle(config.category || config.categories),
@@ -191,10 +187,6 @@ class AnniversaryTimelineCard extends HTMLElement {
     if (this.config) { // Only render if config exists
       this.scheduleRender();
     }
-  }
-
-  get hass() {
-    return this._hass;
   }
 
   getAnniversaryEntities() {
@@ -960,28 +952,11 @@ class AnniversaryTimelineCard extends HTMLElement {
   getCardSize() {
     return 3;
   }
-
-  // Required method for Home Assistant to recognize this as a proper custom card
-  static getConfigElement() {
-    return null; // No visual editor for now
-  }
-
-  // Required method for Home Assistant card validation
-  static getStubConfig() {
-    return {
-      type: 'custom:anniversary-timeline-card',
-      title: 'Upcoming Anniversaries',
-      max_items: 5,
-      show_icons: true,
-      color_coding: true,
-      date_format: 'long'
-    };
-  }
 }
 
 customElements.define('anniversary-timeline-card', AnniversaryTimelineCard);
 
-// Register the card - THIS IS CRITICAL FOR HOME ASSISTANT TO FIND IT
+// Register the card
 window.customCards = window.customCards || [];
 window.customCards.push({
   type: 'custom:anniversary-timeline-card',
