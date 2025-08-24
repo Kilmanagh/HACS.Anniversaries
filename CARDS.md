@@ -7,9 +7,9 @@ This integration includes 4 custom Lovelace cards that provide rich visuals and 
 ### HACS Installation (Recommended)
 
 1. **Install via HACS**: Add this repository to HACS custom repositories
-2. **Download integration**: The cards are automatically installed to `/config/www/community/anniversaries/`
+2. **Download integration**: The cards are automatically installed to `\config\www\community\anniversaries\`
 3. **Register resources**: Manually add the JavaScript resources (see below)
-4. **For developers**: When testing local changes, manually copy updated files to `/config/www/community/anniversaries/`
+4. **For developers**: When testing local changes, manually copy updated files to `\config\www\community\anniversaries\`
 
 ### Manual Resource Registration Required
 
@@ -33,7 +33,7 @@ After adding the resources and restarting, the cards will appear in your Lovelac
 For developers testing local changes:
 
 1. **Edit files** in the development workspace
-2. **Copy updated files** to your Home Assistant instance at `/config/www/community/anniversaries/`
+2. **Copy updated files** to your Home Assistant instance at `\config\www\community\anniversaries\`
 3. **Hard refresh browser** (Ctrl+Shift+R) to bypass JavaScript cache
 4. **Check browser console** (F12) for debug messages and errors
 
@@ -565,7 +565,7 @@ views:
 
 The v1.3.2 update fixed critical card registration issues. After updating:
 
-1. **For HACS users**: Wait for HACS to update files, or manually copy updated files to `/config/www/community/anniversaries/`
+1. **For HACS users**: Wait for HACS to update files, or manually copy updated files to `\config\www\community\anniversaries\`
 2. **Restart Home Assistant** completely
 3. **Hard refresh browser**: Press `Ctrl+Shift+R` (Windows) or `Cmd+Shift+R` (Mac)
 4. **Clear browser cache** if problems persist
@@ -579,7 +579,7 @@ The v1.3.2 update fixed critical card registration issues. After updating:
 ### Deployment Issues
 
 **Files not updating after changes:**
-- **HACS installations**: Files are in `/config/www/community/anniversaries/` - ensure updated files are copied there
+- **HACS installations**: Files are in `\config\www\community\anniversaries\` - ensure updated files are copied there
 - **Development testing**: Copy files manually from development workspace to live Home Assistant instance
 - **Cache issues**: Always hard refresh browser (Ctrl+Shift+R) after file changes
 - **Resource registration**: Verify resource URLs point to `/local/community/anniversaries/[filename].js`

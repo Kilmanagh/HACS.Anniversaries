@@ -335,6 +335,14 @@ class AnniversaryStatsCard extends HTMLElement {
   getCardSize() {
     return 4;
   }
+
+  // Required method for Home Assistant card validation
+  static getStubConfig() {
+    return {
+      type: 'custom:anniversary-stats-card',
+      title: 'Anniversary Statistics'
+    };
+  }
 }
 
 customElements.define('anniversary-stats-card', AnniversaryStatsCard);

@@ -341,6 +341,14 @@ class AnniversaryCalendarCard extends HTMLElement {
   getCardSize() {
     return 3;
   }
+
+  // Required method for Home Assistant card validation
+  static getStubConfig() {
+    return {
+      type: 'custom:anniversary-calendar-card',
+      title: 'Anniversary Calendar'
+    };
+  }
 }
 
 customElements.define('anniversary-calendar-card', AnniversaryCalendarCard);

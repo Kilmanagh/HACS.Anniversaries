@@ -32,9 +32,9 @@ This integration includes **4 custom Lovelace cards** with rich emoji/icon suppo
 - 📊 **Stats Card**: Summary statistics and distribution charts
 
 **Installation Notes**: 
-- Cards are automatically installed to `/config/www/community/anniversaries/` via HACS
+- Cards are automatically installed to `\config\www\community\anniversaries\` via HACS
 - **Manual resource registration required** in Settings → Dashboards → Resources
-- **For developers**: Copy updated files manually to `/config/www/community/anniversaries/` for testing
+- **For developers**: Copy updated files manually to `\config\www\community\anniversaries\` for testing
 - See [CARDS.md](CARDS.md) for complete installation and configuration instructions
 
 ## 🎯 Features
@@ -350,12 +350,12 @@ The integration automatically migrates existing entities to use the proper prefi
 ### Local Development Setup
 1. **Clone repository** to development environment
 2. **Edit files** in `custom_components/anniversaries/www/` 
-3. **Copy updated files** to Home Assistant at `/config/www/community/anniversaries/`
+3. **Copy updated files** to Home Assistant at `\config\www\community\anniversaries\`
 4. **Hard refresh browser** (Ctrl+Shift+R) to bypass cache
 5. **Check browser console** (F12) for debug messages
 
 ### File Deployment
-- **HACS users**: Files auto-install to `/config/www/community/anniversaries/`
+- **HACS users**: Files auto-install to `\config\www\community\anniversaries\`
 - **Manual testing**: Copy workspace files to live HA instance
 - **Resource URLs**: Use `/local/community/anniversaries/[filename].js`
 - **Cache issues**: Always hard refresh after file changes

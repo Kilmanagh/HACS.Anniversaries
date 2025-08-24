@@ -284,6 +284,14 @@ class AnniversaryDetailsCard extends HTMLElement {
   getCardSize() {
     return this.config.compact_mode ? 2 : 4;
   }
+
+  // Required method for Home Assistant card validation
+  static getStubConfig() {
+    return {
+      type: 'custom:anniversary-details-card',
+      entity: 'sensor.anniversary_example'
+    };
+  }
 }
 
 customElements.define('anniversary-details-card', AnniversaryDetailsCard);
