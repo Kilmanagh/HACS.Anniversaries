@@ -102,7 +102,7 @@ class AnniversaryTimelineCard extends HTMLElement {
   getDefaultAttributes(categoryOrCategories) {
     const categoryAttributes = {
       'birthday': ['zodiac_sign', 'birthstone', 'generation'], // Keep the awesome original
-      'anniversary': ['current_years', 'named_anniversary', 'zodiac_sign'], // Enhanced with zodiac
+      'anniversary': ['current_years', 'named_anniversary'], // Removed zodiac_sign
       'memorial': ['current_years', 'birth_flower', 'generation'], // Enhanced with meaningful attributes
       'holiday': ['current_years', 'generation', 'named_anniversary'], // Enhanced
       'work': ['current_years', 'named_anniversary', 'generation'], // Enhanced
@@ -359,7 +359,7 @@ class AnniversaryTimelineCard extends HTMLElement {
     const stoneEmojis = {
       'Garnet': '🔴', 'Amethyst': '🟣', 'Aquamarine': '🔵', 'Diamond': '💎',
       'Emerald': '🟢', 'Pearl': '⚪', 'Ruby': '♦️', 'Peridot': '🟡',
-      'Sapphire': '🔷', 'Opal': '🌈', 'Topaz': '🟠', 'Turquoise': '🩵'
+      'Sapphire': '🔷', 'Opal': '🌈', 'Topaz': '🟠', 'Turquoise': '🟦'
     };
     return stoneEmojis[stone] || '💍';
   }
@@ -372,11 +372,11 @@ class AnniversaryTimelineCard extends HTMLElement {
       return this.getCategoryThemeColors(category, days);
     }
     
-    // Default color scheme (preserves original birthday experience)
-    if (days === 0) return '#f44336';      // Red - today
-    if (days <= 7) return '#ff9800';       // Orange - this week  
-    if (days <= 30) return '#ffc107';      // Yellow - this month
-    return '#4caf50';                      // Green - future
+    // Default color scheme (better readability with darker backgrounds)
+    if (days === 0) return '#B71C1C';      // Dark red - today
+    if (days <= 7) return '#E65100';       // Dark orange - this week  
+    if (days <= 30) return '#F57C00';      // Dark amber - this month
+    return '#2E7D32';                      // Dark green - future
   }
 
   render() {
