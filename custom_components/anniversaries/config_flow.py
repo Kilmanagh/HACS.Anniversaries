@@ -80,12 +80,7 @@ class AnniversariesFlowHandler(config_entries.ConfigFlow):
                 vol.Required(CONF_NAME): str,
                 vol.Required(CONF_DATE): str,
                 vol.Optional(CONF_CATEGORY, default=DEFAULT_CATEGORY): vol.In(CATEGORY_OPTIONS),
-                vol.Optional(CONF_EMOJI, default=self.get_default_emoji_for_category(DEFAULT_CATEGORY)): selector.SelectSelector(
-                    selector.SelectSelectorConfig(
-                        options=[{"value": emoji, "label": emoji} for emoji in EMOJI_OPTIONS],
-                        mode=selector.SelectSelectorMode.DROPDOWN
-                    )
-                ),
+                vol.Optional(CONF_EMOJI, default=self.get_default_emoji_for_category(DEFAULT_CATEGORY)): vol.In(EMOJI_OPTIONS),
                 vol.Optional(CONF_ONE_TIME, default=DEFAULT_ONE_TIME): bool,
                 vol.Optional(CONF_HALF_ANNIVERSARY, default=DEFAULT_HALF_ANNIVERSARY): bool,
                 vol.Optional(CONF_UNIT_OF_MEASUREMENT, default=DEFAULT_UNIT_OF_MEASUREMENT): str,
@@ -172,12 +167,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 vol.Optional(
                     CONF_EMOJI,
                     default=current_config.get(CONF_EMOJI, self.get_default_emoji_for_category(current_config.get(CONF_CATEGORY, DEFAULT_CATEGORY))),
-                ): selector.SelectSelector(
-                    selector.SelectSelectorConfig(
-                        options=[{"value": emoji, "label": emoji} for emoji in EMOJI_OPTIONS],
-                        mode=selector.SelectSelectorMode.DROPDOWN
-                    )
-                ),
+                ): vol.In(EMOJI_OPTIONS),
                 vol.Optional(
                     CONF_ONE_TIME,
                     default=current_config.get(CONF_ONE_TIME, DEFAULT_ONE_TIME),
