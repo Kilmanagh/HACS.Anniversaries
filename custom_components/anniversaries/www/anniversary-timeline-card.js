@@ -323,19 +323,24 @@ class AnniversaryTimelineCard extends HTMLElement {
     const days = parseInt(entity.state);
     const category = entity.attributes.category || 'other';
     
-    // Category-specific icons (matching const.py CATEGORY_ICONS)
+    // Check for custom emoji first
+    if (entity.attributes.custom_emoji) {
+      return entity.attributes.custom_emoji;
+    }
+    
+    // Category-specific icons (matching const.py CATEGORY_EMOJIS)
     const categoryIcons = {
       'birthday': '🎂',
-      'anniversary': '💍',
-      'memorial': '🌸',
-      'holiday': '�',
+      'anniversary': '�',
+      'memorial': '�',
+      'holiday': '🎉',
       'work': '💼',
       'achievement': '🏆',
       'event': '📅',
-      'other': '�'
+      'other': '⭐'
     };
     
-    // Special day indicators override category icons
+    // Special day indicators override category icons (only if no custom emoji)
     if (days === 0) return '🌟'; // Today
     if (days <= 7) return '🔥';  // This week
     

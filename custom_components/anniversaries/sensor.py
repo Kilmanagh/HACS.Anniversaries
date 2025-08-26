@@ -195,6 +195,7 @@ class AnniversarySensor(CoordinatorEntity[AnniversaryDataUpdateCoordinator], Sen
             ATTR_CATEGORY: ann.category,
             ATTR_DAYS_SINCE_LAST: ann.days_since_last,
             ATTR_LAST_ANNIVERSARY_DATE: ann.last_anniversary_date,
+            "custom_emoji": ann.emoji,
         }
         if ann.named_anniversary:
             attrs[ATTR_NAMED_ANNIVERSARY] = ann.named_anniversary

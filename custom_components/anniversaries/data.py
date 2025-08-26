@@ -83,6 +83,7 @@ class AnniversaryData:
     is_one_time: bool = False
     show_half_anniversary: bool = False
     category: str = "other"
+    emoji: str = "🎉"
     unknown_year: bool = False
     config: dict = field(default_factory=dict)
 
@@ -262,7 +263,11 @@ class AnniversaryData:
     @classmethod
     def from_config(cls, config: dict) -> "AnniversaryData":
         """Create AnniversaryData from config entry."""
-        from .const import CONF_DATE, CONF_NAME, CONF_ONE_TIME, CONF_HALF_ANNIVERSARY, CONF_CATEGORY, DEFAULT_CATEGORY, CATEGORY_OPTIONS
+        from .const import (
+            CONF_DATE, CONF_NAME, CONF_ONE_TIME, CONF_HALF_ANNIVERSARY, 
+            CONF_CATEGORY, DEFAULT_CATEGORY, CATEGORY_OPTIONS,
+            CONF_EMOJI, DEFAULT_EMOJI, CATEGORY_EMOJIS
+        )
         
         # Debug logging
         import logging
@@ -298,12 +303,18 @@ class AnniversaryData:
             _LOGGER.warning(f"Invalid category '{category}', using default '{DEFAULT_CATEGORY}'")
             category = DEFAULT_CATEGORY
         
+        # Get emoji - use custom emoji if provided, otherwise use category default
+        emoji = config.get(CONF_EMOJI)
+        if not emoji:
+            emoji = CATEGORY_EMOJIS.get(category, DEFAULT_EMOJI)
+        
         return cls(
             name=config.get(CONF_NAME, "Unknown Anniversary"),
             date=anniversary_date,
             is_one_time=config.get(CONF_ONE_TIME, False),
             show_half_anniversary=config.get(CONF_HALF_ANNIVERSARY, False),
             category=category,
+            emoji=emoji,
             unknown_year=unknown_year,
             config=config
         )

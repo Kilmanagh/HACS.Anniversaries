@@ -24,6 +24,7 @@ CONF_HALF_ANNIVERSARY = "show_half_anniversary"
 CONF_UNIT_OF_MEASUREMENT = "unit_of_measurement"
 CONF_ONE_TIME = "one_time"
 CONF_CATEGORY = "category"
+CONF_EMOJI = "emoji"
 # Removed CONF_COUNT_UP - now using attributes instead
 
 # Category options
@@ -68,7 +69,69 @@ DEFAULT_HALF_ANNIVERSARY = False
 DEFAULT_UNIT_OF_MEASUREMENT = "Days"  # Back to "Days" as requested
 DEFAULT_ONE_TIME = False
 DEFAULT_CATEGORY = CATEGORY_OTHER
+DEFAULT_EMOJI = "🎉"
 # Removed DEFAULT_COUNT_UP - now using attributes instead
+
+# Category-specific default emojis
+CATEGORY_EMOJIS = {
+    CATEGORY_BIRTHDAY: "🎂",
+    CATEGORY_ANNIVERSARY: "💕", 
+    CATEGORY_MEMORIAL: "🌹",
+    CATEGORY_HOLIDAY: "🎉",
+    CATEGORY_WORK: "💼",
+    CATEGORY_ACHIEVEMENT: "🏆",
+    CATEGORY_EVENT: "📅",
+    CATEGORY_OTHER: "⭐",
+}
+
+# Comprehensive emoji options for dropdown selection
+EMOJI_OPTIONS = [
+    # Holidays & Celebrations
+    "🎄", "🎅", "🤶", "❄️", "⛄", "🎃", "👻", "🕷️", "🦇", "🍭",
+    "🦃", "🍂", "🌽", "🥧", "🍁", "🎆", "🎇", "🇺🇸", "🗽", "🎊",
+    "💘", "💝", "💌", "🌹", "💕", "🍀", "☘️", "🌈", "🎩", "💚",
+    "🐰", "🥚", "🌸", "🌷", "🐣", "👑", "🎂", "🎁", "🎈",
+    
+    # Religious & Spiritual
+    "✝️", "⭐", "🕊️", "🙏", "📿", "🕎", "✡️", "🕯️", "📜", "🍯",
+    "☪️", "🕌", "📖", "🌙", "🕉️", "🪷", "🧘", "🔯", "🌟", "💫", "✨",
+    
+    # Relationships & Anniversaries
+    "💍", "💒", "👰", "🤵", "💐", "💖", "💗", "💓", "👫", "👬", "👭",
+    "👨‍👩‍👧‍👦", "❤️", "🥂", "🍾", "💎",
+    
+    # Seasons
+    "🌺", "🌻", "🦋", "☀️", "🌞", "🏖️", "🌊", "🍉", "🌰", "🌾",
+    "🌨️", "🧊", "🔥",
+    
+    # Travel & Vacations
+    "✈️", "🚗", "🚢", "🚂", "🗺️", "🏔️", "🏝️", "🌴", "🧳", "📷",
+    "🎒", "🕶️", "👒", "🗼", "🏰", "🎡", "🎢",
+    
+    # Health & Medical
+    "🏥", "👩‍⚕️", "👨‍⚕️", "💊", "🩺", "🦷", "👁️", "🧠", "❤️‍🩹", "🩹",
+    "💪", "🏃", "🥗", "🔬", "🧪", "📋", "📊", "📈",
+    
+    # Work & Career
+    "💼", "👔", "💻", "🎓", "📚", "✏️", "🖊️", "📝", "🏆", "🥇",
+    "🎯", "🤝", "📞", "✉️", "📧", "📅",
+    
+    # Home & Life
+    "🏠", "🔑", "📦", "🛋️", "🚚", "👶", "🍼", "👪", "🎀", "💙",
+    "📜", "✍️", "💰", "🏦",
+    
+    # Pets & Animals
+    "🐕", "🐱", "🐰", "🐹", "🐦", "🐴", "🐮", "🐷", "🐸", "🐢",
+    "🦎", "🐍", "🦋", "🐝", "🐾", "🦴",
+    
+    # Hobbies & Interests
+    "🎨", "🖌️", "🖍️", "📸", "🎭", "🎵", "🎶", "🎸", "🎹", "🎤",
+    "📖", "🎮", "🕹️", "🎲", "🃏", "🚴", "🏊", "⚽", "🏀",
+    "🧩", "🧶", "✂️", "🧵", "🪡",
+    
+    # General
+    "🎪", "🎖️", "⏰", "⏳", "⌛"
+]
 
 # Attributes
 ATTR_YEARS_NEXT = "years_at_anniversary"

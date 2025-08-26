@@ -318,7 +318,7 @@ class BirthdayTimelineCard extends HTMLElement {
   renderTimelineItem(entity) {
     const days = parseInt(entity.state);
     const attrs = entity.attributes;
-    const icon = this.config.show_icons ? '🎂' : '';
+    const icon = this.config.show_icons ? (entity.attributes.custom_emoji || '🎂') : '';
     const color = this.getColorForDays(days);
     
     return `
