@@ -91,22 +91,24 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 
                 _LOGGER.debug(f"Attempting to register static path: {url_path} -> {file_path}")
                 _LOGGER.debug(f"Path exists: {os.path.exists(file_path)}")
-                _LOGGER.debug(f"HTTP component type: {type(hass.http)}")
-                _LOGGER.debug(f"HTTP component attributes: {[attr for attr in dir(hass.http) if not attr.startswith('_')]}")
                 
-                # Try different registration methods based on Home Assistant version
-                if hasattr(hass.http, 'register_static_path'):
-                    # Modern Home Assistant API
+                # Use the actual available method from your error log
+                if hasattr(hass.http, 'async_register_static_paths'):
+                    # This is the method that was shown as available in your error
+                    await hass.http.async_register_static_paths([{
+                        "url_path": url_path,
+                        "path": file_path,
+                        "cache_headers": True
+                    }])
+                    _LOGGER.info(f"Successfully registered static path via async_register_static_paths: {url_path}")
+                elif hasattr(hass.http, 'register_static_path'):
+                    # Fallback to sync method
                     hass.http.register_static_path(url_path, file_path, True)
-                    _LOGGER.info(f"Successfully registered static path (modern API): {url_path}")
-                elif hasattr(hass.http, 'add_route') and hasattr(hass.http, 'StaticFileHandler'):
-                    # Alternative API approach
-                    from aiohttp.web import StaticResource
-                    resource = StaticResource(url_path, file_path)
-                    hass.http.app.router.register_resource(resource)
-                    _LOGGER.info(f"Successfully registered static path (alternative API): {url_path}")
+                    _LOGGER.info(f"Successfully registered static path via register_static_path: {url_path}")
                 else:
-                    _LOGGER.warning(f"No suitable static path registration method found. Available methods: {[attr for attr in dir(hass.http) if 'static' in attr.lower() or 'route' in attr.lower()]}")
+                    _LOGGER.error(f"No static path registration method found! Available: {[m for m in dir(hass.http) if 'static' in m.lower()]}")
+                    # Continue without static path registration - integration will still work, just no timeline cards
+                    _LOGGER.warning("Timeline cards will not be available, but anniversary tracking will still work")
                 
                 hass.data[DOMAIN]["static_path_registered"] = True
             else:
