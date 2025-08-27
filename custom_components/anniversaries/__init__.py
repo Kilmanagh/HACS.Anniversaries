@@ -92,25 +92,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 _LOGGER.debug(f"Attempting to register static path: {url_path} -> {file_path}")
                 _LOGGER.debug(f"Path exists: {os.path.exists(file_path)}")
                 
-                # Import StaticPathConfig - it's defined in the same module
+                # Simple fallback approach - just register a basic file server
                 try:
-                    # Based on GitHub examples, StaticPathConfig is in homeassistant.components.http
-                    from homeassistant.components.http import StaticPathConfig
-                    
-                    # Create StaticPathConfig object like in the working examples
-                    static_config = StaticPathConfig(url_path, file_path, True)
-                    
-                    # Check if route already exists to prevent conflict
-                    existing_routes = [str(route.resource) for route in hass.http.app.router.routes()]
-                    if url_path not in existing_routes:
-                        await hass.http.async_register_static_paths([static_config])
-                        _LOGGER.info(f"Successfully registered static path: {url_path}")
-                    else:
-                        _LOGGER.info(f"Static path {url_path} already registered, skipping")
-                        
-                except ImportError as e:
-                    _LOGGER.error(f"Could not import StaticPathConfig: {e}")
-                    # Fallback: register manually without StaticPathConfig
                     from aiohttp.web import FileResponse
                     from aiohttp import web
                     
@@ -124,7 +107,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                     
                     # Add a simple route for static files
                     hass.http.app.router.add_get(f"{url_path}/{{filename:.*}}", serve_static_file)
-                    _LOGGER.info(f"Successfully registered static route fallback: {url_path}")
+                    _LOGGER.info(f"Successfully registered static route: {url_path}")
                     
                 except Exception as e:
                     _LOGGER.error(f"Failed to register static path: {e}")
@@ -133,23 +116,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 hass.data[DOMAIN]["static_path_registered"] = True
             else:
                 _LOGGER.warning("HTTP component not available yet")
+                hass.data[DOMAIN]["static_path_registered"] = True
                 
         except Exception as e:
             _LOGGER.error(f"Unexpected error in static path registration: {e}")
             # Don't fail the integration setup
             hass.data[DOMAIN]["static_path_registered"] = True
-                
-                hass.data[DOMAIN]["static_path_registered"] = True
-            else:
-                _LOGGER.warning("HTTP component not available or not initialized yet")
-                
-        except Exception as e:
-            _LOGGER.error(f"Failed to register static path for cards: {e}")
-            _LOGGER.error(f"Exception type: {type(e)}")
-            import traceback
-            _LOGGER.error(f"Traceback: {traceback.format_exc()}")
-            # Don't fail the entire integration if static path registration fails
-            _LOGGER.info("Continuing integration setup without static path registration")
 
     return True
 
