@@ -92,30 +92,52 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 _LOGGER.debug(f"Attempting to register static path: {url_path} -> {file_path}")
                 _LOGGER.debug(f"Path exists: {os.path.exists(file_path)}")
                 
-                # Import StaticPathConfig from the HTTP component
+                # Import StaticPathConfig - it's defined in the same module
                 try:
+                    # Based on GitHub examples, StaticPathConfig is in homeassistant.components.http
                     from homeassistant.components.http import StaticPathConfig
                     
-                    # Use StaticPathConfig object instead of dict
+                    # Create StaticPathConfig object like in the working examples
                     static_config = StaticPathConfig(url_path, file_path, True)
-                    await hass.http.async_register_static_paths([static_config])
-                    _LOGGER.info(f"Successfully registered static path: {url_path}")
                     
-                except ImportError:
-                    _LOGGER.error("Could not import StaticPathConfig")
-                except AttributeError as e:
-                    _LOGGER.error(f"StaticPathConfig missing attribute: {e}")
-                    # Fallback to manual registration
-                    try:
-                        from aiohttp.web import StaticResource
-                        resource = StaticResource(url_path, file_path)
-                        hass.http.app.router.register_resource(resource)
-                        _LOGGER.info(f"Successfully registered static path via fallback: {url_path}")
-                    except Exception as fallback_error:
-                        _LOGGER.error(f"Fallback registration failed: {fallback_error}")
+                    # Check if route already exists to prevent conflict
+                    existing_routes = [str(route.resource) for route in hass.http.app.router.routes()]
+                    if url_path not in existing_routes:
+                        await hass.http.async_register_static_paths([static_config])
+                        _LOGGER.info(f"Successfully registered static path: {url_path}")
+                    else:
+                        _LOGGER.info(f"Static path {url_path} already registered, skipping")
                         
+                except ImportError as e:
+                    _LOGGER.error(f"Could not import StaticPathConfig: {e}")
+                    # Fallback: register manually without StaticPathConfig
+                    from aiohttp.web import FileResponse
+                    from aiohttp import web
+                    
+                    async def serve_static_file(request):
+                        """Serve static files from www directory."""
+                        filename = request.match_info.get('filename', 'index.html')
+                        filepath = os.path.join(file_path, filename)
+                        if os.path.exists(filepath) and os.path.isfile(filepath):
+                            return FileResponse(filepath)
+                        return web.Response(status=404)
+                    
+                    # Add a simple route for static files
+                    hass.http.app.router.add_get(f"{url_path}/{{filename:.*}}", serve_static_file)
+                    _LOGGER.info(f"Successfully registered static route fallback: {url_path}")
+                    
                 except Exception as e:
-                    _LOGGER.error(f"Unexpected error registering static path: {e}")
+                    _LOGGER.error(f"Failed to register static path: {e}")
+                    _LOGGER.debug("Static files will not be available, but emoji system will still work")
+                
+                hass.data[DOMAIN]["static_path_registered"] = True
+            else:
+                _LOGGER.warning("HTTP component not available yet")
+                
+        except Exception as e:
+            _LOGGER.error(f"Unexpected error in static path registration: {e}")
+            # Don't fail the integration setup
+            hass.data[DOMAIN]["static_path_registered"] = True
                 
                 hass.data[DOMAIN]["static_path_registered"] = True
             else:
