@@ -1,0 +1,8 @@
+# Minimal configuration for testing
+default_config:
+
+# Enable logging for debugging
+logger:
+  default: info
+  logs:
+    custom_components.anniversaries: debug

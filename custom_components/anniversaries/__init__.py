@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -79,20 +80,45 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Register update listener
     entry.async_on_unload(entry.add_update_listener(update_listener))
     
-    # Register static path for cards (only once)
+    # Register static path for cards (only once) - moved to end to ensure HTTP component is ready
     if "static_path_registered" not in hass.data[DOMAIN]:
         try:
-            # Register the www directory to be accessible via /local/community/anniversaries/
-            # Use the correct method for Home Assistant's HTTP component
-            hass.http.register_static_path(
-                f"/local/community/{DOMAIN}",
-                hass.config.path(f"custom_components/{DOMAIN}/www"),
-                True  # cache_headers
-            )
-            hass.data[DOMAIN]["static_path_registered"] = True
-            _LOGGER.info(f"Registered static path: /local/community/{DOMAIN}/")
+            # Wait for HTTP component to be fully ready
+            if hasattr(hass, 'http') and hass.http is not None:
+                # Register the www directory to be accessible via /local/community/anniversaries/
+                url_path = f"/local/community/{DOMAIN}"
+                file_path = hass.config.path(f"custom_components/{DOMAIN}/www")
+                
+                _LOGGER.debug(f"Attempting to register static path: {url_path} -> {file_path}")
+                _LOGGER.debug(f"Path exists: {os.path.exists(file_path)}")
+                _LOGGER.debug(f"HTTP component type: {type(hass.http)}")
+                _LOGGER.debug(f"HTTP component attributes: {[attr for attr in dir(hass.http) if not attr.startswith('_')]}")
+                
+                # Try different registration methods based on Home Assistant version
+                if hasattr(hass.http, 'register_static_path'):
+                    # Modern Home Assistant API
+                    hass.http.register_static_path(url_path, file_path, True)
+                    _LOGGER.info(f"Successfully registered static path (modern API): {url_path}")
+                elif hasattr(hass.http, 'add_route') and hasattr(hass.http, 'StaticFileHandler'):
+                    # Alternative API approach
+                    from aiohttp.web import StaticResource
+                    resource = StaticResource(url_path, file_path)
+                    hass.http.app.router.register_resource(resource)
+                    _LOGGER.info(f"Successfully registered static path (alternative API): {url_path}")
+                else:
+                    _LOGGER.warning(f"No suitable static path registration method found. Available methods: {[attr for attr in dir(hass.http) if 'static' in attr.lower() or 'route' in attr.lower()]}")
+                
+                hass.data[DOMAIN]["static_path_registered"] = True
+            else:
+                _LOGGER.warning("HTTP component not available or not initialized yet")
+                
         except Exception as e:
-            _LOGGER.warning(f"Failed to register static path for cards: {e}")
+            _LOGGER.error(f"Failed to register static path for cards: {e}")
+            _LOGGER.error(f"Exception type: {type(e)}")
+            import traceback
+            _LOGGER.error(f"Traceback: {traceback.format_exc()}")
+            # Don't fail the entire integration if static path registration fails
+            _LOGGER.info("Continuing integration setup without static path registration")
 
     return True
 
