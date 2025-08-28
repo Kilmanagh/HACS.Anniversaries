@@ -370,18 +370,18 @@ class AnniversaryTimelineCard extends HTMLElement {
   }
 
   getColorForDays(days, category = null) {
-    if (!this.config.color_coding) return '#1976d2';
+    if (!this.config.color_coding) return '#FF9800';
     
     // Use category-aware colors if category provided and color scheme enabled
     if (category && this.config.category_color_scheme) {
       return this.getCategoryThemeColors(category, days);
     }
     
-    // Default color scheme (better readability with darker backgrounds)
-    if (days === 0) return '#B71C1C';      // Dark red - today
-    if (days <= 7) return '#E65100';       // Dark orange - this week  
-    if (days <= 30) return '#F57C00';      // Dark amber - this month
-    return '#2E7D32';                      // Dark green - future
+    // Universal time-based color scheme: Red (urgent) → Orange (soon) → Green (safe) → Blue (distant)
+    if (days === 0) return '#F44336';      // Red - today (urgent!)
+    if (days <= 7) return '#FF9800';       // Orange - this week (attention needed)
+    if (days <= 30) return '#4CAF50';      // Green - this month (comfortable distance)
+    return '#2196F3';                      // Blue - future (distant, calm)
   }
 
   render() {

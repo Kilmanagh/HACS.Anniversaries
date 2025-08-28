@@ -190,12 +190,13 @@ class BirthdayTimelineCard extends HTMLElement {
   }
 
   getColorForDays(days) {
-    if (!this.config.color_coding) return '#FF69B4';
+    if (!this.config.color_coding) return '#FF9800';
     
-    if (days === 0) return '#FF1493';      // Deep pink - today
-    if (days <= 7) return '#FF69B4';       // Hot pink - this week  
-    if (days <= 30) return '#FFA500';      // Orange - this month
-    return '#90EE90';                      // Light green - future
+    // Universal time-based color scheme: Red (urgent) → Orange (soon) → Green (safe) → Blue (distant)
+    if (days === 0) return '#F44336';      // Red - today (urgent!)
+    if (days <= 7) return '#FF9800';       // Orange - this week (attention needed)
+    if (days <= 30) return '#4CAF50';      // Green - this month (comfortable distance)
+    return '#2196F3';                      // Blue - future (distant, calm)
   }
 
   render() {

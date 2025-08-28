@@ -189,11 +189,11 @@ class HolidayTimelineCard extends HTMLElement {
   getColorForDays(days) {
     if (!this.config.color_coding) return '#FF9800';
     
-    // Holiday theme colors (festive orange/red scheme)
-    if (days === 0) return '#FF5722';      // Deep orange-red - today
-    if (days <= 7) return '#FF9800';       // Orange - this week  
-    if (days <= 30) return '#FFB74D';      // Light orange - this month
-    return '#FFCC02';                      // Gold - future
+    // Universal time-based color scheme: Red (urgent) → Yellow (soon) → Green (safe) → Blue (distant)
+    if (days === 0) return '#F44336';      // Red - today (urgent!)
+    if (days <= 7) return '#FF9800';       // Orange - this week (attention needed)
+    if (days <= 30) return '#4CAF50';      // Green - this month (comfortable distance)
+    return '#2196F3';                      // Blue - future (distant, calm)
   }
 
   render() {
@@ -317,7 +317,9 @@ class HolidayTimelineCard extends HTMLElement {
   renderTimelineItem(entity) {
     const days = parseInt(entity.state);
     const attrs = entity.attributes;
-    const icon = this.config.show_icons ? (entity.attributes.custom_emoji || '🎉') : '';
+    
+    // Get emoji: use custom_emoji if available, otherwise use default holiday emoji
+    const icon = this.config.show_icons ? this.getDisplayEmoji(attrs) : '';
     const color = this.getColorForDays(days);
     
     return `
@@ -340,6 +342,18 @@ class HolidayTimelineCard extends HTMLElement {
         </div>
       </div>
     `;
+  }
+
+  getDisplayEmoji(attrs) {
+    // Priority: custom_emoji > category-specific default > generic holiday default
+    if (attrs.custom_emoji) {
+      console.log(`🎉 [Holiday Card] Using custom emoji: ${attrs.custom_emoji} for ${attrs.friendly_name}`);
+      return attrs.custom_emoji;
+    }
+    
+    // Fallback to holiday default
+    console.log(`🎉 [Holiday Card] Using default holiday emoji: 🎉 for ${attrs.friendly_name}`);
+    return '🎉';
   }
 
   renderAttributes(attrs) {

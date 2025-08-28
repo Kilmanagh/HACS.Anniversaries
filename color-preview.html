@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Holiday Timeline Card Color Preview</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .scheme { margin: 20px 0; padding: 15px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .color-row { display: flex; gap: 10px; margin: 10px 0; align-items: center; }
+        .color-box { 
+            width: 80px; 
+            height: 40px; 
+            border-radius: 8px; 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-weight: bold; 
+            font-size: 12px;
+        }
+        .label { width: 120px; font-weight: bold; }
+        h2 { color: #333; border-bottom: 2px solid #ddd; padding-bottom: 5px; }
+        .current { border: 3px solid #333; }
+    </style>
+</head>
+<body>
+    <h1>Holiday Timeline Card Color Schemes</h1>
+
+    <div class="scheme">
+        <h2>Current Scheme (with new light green)</h2>
+        <div class="color-row">
+            <div class="label">Today (0 days):</div>
+            <div class="color-box current" style="background-color: #FF5722;">TODAY</div>
+            <span>#FF5722 - Deep orange-red</span>
+        </div>
+        <div class="color-row">
+            <div class="label">This week (1-7):</div>
+            <div class="color-box current" style="background-color: #FF9800;">5 days</div>
+            <span>#FF9800 - Orange</span>
+        </div>
+        <div class="color-row">
+            <div class="label">This month (8-30):</div>
+            <div class="color-box current" style="background-color: #FFB74D;">15 days</div>
+            <span>#FFB74D - Light orange</span>
+        </div>
+        <div class="color-row">
+            <div class="label">Future (31+):</div>
+            <div class="color-box current" style="background-color: #8BC34A;">45 days</div>
+            <span>#8BC34A - Light green (NEW!)</span>
+        </div>
+    </div>
+
+    <div class="scheme">
+        <h2>Option 1: Blue-Purple Calm Theme</h2>
+        <div class="color-row">
+            <div class="label">Today (0 days):</div>
+            <div class="color-box" style="background-color: #E91E63;">TODAY</div>
+            <span>#E91E63 - Pink</span>
+        </div>
+        <div class="color-row">
+            <div class="label">This week (1-7):</div>
+            <div class="color-box" style="background-color: #673AB7;">5 days</div>
+            <span>#673AB7 - Purple</span>
+        </div>
+        <div class="color-row">
+            <div class="label">This month (8-30):</div>
+            <div class="color-box" style="background-color: #3F51B5;">15 days</div>
+            <span>#3F51B5 - Indigo</span>
+        </div>
+        <div class="color-row">
+            <div class="label">Future (31+):</div>
+            <div class="color-box" style="background-color: #2196F3;">45 days</div>
+            <span>#2196F3 - Blue</span>
+        </div>
+    </div>
+
+    <div class="scheme">
+        <h2>Option 2: Forest Green Theme</h2>
+        <div class="color-row">
+            <div class="label">Today (0 days):</div>
+            <div class="color-box" style="background-color: #FF5722;">TODAY</div>
+            <span>#FF5722 - Orange-red (same)</span>
+        </div>
+        <div class="color-row">
+            <div class="label">This week (1-7):</div>
+            <div class="color-box" style="background-color: #FF9800;">5 days</div>
+            <span>#FF9800 - Orange (same)</span>
+        </div>
+        <div class="color-row">
+            <div class="label">This month (8-30):</div>
+            <div class="color-box" style="background-color: #4CAF50;">15 days</div>
+            <span>#4CAF50 - Green</span>
+        </div>
+        <div class="color-row">
+            <div class="label">Future (31+):</div>
+            <div class="color-box" style="background-color: #2E7D32;">45 days</div>
+            <span>#2E7D32 - Dark green</span>
+        </div>
+    </div>
+
+    <div class="scheme">
+        <h2>Option 3: Teal-Blue Gradient</h2>
+        <div class="color-row">
+            <div class="label">Today (0 days):</div>
+            <div class="color-box" style="background-color: #F44336;">TODAY</div>
+            <span>#F44336 - Red</span>
+        </div>
+        <div class="color-row">
+            <div class="label">This week (1-7):</div>
+            <div class="color-box" style="background-color: #FF9800;">5 days</div>
+            <span>#FF9800 - Orange</span>
+        </div>
+        <div class="color-row">
+            <div class="label">This month (8-30):</div>
+            <div class="color-box" style="background-color: #00BCD4;">15 days</div>
+            <span>#00BCD4 - Cyan</span>
+        </div>
+        <div class="color-row">
+            <div class="label">Future (31+):</div>
+            <div class="color-box" style="background-color: #607D8B;">45 days</div>
+            <span>#607D8B - Blue-gray</span>
+        </div>
+    </div>
+
+    <div class="scheme">
+        <h2>OLD: Original (ugly gold)</h2>
+        <div class="color-row">
+            <div class="label">Future (31+):</div>
+            <div class="color-box" style="background-color: #FFCC02;">45 days</div>
+            <span>#FFCC02 - Gold (the ugly one!)</span>
+        </div>
+    </div>
+
+</body>
+</html>
