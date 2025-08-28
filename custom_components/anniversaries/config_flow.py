@@ -166,7 +166,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 ): vol.In(CATEGORY_OPTIONS),
                 vol.Optional(
                     CONF_EMOJI,
-                    default=current_config.get(CONF_EMOJI, self.get_default_emoji_for_category(current_config.get(CONF_CATEGORY, DEFAULT_CATEGORY))),
+                    default=current_config.get(CONF_EMOJI, CATEGORY_EMOJIS.get(current_config.get(CONF_CATEGORY, DEFAULT_CATEGORY), DEFAULT_EMOJI)),
                 ): vol.In(EMOJI_OPTIONS),
                 vol.Optional(
                     CONF_ONE_TIME,
