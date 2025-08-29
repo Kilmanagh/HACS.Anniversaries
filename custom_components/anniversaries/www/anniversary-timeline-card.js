@@ -331,8 +331,8 @@ class AnniversaryTimelineCard extends HTMLElement {
     // Category-specific icons (matching const.py CATEGORY_EMOJIS)
     const categoryIcons = {
       'birthday': '🎂',
-      'anniversary': '�',
-      'memorial': '�',
+      'anniversary': '💕',
+      'memorial': '🌹',
       'holiday': '🎉',
       'work': '💼',
       'achievement': '🏆',
@@ -706,7 +706,7 @@ class AnniversaryTimelineCard extends HTMLElement {
         today: '#E91E63',
         week: '#F06292',
         month: '#F8BBD9',
-        future: '#FCE4EC'
+        future: '#90EE90'
       },
       'respectful': { // Memorial theme - gentle colors
         today: '#9C27B0',
@@ -718,25 +718,25 @@ class AnniversaryTimelineCard extends HTMLElement {
         today: '#FF5722',
         week: '#FF9800',
         month: '#FFB74D',
-        future: '#FFCC02'
+        future: '#90EE90'
       },
       'professional': { // Work theme
         today: '#1976D2',
         week: '#2196F3',
         month: '#42A5F5',
-        future: '#90CAF9'
+        future: '#90EE90'
       },
       'success': { // Achievement theme
         today: '#388E3C',
         week: '#4CAF50',
         month: '#66BB6A',
-        future: '#A5D6A7'
+        future: '#90EE90'
       },
       'neutral': { // Event/Other theme
-        today: '#455A64',
-        week: '#607D8B',
-        month: '#90A4AE',
-        future: '#B0BEC5'
+        today: '#FF1493',
+        week: '#FF69B4', 
+        month: '#FFA500',
+        future: '#90EE90'
       }
     };
 
