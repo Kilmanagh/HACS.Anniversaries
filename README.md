@@ -1,22 +1,12 @@
 # Anniversaries
 
-[![HACS](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/pinkywafer/Anniversaries)](https://github.com/pinkywafer/Anniversaries/releases)
-![GitHub Release Date](https://img.shields.io/github/release-date/pinkywafer/Anniversaries)
-[![GitHub](https://img.shields.io/github/license/pinkywafer/Anniversaries)](LICENSE)
 
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-Yes-brightgreen.svg)](https://github.com/pinkywafer/Anniversaries/graphs/commit-activity)
-[![GitHub issues](https://img.shields.io/github/issues/pinkywafer/Anniversaries)](https://github.com/pinkywafer/Anniversaries/issues)
-
-[![Buy me a coffee](https://img.shields.io/static/v1.svg?label=Buy%20me%20a%20coffee&logo=buy%20me%20a%20coffee&logoColor=white&labelColor=ff69b4&message=donate&color=Black)](https://www.buymeacoffee.com/V3q9id4)
-
-[![Support Pinkywafer on Patreon][patreon-shield]][patreon]
 
 The 'anniversaries' component is a Home Assistant custom sensor which counts down to a recurring date such as birthdays, but can be used for any anniversary which occurs annually on the same date.
 
 Any anniversaries entries configured will be added to the home assistant calendar. This also generates the `calendar.anniversaries` entity, which shows information about the next configured anniversary. _N.B. At the moment, only the next occurrence of the anniversaries are added to the calendar_
 
-[![Support Pinkywafer on Patreon][patreon-shield]][patreon]
+
 
 The 'anniversaries' component is a Home Assistant custom sensor which counts down to a recurring date such as birthdays, but can be used for any anniversary which occurs annually on the same date.
 
@@ -49,6 +39,19 @@ This integration includes **4 custom Lovelace cards** with rich emoji/icon suppo
 - ✅ **Half-anniversary support** for special dates
 - ✅ **One-time events** for non-recurring dates
 - ✅ **Multi-language support** with translations
+
+## 🚀 New Features & Improvements
+
+- Expanded emoji selection: Now includes family, generations, community, travel/adventure, accessibility, music, and more
+- Universal color scheme for timeline cards: Red (today) → Orange (this week) → Green (this month) → Blue (future)
+- Duplicate emojis removed for clarity and easier selection
+- Fixed corrupted emojis and improved category icons for all cards
+- Category icons now match the latest emoji assignments in const.py
+
+## 📝 Emoji Categories
+- Basic celebrations, Religious & Spiritual, Love & Relationships, Seasons, Travel & Vacations, Health & Medical, Work & Career, Home & Life, Animals & Pets, Hobbies & Interests, General & Time, Family & Generations, Community & Social, Travel & Adventure
+
+See the integration for the full emoji list and category details.
 
 ## 🆕 Latest Updates
 
@@ -107,7 +110,7 @@ This integration includes **4 custom Lovelace cards** with rich emoji/icon suppo
 ### MANUAL INSTALLATION
 
 1. Download the `anniversaries.zip` file from the
-   [latest release](https://github.com/pinkywafer/anniversaries/releases/latest).
+   [latest release](https://github.com/).
 2. Unpack the release and copy the `custom_components/anniversaries` directory
    into the `custom_components` directory of your Home Assistant
    installation.
@@ -182,6 +185,34 @@ Comprehensive overview including:
 - Next 3 upcoming anniversaries
 - Distribution charts (zodiac signs, generations)
 - Quick insights and trends
+
+### 🎉 Holiday Timeline Card
+
+The **Holiday Timeline Card** displays upcoming holidays in chronological order, with:
+- **Universal color scheme**: Red (today) → Orange (this week) → Green (this month) → Blue (future)
+- **Emoji support**: Choose from a comprehensive emoji list for each holiday (🎄🎃🦃🎉 etc.)
+- **Category filtering**: Only shows entities with the 'holiday' category
+- **Attribute badges**: Displays relevant attributes for each holiday
+- **Customizable display**: Title, max items, date format, icons, and more
+
+**Example configuration:**
+```yaml
+- type: custom:holiday-timeline-card
+  title: "🎉 Upcoming Holidays"
+  max_items: 5
+  date_format: long
+  show_day_of_week: true
+  show_icons: true
+  color_coding: true
+```
+
+**Features:**
+- Chronological list of holidays with days remaining
+- Color-coded urgency for each event
+- Rich emoji and icon support
+- Debug mode for troubleshooting entity filtering
+
+See the integration and card file for advanced options and details.
 
 **For detailed card configuration and examples, see [CARDS.md](CARDS.md)**
 
@@ -365,5 +396,3 @@ The integration automatically migrates existing entities to use the proper prefi
 - Check resource registration in Settings → Dashboards → Resources
 - Verify card types use `custom:` prefix (e.g., `custom:anniversary-timeline-card`)
 
-[patreon-shield]: https://c5.patreon.com/external/logo/become_a_patron_button.png
-[patreon]: https://www.patreon.com/pinkywafer

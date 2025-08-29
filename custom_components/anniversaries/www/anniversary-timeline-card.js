@@ -1,6 +1,9 @@
 /**
- * Anniversary Timeline Card v1.3.2
+ * Anniversary Timeline Card v1.3.3
  * Shows upcoming anniversaries in chronological order with all attributes
+ * Now uses universal color scheme (red → orange → green → blue) for urgency
+ * Emoji selection expanded and matches latest const.py
+ * Category icons fixed for corrupted emojis
  */
 
 class AnniversaryTimelineCard extends HTMLElement {
@@ -705,7 +708,7 @@ class AnniversaryTimelineCard extends HTMLElement {
       'romantic': { // Anniversary theme
         today: '#E91E63',
         week: '#F06292',
-        month: '#F8BBD9',
+        month: '#c086a3ff',
         future: '#90EE90'
       },
       'respectful': { // Memorial theme - gentle colors

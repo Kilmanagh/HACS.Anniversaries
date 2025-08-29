@@ -309,30 +309,53 @@ When you specify a category, the card automatically optimizes settings:
 ### 2. Anniversary Details Card (`anniversary-details-card`)
 Detailed view of a single anniversary with rich attributes and animations.
 
-**Configuration:**
+**Features:**
+- Focuses on a single anniversary entity
+- Shows all attributes (zodiac, birthstone, generation, milestones, etc.)
+- Optional animated backgrounds and compact mode
+- Customizable display: show/hide attributes, background, animation
+
+**Example Configuration:**
 ```yaml
 type: custom:anniversary-details-card
 entity: sensor.anniversary_birthday_mom
-show_attributes: true
-show_background: true
-show_animation: true
-compact_mode: false
+show_attributes: true         # Show all attributes (default: true)
+show_background: true         # Animated background (default: true)
+show_animation: true          # Enable card animation (default: true)
+compact_mode: false           # Compact layout (default: false)
+title: "Mom's Birthday"       # Optional custom title
 ```
+
+**Usage Notes:**
+- Set `entity` to the sensor you want details for (e.g., `sensor.anniversary_birthday_mom`)
+- Use `show_attributes`, `show_background`, and `show_animation` to customize the look
+- Compact mode is useful for dashboards with limited space
 
 ### 3. Anniversary Calendar Card (`anniversary-calendar-card`)
 Mini calendar view highlighting anniversary dates with popup details.
 
-**Configuration:**
+**Features:**
+- Mini calendar view with highlighted anniversary dates
+- Clickable dates show popup details for all anniversaries on that day
+- Navigation controls for browsing months
+- Supports filtering by entity or category
+
+**Example Configuration:**
 ```yaml
 type: custom:anniversary-calendar-card
 title: "Anniversary Calendar"
-show_navigation: true
-show_details_popup: true
-# Optional: specify specific entities
+months_to_show: 1                # Number of months to display (default: 1)
+show_navigation: true            # Show month navigation arrows (default: true)
+show_details_popup: true         # Enable popup details on date click (default: true)
 entities:
   - sensor.anniversary_birthday_mom
   - sensor.anniversary_wedding_anniversary
 ```
+
+**Usage Notes:**
+- By default, shows all anniversary sensors; use `entities` to limit to specific ones
+- Click on a highlighted date to see all anniversaries for that day
+- Use `months_to_show` to display more than one month at a time
 
 ### 4. Anniversary Stats Card (`anniversary-stats-card`)
 Summary statistics and overview of all anniversaries.
@@ -368,8 +391,8 @@ show_charts: true
 ### Color Coding
 - **Red**: Today (0 days)
 - **Orange**: This week (1-7 days)
-- **Yellow**: This month (8-30 days)
-- **Green**: Future (30+ days)
+- **Green**: This month (8-30 days)
+- **Blue**: Future (30+ days)
 
 ### Animations
 - Pulse animation for today's anniversaries
@@ -630,8 +653,8 @@ The v1.3.2 update fixed critical card registration issues. After updating:
 ### Version Information
 
 - **Timeline Card**: v1.3.2 (Config fixes, enhanced debugging)
-- **Details Card**: v1.0.0 (Stable)
-- **Calendar Card**: v1.0.0 (Stable)  
-- **Stats Card**: v1.0.0 (Stable)
+- **Details Card**: v1.3.2 (Stable)
+- **Calendar Card**: v1.3.2 (Stable)  
+- **Stats Card**: v1.3.2 (Stable)
 
 Check browser console for version messages when cards load.

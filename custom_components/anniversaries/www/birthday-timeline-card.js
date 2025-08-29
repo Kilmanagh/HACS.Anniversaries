@@ -1,6 +1,8 @@
 /**
- * Birthday Timeline Card v1.0.0
+ * Birthday Timeline Card v1.0.1
  * Shows upcoming birthdays only in chronological order
+ * Now uses universal color scheme (red → orange → green → blue) for urgency
+ * Emoji selection expanded and matches latest const.py
  */
 
 class BirthdayTimelineCard extends HTMLElement {

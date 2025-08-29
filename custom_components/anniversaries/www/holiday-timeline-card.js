@@ -1,6 +1,8 @@
 /**
- * Holiday Timeline Card v1.0.0
+ * Holiday Timeline Card v1.0.1
  * Shows upcoming holidays only in chronological order
+ * Now uses universal color scheme (red → orange → green → blue) for urgency
+ * Emoji selection expanded and matches latest const.py
  */
 
 class HolidayTimelineCard extends HTMLElement {
