@@ -66,7 +66,6 @@ class AnniversaryDetailsCard extends HTMLElement {
 
   render() {
     if (!this._hass) return;
-    
     const entity = this._hass.states[this.config.entity];
     if (!entity) {
       this.shadowRoot.innerHTML = `
@@ -76,12 +75,25 @@ class AnniversaryDetailsCard extends HTMLElement {
       `;
       return;
     }
-
     const days = parseInt(entity.state);
     const attrs = entity.attributes;
     const background = this.getBackgroundGradient(days);
     const isToday = days === 0;
     const isMilestone = attrs.is_milestone;
+    const category = attrs.category || 'other';
+
+    let attributesHtml = '';
+    if (this.config.show_attributes) {
+      if (category === 'birthday') {
+        attributesHtml = this.renderBirthdayAttributes(attrs);
+      } else if (category === 'anniversary') {
+        attributesHtml = this.renderAnniversaryAttributes(attrs);
+      } else if (category === 'holiday') {
+        attributesHtml = this.renderHolidayAttributes(attrs);
+      } else {
+        attributesHtml = this.renderDefaultAttributes(attrs);
+      }
+    }
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -184,32 +196,27 @@ class AnniversaryDetailsCard extends HTMLElement {
           font-size: 1.2em;
         }
       </style>
-      
       <div class="card ${this.config.compact_mode ? 'compact' : ''}">
         ${isToday ? '<div class="celebration-overlay"></div>' : ''}
-        
         <div class="card-header">
           <div class="entity-name">${attrs.friendly_name || entity.entity_id}</div>
         </div>
-        
         <div class="countdown-display">
           <div class="days-number">${days}</div>
           <div class="days-label">${days === 1 ? 'Day' : 'Days'} ${isToday ? 'TODAY! 🎉' : ''}</div>
         </div>
-        
         <div class="anniversary-date">
           📅 ${attrs.next_date}
           ${attrs.years_at_anniversary ? `<br>🎂 ${attrs.years_at_anniversary} years` : ''}
         </div>
-        
-        ${this.config.show_attributes ? this.renderAttributes(attrs) : ''}
+        ${attributesHtml}
       </div>
     `;
   }
 
-  renderAttributes(attrs) {
+  // Birthday template (original, untouched)
+  renderBirthdayAttributes(attrs) {
     const attributeItems = [];
-    
     if (attrs.zodiac_sign) {
       attributeItems.push({
         icon: this.getZodiacEmoji(attrs.zodiac_sign),
@@ -217,7 +224,6 @@ class AnniversaryDetailsCard extends HTMLElement {
         value: attrs.zodiac_sign
       });
     }
-    
     if (attrs.birthstone) {
       attributeItems.push({
         icon: this.getBirthstoneEmoji(attrs.birthstone),
@@ -225,7 +231,6 @@ class AnniversaryDetailsCard extends HTMLElement {
         value: attrs.birthstone
       });
     }
-    
     if (attrs.birth_flower) {
       attributeItems.push({
         icon: '🌸',
@@ -233,7 +238,6 @@ class AnniversaryDetailsCard extends HTMLElement {
         value: attrs.birth_flower
       });
     }
-    
     if (attrs.generation) {
       attributeItems.push({
         icon: '👥',
@@ -241,7 +245,6 @@ class AnniversaryDetailsCard extends HTMLElement {
         value: attrs.generation
       });
     }
-    
     if (attrs.named_anniversary) {
       attributeItems.push({
         icon: '💫',
@@ -249,7 +252,6 @@ class AnniversaryDetailsCard extends HTMLElement {
         value: attrs.named_anniversary
       });
     }
-    
     if (attrs.current_years !== undefined) {
       attributeItems.push({
         icon: '📊',
@@ -257,7 +259,6 @@ class AnniversaryDetailsCard extends HTMLElement {
         value: `${attrs.current_years} years`
       });
     }
-    
     if (attrs.weeks_remaining !== undefined) {
       attributeItems.push({
         icon: '📆',
@@ -265,9 +266,121 @@ class AnniversaryDetailsCard extends HTMLElement {
         value: attrs.weeks_remaining
       });
     }
-
     if (attributeItems.length === 0) return '';
+    return `
+      <div class="attributes-grid">
+        ${attributeItems.map(item => `
+          <div class="attribute-item">
+            <div class="attribute-icon">${item.icon}</div>
+            <div class="attribute-label">${item.label}</div>
+            <div class="attribute-value">${item.value}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
 
+  // Anniversary template (no zodiac, birthstone, etc.; show named anniversary, suggested gifts)
+  renderAnniversaryAttributes(attrs) {
+    const attributeItems = [];
+    if (attrs.named_anniversary) {
+      attributeItems.push({
+        icon: '💫',
+        label: 'Named Anniversary',
+        value: attrs.named_anniversary
+      });
+    }
+    if (attrs.suggested_gift) {
+      attributeItems.push({
+        icon: '🎁',
+        label: 'Suggested Gift',
+        value: attrs.suggested_gift
+      });
+    }
+    if (attrs.current_years !== undefined) {
+      attributeItems.push({
+        icon: '📅',
+        label: 'Years Together',
+        value: `${attrs.current_years} years`
+      });
+    }
+    if (attrs.milestone) {
+      attributeItems.push({
+        icon: '🏆',
+        label: 'Milestone',
+        value: attrs.milestone
+      });
+    }
+    if (attributeItems.length === 0) return '';
+    return `
+      <div class="attributes-grid">
+        ${attributeItems.map(item => `
+          <div class="attribute-item">
+            <div class="attribute-icon">${item.icon}</div>
+            <div class="attribute-label">${item.label}</div>
+            <div class="attribute-value">${item.value}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  // Holiday template (no years old, gemstones, generation, etc.)
+  renderHolidayAttributes(attrs) {
+    const attributeItems = [];
+    if (attrs.holiday_type) {
+      attributeItems.push({
+        icon: '🎉',
+        label: 'Holiday Type',
+        value: attrs.holiday_type
+      });
+    }
+    if (attrs.region) {
+      attributeItems.push({
+        icon: '🌍',
+        label: 'Region',
+        value: attrs.region
+      });
+    }
+    if (attrs.notes) {
+      attributeItems.push({
+        icon: '📝',
+        label: 'Notes',
+        value: attrs.notes
+      });
+    }
+    if (attributeItems.length === 0) return '';
+    return `
+      <div class="attributes-grid">
+        ${attributeItems.map(item => `
+          <div class="attribute-item">
+            <div class="attribute-icon">${item.icon}</div>
+            <div class="attribute-label">${item.label}</div>
+            <div class="attribute-value">${item.value}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  // Default template for other categories
+  renderDefaultAttributes(attrs) {
+    const attributeItems = [];
+    if (attrs.named_anniversary) {
+      attributeItems.push({
+        icon: '💫',
+        label: 'Anniversary',
+        value: attrs.named_anniversary
+      });
+    }
+    if (attrs.current_years !== undefined) {
+      attributeItems.push({
+        icon: '📊',
+        label: 'Years',
+        value: `${attrs.current_years} years`
+      });
+    }
+    if (attributeItems.length === 0) return '';
     return `
       <div class="attributes-grid">
         ${attributeItems.map(item => `
