@@ -213,7 +213,7 @@ class HolidayTimelineCard extends HTMLElement {
           margin: 4px;
         }
         .card-header {
-          font-size: 1.2em;
+          font-size: 1.5em;
           font-weight: bold;
           margin-bottom: 16px;
           color: var(--primary-text-color);
